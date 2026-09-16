@@ -1,75 +1,22 @@
-# React + TypeScript + Vite
+## 커밋 컨벤션
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+커밋 메시지는 `[Type] 작성 내용` 형식으로 통일합니다.
 
-Currently, two official plugins are available:
+| Type | 설명 |
+|------|------|
+| `[Feat]` | 새로운 기능 구현 |
+| `[Add]` | 부수적인 코드 추가, 라이브러리 추가, 새로운 파일 생성 |
+| `[Mod]` | 코드 수정 및 내부 파일 수정 |
+| `[Fix]` | 버그 및 오류 해결 |
+| `[Refactor]` | 코드 리팩터링 (전면 수정) |
+| `[Chore]` | 버전 코드 수정, 패키지 구조 변경, 타입/변수명 변경 등 사소한 변경 |
+| `[Rename]` | 파일명 또는 폴더명 수정 |
+| `[Del]` | 쓸모없는 코드나 파일 삭제 |
+| `[Docs]` | 문서화 작업 |
+| `[Environment]` | 개발 환경 세팅 |
+| `[!HOTFIX]` | 급하게 고쳐야 하는 치명적 버그 수정 |
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## React Compiler
+## PR 제목
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
-
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
+`[Type] 작업 내용` 형식으로 작성합니다 (커밋 컨벤션과 동일).
