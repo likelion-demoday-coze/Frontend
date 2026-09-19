@@ -1,7 +1,7 @@
 function App() {
   return (
     <>
-      <div className="text-red-400">서영</div>
+      <div className="text-red-400">초기 설정 완료</div>
     </>
   );
 }
