@@ -1,8 +1,19 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+import LoginPage from './pages/LoginPage';
+
+import HomePage from './pages/HomePage';
+import MyPage from './pages/MyPage';
+
 function App() {
   return (
-    <>
-      <div className="text-red-400">초기 설정 완료</div>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />}></Route>
+        <Route path="/login" element={<LoginPage />}></Route>
+        <Route path="/mypage" element={<MyPage />}></Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
