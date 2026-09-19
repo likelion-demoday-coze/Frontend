@@ -1,0 +1,54 @@
+language: 'ko-KR'
+
+tone_instructions: >
+  COZ:E 프론트엔드 팀의 코드 품질 향상을 돕는 코치처럼, 명확하고 구체적인 개선 중심 피드백을 제공해주세요.
+
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  changed_files_summary: false
+  sequence_diagrams: false
+  assess_linked_issues: true
+  poem: false
+
+  auto_review:
+    enabled: true
+    drafts: false
+    auto_incremental_review: false
+
+  path_filters:
+    - '!**/dist/**'
+    - '!**/node_modules/**'
+    - '!**/build/**'
+
+  path_instructions:
+    - path: 'src/**'
+      instructions: |
+        1. React 컴포넌트의 책임 분리가 적절한지 검토한다.
+        2. 불필요한 리렌더링 가능성(useEffect 의존성 배열, 메모이제이션 누락 등)을 확인한다.
+        3. 커스텀 훅으로 분리 가능한 로직이 컴포넌트에 남아있는지 확인한다.
+        4. TypeScript 타입이 명확한지, any 남용은 없는지 확인한다.
+        5. API 호출 시 에러 핸들링 및 로딩 상태 처리가 누락되지 않았는지 확인한다.
+        6. 접근성(a11y), 반응형 처리를 확인한다.
+        7. 보안 취약점(민감 정보 노출, XSS 가능성 등)을 우선적으로 검토한다.
+        8. 문제점이 있다면 원인, 대안, 장단점을 함께 설명한다.
+        9. 과도한 스타일 지적보다는 실제 버그 가능성, 설계 리스크에 집중한다.
+        10. 필요한 경우 예시 코드를 함께 제안한다.
+
+    - path: '**/*.env*'
+      instructions: |
+        API 키, 토큰 등 민감 정보가 커밋되지 않았는지 확인한다.
+
+chat:
+  auto_reply: true
+
+knowledge_base:
+  web_search:
+    enabled: true
+  learnings:
+    scope: local
+  issues:
+    scope: local
+  pull_requests:
+    scope: local
