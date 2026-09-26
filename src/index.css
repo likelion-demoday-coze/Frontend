@@ -6,6 +6,11 @@
     'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont,
     system-ui, sans-serif;
 
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-transparent: transparent;
+
   /* Gray */
   --color-gray-05: #f7f7f8;
   --color-gray-10: #e6e8ea;
