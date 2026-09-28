@@ -1,103 +1,68 @@
+//공통 통신 설정
 import axios from 'axios';
-import useAuthstore from '../stores/useAuthStore';
 
 const baseURL = import.meta.env.VITE_API_URL;
 
-const api = axios.create({ baseURL });
+const api = axios.create({ baseURL, withCredentials: true });
 
-//요청 인터셉터 -> accessToken을 자동으로 붙여줌
+//CSRF 토큰 캐싱용 -> 최초 진입/로그인 직후 한 번 받아서 보관, 이후 요청마다 재사용
+let csrfToken: string | null = null;
+let csrfHeaderName: string | null = null;
 
+//토큰 조회 함수 -> 앱 최초 진입/로그인 성공/세선 만료 후 재로그인시
+export async function fetchCsrfToken() {
+  const { data } = await axios.get(`${baseURL}/api/v1/auth/csrf`, {
+    withCredentials: true,
+  });
+  csrfToken = data.result.token;
+  csrfHeaderName = data.result.headerName;
+}
+
+// axiosInstance.ts에 추가
+export function hasCsrfToken() {
+  return !!csrfToken && !!csrfHeaderName;
+}
+
+//CSRF 토큰 초기화 함수
+export function clearCsrfToken() {
+  csrfToken = null;
+  csrfHeaderName = null;
+}
+
+//요청 인터셉터
 api.interceptors.request.use(
   (config) => {
-    let token = useAuthstore.getState().accessToken;
+    const safeMethods = ['get', 'head', 'options'];
+    const method = config.method?.toLowerCase();
 
-    //쥬스탠드에 토큰이 없다면 로컬에서 가져오는 코드
-    if (!token) {
-      try {
-        const raw = localStorage.getItem('auth-storage');
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          token = parsed?.state?.accessToken ?? null;
-        }
-      } catch {
-        //실패시 그냥 토근 없는 채로 진행
-      }
+    //안전한 메서드가 아니고,  토큰과 헤더 이름이 모두 준비되어있을떄
+    if (
+      method &&
+      !safeMethods.includes(method) &&
+      csrfHeaderName &&
+      csrfToken
+    ) {
+      //토큰을 헤더에 붙임
+      config.headers[csrfHeaderName] = csrfToken;
     }
-    //있으면 토큰을 헤더에 추가함
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    } else {
-      delete config.headers.Authorization;
-    }
+
+    //요청 계속 진행
     return config;
   },
   (error) => {
-    //에러를 호출한 곳에 보내줌 -> 나중에 에러메시지 처리
+    //에러를 호출한 곳으로 전송
     return Promise.reject(error);
   }
 );
 
-//응답 인터셉터 -> 401(토큰 만료) 시에만 자동 재요청, 나머지는 상태코드 별로 로그 처리
+//응답 인터셉터
 api.interceptors.response.use(
-  //성공시 응답만 반환
   (response) => response,
-
   async (error) => {
-    //리프레쉬 토큰이 아직 없기 때문에 사용 x -> 추후 주석해제
-    /*
-    const originalRequest = error.config;
-
-    //401에러이고, 재시도를 한 번 했다면 -> 토큰 만료
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      try {
-        const refreshToken = useAuthstore.getState().refreshToken;
-
-        if (!refreshToken) {
-          throw new Error('리프레쉬 토큰이 없습니다.');
-        }
-
-        const refreshResponse = await axios.post(
-          `${baseURL}/api/v1/auth/refresh`,
-          { refreshToken }
-        );
-
-        const newAccessToken = refreshResponse.data.result?.accessToken;
-
-        if (newAccessToken) {
-          useAuthstore.setState({ accessToken: newAccessToken });
-
-          //리프레쉬 토큰도 교체
-          const newRefreshToken = refreshResponse.data.result?.refreshToken;
-
-          if (newRefreshToken) {
-            useAuthstore.setState({ refreshToken: newRefreshToken });
-          }
-
-          //실패했던 원래 요청 헤더 토크 ㄴ교체
-          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-
-          return api(originalRequest);
-        }
-      } catch (refreshError) {
-        //리프레쉬 토큰도 만료되면 -> 강제 로그아웃
-        console.error('토큰 재발급 실패, 로그아웃');
-        useAuthstore.getState().clearAuth();
-
-        try {
-          localStorage.clear();
-          sessionStorage.clear();
-        } catch {}
-
-        window.location.href = '/login';
-        return Promise.reject(refreshError);
-      }
-    }*/
-
     //임시 401에러 처리
     if (error.response?.status === 401) {
-      console.warn('인증 만료 (401) - refresh API 미구현 상태');
+      console.warn('인증 만료 (401) - 재로그인 필요');
+      clearCsrfToken();
     }
     //이외 에러 처리
     if (error.response) {

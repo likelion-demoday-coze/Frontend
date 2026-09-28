@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signup, checkNickname } from '../../api/auth';
-import { fetchCsrfToken } from '../../api/axiosInstancetest';
+import { fetchCsrfToken, hasCsrfToken } from '../../api/axiosInstance';
 
 const SignupPage = () => {
   const [nickname, setNickname] = useState('');
@@ -42,6 +42,7 @@ const SignupPage = () => {
       setMessage('확인 중 오류 발생');
     }
   };
+
   const handleSignup = async () => {
     if (!nickname.trim()) {
       alert('닉네임을 입력해주세요.');
@@ -53,6 +54,10 @@ const SignupPage = () => {
     }
     try {
       setIsLoading(true);
+      //토큰이 없으면 받은 후 가입요청
+      if (!hasCsrfToken()) {
+        await fetchCsrfToken();
+      }
       await signup({ nickname: nickname.trim() });
       navigate('/');
     } catch (error) {
