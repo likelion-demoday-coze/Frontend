@@ -57,7 +57,7 @@ const SignupPage = () => {
       navigate('/');
     } catch (error) {
       console.error('회원가입 실패', error);
-      alert('회원가입에 실패하였습니다');
+      alert('회원가입에 실패하였습니다.');
     } finally {
       setIsLoading(false);
     }

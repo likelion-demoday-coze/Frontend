@@ -31,7 +31,7 @@ export interface NicknameRequest {
 }
 
 export interface NicknameResult {
-  availiable: boolean;
+  available: boolean;
 }
 //카카오 로그인 -> 브라우저 직접 이동
 export const startKaKaoLogin = () => {
@@ -48,7 +48,7 @@ export const signup = async (payload: SignupRequest) => {
 };
 
 //닉네임 사용 가능 여부 확인
-export const nicknamep_availability = async (payload: NicknameRequest) => {
+export const checkNickname = async (payload: NicknameRequest) => {
   const { data } = await api.post<ApiResponse<NicknameResult>>(
     '/api/v1/members/nickname-availability',
     payload
