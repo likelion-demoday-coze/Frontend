@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signup, checkNickname } from '../../api/auth';
-import { fetchCsrfToken } from '../../api/axiosInstancee';
+import { fetchCsrfToken } from '../../api/axiosInstancetest';
 
 const SignupPage = () => {
   const [nickname, setNickname] = useState('');
