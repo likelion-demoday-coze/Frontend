@@ -32,6 +32,13 @@ export interface NicknameRequest {
 export interface NicknameResult {
   available: boolean;
 }
+
+//내 정보 조회
+export interface getMeResult {
+  memberId: number;
+  nickname: string;
+}
+
 //카카오 로그인 -> 브라우저 직접 이동
 export const startKaKaoLogin = () => {
   window.location.href = `${baseURL}/api/v1/auth/oauth2/authorization/kakao`;
@@ -52,6 +59,13 @@ export const checkNickname = async (payload: NicknameRequest) => {
     '/api/v1/members/nickname-availability',
     { params: payload }
   );
+  return data.result;
+};
+
+//내 정보 조회
+export const getMe = async () => {
+  const { data } =
+    await api.get<ApiResponse<getMeResult>>('/api/v1/members/me');
   return data.result;
 };
 

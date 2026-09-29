@@ -1,4 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { getMe } from './api/auth';
+import useAuthstore from './stores/useAuthStore';
+import { fetchCsrfToken } from './api/axiosInstance';
 
 import ProtectedRoute from './components/guards/ProtectedRoute';
 
@@ -9,6 +13,20 @@ import HomePage from './pages/HomePage';
 import MyPage from './pages/MyPage';
 
 function App() {
+  useEffect(() => {
+    const init = async () => {
+      try {
+        await fetchCsrfToken();
+        const me = await getMe();
+        useAuthstore.getState().setMember(me);
+      } catch {
+        useAuthstore.getState().clearAuth();
+      } finally {
+        useAuthstore.getState().setInitialized();
+      }
+    };
+    init();
+  }, []);
   return (
     <BrowserRouter>
       <Routes>
