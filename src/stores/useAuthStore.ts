@@ -1,26 +1,26 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
-interface AuthState {
-  accessToken: string | null;
-  refreshToken: string | null;
-
-  setAuth: (accessToken: string, refreshToken: string) => void;
-  clearAuth: () => void;
+interface Member {
+  memberId: number;
+  nickname: string;
 }
 
-const useAuthstore = create<AuthState>()(
-  persist(
-    (set) => ({
-      accessToken: null,
-      refreshToken: null,
+interface AuthState {
+  member: Member | null;
+  isInitialized: boolean;
 
-      setAuth: (accessToken, refreshToken) =>
-        set({ accessToken, refreshToken }),
-      clearAuth: () => set({ accessToken: null, refreshToken: null }),
-    }),
-    { name: 'auth-storage' }
-  )
-);
+  setMember: (member: Member) => void;
+  clearAuth: () => void;
+  setInitialized: () => void;
+}
+
+const useAuthstore = create<AuthState>()((set) => ({
+  member: null,
+  isInitialized: true, // 임시: getMe 붙이기 전까지 /mypage는 항상 /login으로 리다이렉트됨
+
+  setMember: (member) => set({ member }),
+  clearAuth: () => set({ member: null }),
+  setInitialized: () => set({ isInitialized: true }),
+}));
 
 export default useAuthstore;
