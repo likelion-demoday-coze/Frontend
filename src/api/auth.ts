@@ -48,9 +48,9 @@ export const signup = async (payload: SignupRequest) => {
 
 //닉네임 사용 가능 여부 확인
 export const checkNickname = async (payload: NicknameRequest) => {
-  const { data } = await api.post<ApiResponse<NicknameResult>>(
+  const { data } = await api.get<ApiResponse<NicknameResult>>(
     '/api/v1/members/nickname-availability',
-    payload
+    { params: payload }
   );
   return data.result;
 };
