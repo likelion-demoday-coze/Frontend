@@ -12,9 +12,8 @@ export interface ApiResponse<T> {
 
 //내 정보 조회
 export interface CsrfResult {
-  paramterName: string;
+  headerName: string; //이게 뭐지
   token: string;
-  haderName: string; //이게 뭐지
 }
 
 export interface SignupRequest {

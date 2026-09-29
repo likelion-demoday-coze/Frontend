@@ -1,4 +1,4 @@
-import axios from 'axios';
+/*import axios from 'axios';
 import useAuthstore from '../stores/useAuthStore';
 
 const baseURL = import.meta.env.VITE_API_URL;
@@ -93,8 +93,7 @@ api.interceptors.response.use(
         window.location.href = '/login';
         return Promise.reject(refreshError);
       }
-    }*/
-
+    }
     //임시 401에러 처리
     if (error.response?.status === 401) {
       console.warn('인증 만료 (401) - refresh API 미구현 상태');
@@ -136,3 +135,4 @@ api.interceptors.response.use(
 );
 
 export default api;
+*/
