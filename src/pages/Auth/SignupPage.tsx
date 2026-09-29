@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signup, checkNickname } from '../../api/auth';
 import { fetchCsrfToken, hasCsrfToken } from '../../api/axiosInstance';
+import useAuthstore from '../../stores/useAuthStore';
 
 const SignupPage = () => {
   const [nickname, setNickname] = useState('');
@@ -58,7 +59,8 @@ const SignupPage = () => {
       if (!hasCsrfToken()) {
         await fetchCsrfToken();
       }
-      await signup({ nickname: nickname.trim() });
+      const result = await signup({ nickname: nickname.trim() });
+      useAuthstore.getState().setMember(result);
       navigate('/');
     } catch (error) {
       console.error('회원가입 실패', error);

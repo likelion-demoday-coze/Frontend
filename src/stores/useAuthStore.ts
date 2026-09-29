@@ -16,7 +16,7 @@ interface AuthState {
 
 const useAuthstore = create<AuthState>()((set) => ({
   member: null,
-  isInitialized: true, // 임시: getMe 붙이기 전까지 /mypage는 항상 /login으로 리다이렉트됨
+  isInitialized: false,
 
   setMember: (member) => set({ member }),
   clearAuth: () => set({ member: null }),
