@@ -1,4 +1,12 @@
+import { Outlet } from 'react-router-dom';
+import LeftNavbar from './LeftNavbar';
+
 const Layout = () => {
-  return <div>레이아웃 </div>;
+  return (
+    <div className="flex">
+      <LeftNavbar />
+      <Outlet />
+    </div>
+  );
 };
 export default Layout;
