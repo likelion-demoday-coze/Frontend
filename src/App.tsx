@@ -12,6 +12,8 @@ import SignupPage from './pages/Auth/SignupPage';
 import HomePage from './pages/HomePage';
 import MyPage from './pages/MyPage';
 
+import Layout from './components/layouts/Layout';
+
 function App() {
   //새로고침 시 로그인 상태인지 서버에 물어보고, 내정보 저장
   useEffect(() => {
@@ -36,8 +38,11 @@ function App() {
         <Route path="/signup" element={<SignupPage />}></Route>
         {/*로그인 안하면 로그인 페이지로 쫓겨나는 가드*/}
         <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<HomePage />}></Route>
-          <Route path="/mypage" element={<MyPage />}></Route>
+          <Route element={<Layout />}>
+            <Route path="/" element={<HomePage />}></Route>
+
+            <Route path="/mypage" element={<MyPage />}></Route>
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>

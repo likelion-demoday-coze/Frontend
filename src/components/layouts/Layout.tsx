@@ -3,9 +3,11 @@ import LeftNavbar from './LeftNavbar';
 
 const Layout = () => {
   return (
-    <div className="flex">
+    <div className="flex min-h-screen">
       <LeftNavbar />
-      <Outlet />
+      <main className="flex-1">
+        <Outlet />
+      </main>
     </div>
   );
 };
