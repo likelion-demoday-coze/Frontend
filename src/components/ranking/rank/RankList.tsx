@@ -7,7 +7,7 @@ interface RankListProps {
 }
 
 const RankList = ({ me, items }: RankListProps) => (
-  <ul className="flex flex-col gap-1">
+  <ul className="flex flex-col ">
     {me && <RankRow {...me} isMe />}
     {items.map((item) => (
       <RankRow key={item.rank} {...item} />

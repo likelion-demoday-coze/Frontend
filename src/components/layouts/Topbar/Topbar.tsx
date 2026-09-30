@@ -9,7 +9,7 @@ interface TopBarProps {
 
 const TopBar = ({ streakDays, passOrCash }: TopBarProps) => {
   return (
-    <header className="flex justify-end gap-4 px-8 py-4">
+    <header className="flex gap-4">
       <StatItem
         icon={<div className="h-8 w-8 rounded bg-gray-20" />}
         label={`${streakDays}일`}

@@ -13,11 +13,10 @@ const RankNumber = ({
 }: Pick<RankRowProps, 'rank' | 'isMe' | 'change'>) => {
   if (isMe) {
     return (
-      <span className="text-blue-60">
+      <span className="flex items-center gap-4.5 text-blue-60">
         {rank}
         {!!change && (
-          //변동사항이 있다면 -> 절댓값사용
-          <span className="text-xs text-gray-80">
+          <span className="text-xs">
             {change > 0 ? '▲' : '▼'} {Math.abs(change)}
           </span>
         )}
@@ -27,7 +26,7 @@ const RankNumber = ({
   return rank <= 3 ? (
     <div className="h-9 w-9 rounded-lg bg-gray-20" />
   ) : (
-    <span className="">{String(rank).padStart(3, '0')}</span>
+    <span className="text-blue-60">{String(rank).padStart(3, '0')}</span>
   );
 };
 
@@ -41,17 +40,15 @@ const RankRow = ({
 }: RankRowProps) => {
   return (
     <li
-      className={`flex items-center gap-4 px-4 py-2.5 ${
-        isMe
-          ? 'rounded-2xl border border-blue-60 bg-blue-08'
-          : 'border-b border-gray-20'
+      className={`flex h-14 items-center gap-4 rounded-2xl px-5 ${
+        isMe ? 'border border-blue-60 bg-blue-08' : 'border-t border-gray-20'
       }`}
     >
-      <div className="w-15.5">
+      <div className="flex w-20 items-center">
         <RankNumber rank={rank} isMe={isMe} change={change} />
       </div>
       <Avatar src={profileImage} />
-      <span className="flex-1 text-[16px] text-gray-60 font-semibold">
+      <span className="flex-1 text-[16px] font-semibold text-gray-60">
         {nickname}
       </span>
       <ScoreBadge value={score} />
