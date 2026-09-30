@@ -1,14 +1,7 @@
 import api, { clearCsrfToken, fetchCsrfToken } from './axiosInstance';
+import type { ApiResponse } from '../types/api';
 
 const baseURL = import.meta.env.VITE_API_URL;
-
-// 백엔드 공통 응답 구조 작성필요
-export interface ApiResponse<T> {
-  isSuccess: boolean;
-  code: string;
-  message: string;
-  result: T; // 실제 데이터는 여기에 들어감
-}
 
 //내 정보 조회
 export interface CsrfResult {
