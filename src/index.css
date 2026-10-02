@@ -6,6 +6,9 @@
     'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont,
     system-ui, sans-serif;
 
+  /* 반응형 기준: 기본(~1023px) 아이폰 / lg(1024px~) 데스크탑 / wide(1440px~) Figma 데스크탑 원본 수치 */
+  --breakpoint-wide: 90rem;
+
   --color-*: initial;
   --color-white: #ffffff;
   --color-black: #000000;
