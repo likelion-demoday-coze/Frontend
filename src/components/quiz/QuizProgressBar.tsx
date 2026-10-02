@@ -8,6 +8,7 @@ const QuizProgressBar = ({ current, total }: QuizProgressBarProps) => {
   return (
     <div
       role="progressbar"
+      aria-label="퀴즈 진행률"
       aria-valuemin={0}
       aria-valuemax={total}
       aria-valuenow={current}

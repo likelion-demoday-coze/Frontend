@@ -45,10 +45,17 @@ const OptionButton = ({
       <span
         className={`flex size-7 shrink-0 items-center justify-center rounded-lg text-base font-bold lg:size-8 lg:text-xl ${badgeStyles[status]}`}
       >
-        {status === 'correct' && <CorrectIcon className="size-4" />}
-        {status === 'wrong' && <WrongIcon className="size-5 lg:size-6" />}
+        {status === 'correct' && (
+          <CorrectIcon aria-hidden="true" className="size-4" />
+        )}
+        {status === 'wrong' && (
+          <WrongIcon aria-hidden="true" className="size-5 lg:size-6" />
+        )}
         {(status === 'default' || status === 'selected') && number}
       </span>
+      {/*아이콘만 보이는 채점 결과를 스크린리더에 전달*/}
+      {status === 'correct' && <span className="sr-only">정답:</span>}
+      {status === 'wrong' && <span className="sr-only">오답:</span>}
       <span className="leading-snug">{label}</span>
     </button>
   );

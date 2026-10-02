@@ -25,13 +25,19 @@ const labels: Record<CountChipType, string> = {
 const CountChip = ({ type, count }: CountChipProps) => {
   return (
     <span
-      aria-label={`${labels[type]} ${count}개`}
       className={`inline-flex h-9 min-w-15 items-center justify-center gap-1.5 rounded-lg border px-2.5 text-base font-medium lg:h-11 lg:min-w-19 lg:gap-2.5 lg:px-3 lg:text-xl ${chipStyles[type]}`}
     >
-      {type === 'correct' && <CorrectIcon className="size-4 text-green-65" />}
-      {type === 'wrong' && <WrongIcon className="size-4 lg:size-5" />}
-      {type === 'combo' && <ComboIcon className="h-4 w-3.5 text-red-r" />}
-      {String(count).padStart(2, '0')}
+      {type === 'correct' && (
+        <CorrectIcon aria-hidden="true" className="size-4 text-green-65" />
+      )}
+      {type === 'wrong' && (
+        <WrongIcon aria-hidden="true" className="size-4 lg:size-5" />
+      )}
+      {type === 'combo' && (
+        <ComboIcon aria-hidden="true" className="h-4 w-3.5 text-red-r" />
+      )}
+      <span aria-hidden="true">{String(count).padStart(2, '0')}</span>
+      <span className="sr-only">{`${labels[type]} ${count}개`}</span>
     </span>
   );
 };
