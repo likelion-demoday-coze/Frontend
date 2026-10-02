@@ -1,0 +1,39 @@
+import CorrectIcon from '../../assets/quiz/correct.svg?react';
+import WrongIcon from '../../assets/quiz/wrong.svg?react';
+import ComboIcon from '../../assets/quiz/combo.svg?react';
+
+export type CountChipType = 'correct' | 'wrong' | 'combo';
+
+interface CountChipProps {
+  type: CountChipType;
+  count: number;
+}
+
+const chipStyles: Record<CountChipType, string> = {
+  correct: 'border-blue-60 bg-blue-05 text-blue-60',
+  wrong: 'border-red-55 bg-red-10 text-red-r',
+  combo: 'border-red-55 bg-yellow-05 text-yellow-45',
+};
+
+const labels: Record<CountChipType, string> = {
+  correct: '정답',
+  wrong: '오답',
+  combo: '콤보',
+};
+
+//정답 / 오답 / 콤보(연속 정답) 개수 칩
+const CountChip = ({ type, count }: CountChipProps) => {
+  return (
+    <span
+      aria-label={`${labels[type]} ${count}개`}
+      className={`inline-flex h-9 min-w-15 items-center justify-center gap-1.5 rounded-lg border px-2.5 text-base font-medium lg:h-11 lg:min-w-19 lg:gap-2.5 lg:px-3 lg:text-xl ${chipStyles[type]}`}
+    >
+      {type === 'correct' && <CorrectIcon className="size-4 text-green-65" />}
+      {type === 'wrong' && <WrongIcon className="size-4 lg:size-5" />}
+      {type === 'combo' && <ComboIcon className="h-4 w-3.5 text-red-r" />}
+      {String(count).padStart(2, '0')}
+    </span>
+  );
+};
+
+export default CountChip;
