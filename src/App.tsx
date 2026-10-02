@@ -13,6 +13,8 @@ import HomePage from './pages/HomePage';
 import MyPage from './pages/MyPage';
 
 import Layout from './components/layouts/Layout';
+import RankingPage from './pages/RankingPage';
+import ShopPage from './pages/ShopPage';
 import FullScreenLayout from './components/layouts/FullScreenLayout';
 
 import { ROUTES } from './constants/routes';
@@ -64,6 +66,9 @@ function App() {
             <Route path={ROUTES.HOME} element={<HomePage />}></Route>
 
             <Route path={ROUTES.MYPAGE} element={<MyPage />}></Route>
+
+            <Route path={ROUTES.RANKING} element={<RankingPage />}></Route>
+            <Route path={ROUTES.SHOP} element={<ShopPage />}></Route>
 
             {/*문제풀이 (GNB 있는 화면)*/}
             <Route path={ROUTES.QUIZ} element={<QuizModePage />} />
