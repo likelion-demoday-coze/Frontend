@@ -31,7 +31,7 @@ const LeftNavbar = () => {
               `flex items-center gap-3 text-[18px] ${isActive ? 'font-bold text-blue-60' : 'text-gray-60'}`
             }
           >
-            <Icon className="h-[18px] w-[18px]" />
+            <Icon className="h-4.5 w-4.5" />
             <div>{label}</div>
           </NavLink>
         ))}
