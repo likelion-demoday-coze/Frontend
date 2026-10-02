@@ -40,7 +40,7 @@ const RankRow = ({
 }: RankRowProps) => {
   return (
     <li
-      className={`flex h-14 items-center gap-4 rounded-2xl px-5 ${
+      className={`flex h-14 items-center gap-4 rounded-2xl px-5 cursor-pointer ${
         isMe ? 'border border-blue-60 bg-blue-08' : 'border-t border-gray-20'
       }`}
     >

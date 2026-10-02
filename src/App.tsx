@@ -14,6 +14,7 @@ import MyPage from './pages/MyPage';
 
 import Layout from './components/layouts/Layout';
 import RankingPage from './pages/RankingPage';
+import ShopPage from './pages/ShopPage';
 
 function App() {
   //새로고침 시 로그인 상태인지 서버에 물어보고, 내정보 저장
@@ -44,6 +45,7 @@ function App() {
 
             <Route path="/mypage" element={<MyPage />}></Route>
             <Route path="/ranking" element={<RankingPage />}></Route>
+            <Route path="/shop" element={<ShopPage />}></Route>
           </Route>
         </Route>
       </Routes>

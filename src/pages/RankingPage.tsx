@@ -1,8 +1,10 @@
 import { useSearchParams } from 'react-router-dom';
-import type { MyRank, RankItem, RankingType } from '../types/ranking';
+import type { RankingType } from '../types/ranking';
 import TapToggle from '../components/ranking/TapToggle';
 import RankList from '../components/ranking/rank/RankList'; //랭킹
 import MyRankPanel from '../components/ranking/MyRankPanel';
+
+import { MOCK_RANKING } from '../mocks/rankingMock';
 
 const TABS = [
   { key: 'regular', label: '정규장 랭킹' },
@@ -35,33 +37,12 @@ const CONFIG: Record<
   },
 };
 
-// 임시 데이터 (API 연동 시 교체)
-const ME: MyRank = { rank: 125, change: 17, nickname: 'COZ:Y_화팅', score: 22 };
-
-const ITEMS: RankItem[] = Array.from({ length: 8 }, (_, i) => ({
-  rank: i + 1,
-  nickname: '방울모아태산',
-  score: 22,
-}));
-
-const STATS: Record<RankingType, { label: string; value: string }[]> = {
-  regular: [
-    { label: '상위', value: '13.9%' },
-    { label: '나의 누적 주가', value: '275.00 방울' },
-    { label: '유저 평균 주가', value: '115.30 방울' },
-  ],
-  afterhours: [
-    { label: '상위', value: '13.9%' },
-    { label: '나의 최고 기록', value: '22문제' },
-    { label: '유저 평균 정답수', value: '15문제' },
-  ],
-};
-
 const RankingPage = () => {
   const [params, setParams] = useSearchParams();
   const type: RankingType =
     params.get('type') === 'afterhours' ? 'afterhours' : 'regular';
   const c = CONFIG[type];
+  const data = MOCK_RANKING[type]; // API 연동 시 교체
 
   return (
     <div>
@@ -70,24 +51,26 @@ const RankingPage = () => {
         value={type}
         onChange={(key) => setParams({ type: key }, { replace: true })}
       />
+
       <div className="mt-9.5 flex flex-col gap-2">
         <h1 className="text-[28px] font-semibold">{c.title}</h1>
         <p className="text-sm text-gray-60">{c.description}</p>
       </div>
-      <div className="flex flex-col gap-10 lg:flex-row lg:gap-18">
-        <div className="mt-20 flex-1">
+
+      <div className="mt-10 flex flex-col gap-10 lg:flex-row lg:gap-18">
+        <div className="min-w-0 flex-1">
           {c.notice && <p className="text-xs text-blue-60">{c.notice}</p>}
-          <div className="mt-4">
-            <RankList me={ME} items={ITEMS} />
+          <div className={c.notice ? 'mt-4' : ''}>
+            <RankList me={data.me} items={data.items} />
           </div>
         </div>
 
         <MyRankPanel
           criteria={c.criteria}
           actionLabel={c.actionLabel}
-          rank={ME.rank}
-          lastRank={200}
-          stats={STATS[type]}
+          rank={data.me.rank}
+          lastRank={data.lastRank}
+          stats={data.stats}
         />
       </div>
     </div>
