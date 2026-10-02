@@ -18,9 +18,9 @@ const menuItems = [
 const LeftNavbar = () => {
   return (
     <aside className="sticky top-0 flex w-49.5 shrink-0 flex-col border-r border-gray-20 h-screen px-4.5 py-8 gap-6.5">
-      <div>
+      <NavLink key={'홈'} to={'/'} end={'/' === '/'}>
         <img src={textlogo} alt="COZ:E" />
-      </div>
+      </NavLink>
       <nav className="flex flex-col gap-5">
         {menuItems.map(({ to, label, icon: Icon }) => (
           <NavLink

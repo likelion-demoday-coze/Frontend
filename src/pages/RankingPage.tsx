@@ -40,7 +40,7 @@ const CONFIG: Record<
 const RankingPage = () => {
   const [params, setParams] = useSearchParams();
   const type: RankingType =
-    params.get('type') === 'afterhours' ? 'afterhours' : 'regular';
+    params.get('tab') === 'afterhours' ? 'afterhours' : 'regular';
   const c = CONFIG[type];
   const data = MOCK_RANKING[type]; // API 연동 시 교체
 
@@ -49,7 +49,7 @@ const RankingPage = () => {
       <TapToggle
         tabs={TABS}
         value={type}
-        onChange={(key) => setParams({ type: key }, { replace: true })}
+        onChange={(key) => setParams({ tab: key }, { replace: true })}
       />
 
       <div className="mt-9.5 flex flex-col gap-2">
