@@ -35,7 +35,6 @@ const StockChartCard = () => {
     getStockGraph(period)
       .then((res) => {
         if (ignore) return;
-        console.log(res);
         setHistory(res);
         setStatus('done');
       })
