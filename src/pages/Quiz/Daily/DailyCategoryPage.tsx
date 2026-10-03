@@ -1,21 +1,34 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import BackHeader from '../../../components/layouts/BackHeader';
 import CategoryCard from '../../../components/quiz/CategoryCard';
+import StartConfirmModal from '../../../components/quiz/StartConfirmModal';
 import {
   QUIZ_CATEGORIES,
   QUIZ_CATEGORY_INFO,
 } from '../../../constants/quizCategory';
+import { DAILY_FISH_COST } from '../../../constants/quizCost';
 import { ROUTES } from '../../../constants/routes';
+import useQuizEntryStatus from '../../../hooks/useQuizEntryStatus';
 import type { QuizCategory } from '../../../types/quiz';
 
 const DailyCategoryPage = () => {
+  const navigate = useNavigate();
+  const { fishBalance, isPass, dailyAttempt } = useQuizEntryStatus();
   const [selectedCategory, setSelectedCategory] = useState<QuizCategory | null>(
     null
   );
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const handleNext = () => {
     if (!selectedCategory) return;
-    //TODO: 시작 확인 모달 열기
+    setIsConfirmOpen(true);
+  };
+
+  const handleCloseConfirm = useCallback(() => setIsConfirmOpen(false), []);
+
+  const handleStart = () => {
+    //TODO: 세션 생성 API 연동 후 문제 풀이 화면으로 이동
   };
 
   return (
@@ -58,6 +71,19 @@ const DailyCategoryPage = () => {
           {selectedCategory ? '다음' : '카테고리 선택'}
         </button>
       </main>
+
+      {isConfirmOpen && selectedCategory && (
+        <StartConfirmModal
+          categoryLabel={QUIZ_CATEGORY_INFO[selectedCategory].label}
+          fishCost={DAILY_FISH_COST}
+          fishBalance={fishBalance}
+          isPass={isPass}
+          attempt={dailyAttempt}
+          onClose={handleCloseConfirm}
+          onStart={handleStart}
+          onCharge={() => navigate(ROUTES.SHOP)}
+        />
+      )}
     </div>
   );
 };

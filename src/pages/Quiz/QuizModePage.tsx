@@ -2,26 +2,21 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ModeCard from '../../components/quiz/ModeCard';
 import { ROUTES } from '../../constants/routes';
+import {
+  DAILY_FISH_COST,
+  TIME_ATTACK_FISH_COST,
+} from '../../constants/quizCost';
+import useQuizEntryStatus from '../../hooks/useQuizEntryStatus';
 
 type QuizMode = 'daily' | 'timeAttack';
-
-const DAILY_FISH_COST = 50;
-const TIME_ATTACK_FISH_COST = 100;
-
-//TODO: API 연동 전 임시 값 (생선 잔액, 패스 여부, 오늘 횟수)
-const MOCK_STATUS = {
-  fishBalance: 300,
-  isPass: false,
-  dailyAttempt: { used: 0, limit: 2 },
-  timeAttackAttempt: { used: 0, limit: 3 },
-};
 
 const QuizModePage = () => {
   const navigate = useNavigate();
   const [selectedMode, setSelectedMode] = useState<QuizMode | null>(null);
-  const { fishBalance, isPass, dailyAttempt, timeAttackAttempt } = MOCK_STATUS;
+  const { fishBalance, isPass, dailyAttempt, timeAttackAttempt } =
+    useQuizEntryStatus();
 
-  //시간외거래는 하루 횟수를 다 쓰면 입장 불가 (정규장은 소진 후에도 학습 가능)
+  //정규장은 횟수 소진 후에도 학습 가능, 시간외거래는 불가
   const isTimeAttackExhausted =
     timeAttackAttempt.used >= timeAttackAttempt.limit;
   const canStart =
