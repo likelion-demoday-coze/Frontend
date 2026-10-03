@@ -84,9 +84,11 @@ function App() {
             />
           </Route>
 
+          {/*문제풀이 (뒤로가기 헤더가 있는 전체 화면, 헤더는 페이지에서 렌더링)*/}
+          <Route path={ROUTES.DAILY_QUIZ} element={<DailyCategoryPage />} />
+
           {/*문제풀이 (로고만 있는 전체 화면)*/}
           <Route element={<FullScreenLayout />}>
-            <Route path={ROUTES.DAILY_QUIZ} element={<DailyCategoryPage />} />
             <Route
               path={ROUTES.DAILY_QUIZ_REVIEW}
               element={<DailyQuizReviewPage />}
