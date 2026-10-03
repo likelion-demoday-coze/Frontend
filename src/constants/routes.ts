@@ -1,8 +1,8 @@
 //라우트 경로 모음 - <Route path>에는 ROUTES, 이동(navigate, Link)에는 경로 생성 함수 사용
 
 export const ROUTES = {
-  HOME: '/',
-  LOGIN: '/login',
+  LANDING: '/',
+  HOME: '/home',
   SIGNUP: '/signup', //백엔드가 신규 회원을 보내는 경로 → 온보딩 약관으로 이동
 
   //온보딩

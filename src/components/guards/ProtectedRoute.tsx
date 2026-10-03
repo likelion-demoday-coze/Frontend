@@ -13,7 +13,7 @@ function ProtectedRoute() {
   }
 
   if (!member) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   //로그인 상태면 그대로
