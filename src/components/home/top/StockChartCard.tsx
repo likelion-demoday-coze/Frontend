@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import StockLineChart from './StockLineChart';
+import { getStockGraph } from '../../../api/stock';
 import type { StockHistory, StockPeriod } from '../../../types/stock';
 
 const PERIODS = [
@@ -7,7 +8,7 @@ const PERIODS = [
   { key: 'WEEK', label: '1주' },
   { key: 'ALL', label: '전체 기간' },
 ] as const;
-// 서버가 준 시각(ISO 문자열)을 화면에 보일 글씨로 바꾸는 함수
+
 const formatLabel = (iso: string, period: StockPeriod) => {
   const d = new Date(iso);
   return period === 'DAY'
@@ -20,12 +21,31 @@ const formatLabel = (iso: string, period: StockPeriod) => {
         .toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' })
         .replace(/\s/g, ''); // 'ko-KR' 형식에 들어가는 공백 제거
 };
+
 const StockChartCard = () => {
   const [period, setPeriod] = useState<StockPeriod>('WEEK'); //기본값은 1주
   //받아온 데이터
   const [history, setHistory] = useState<StockHistory | null>(null);
   //화면상태(불러오는 중/실패/성공)
   const [status, setStatus] = useState<'loading' | 'error' | 'done'>('loading');
+
+  useEffect(() => {
+    let ignore = false; //탭을 너무 빠르게 바꿨을 때 늦게 온 옛 응답 무시
+    setStatus('loading');
+    getStockGraph(period)
+      .then((res) => {
+        if (ignore) return;
+        console.log(res);
+        setHistory(res);
+        setStatus('done');
+      })
+      .catch(() => {
+        if (!ignore) setStatus('error');
+      });
+    return () => {
+      ignore = true;
+    };
+  }, [period]);
 
   //증감율 계산
   const rate = history?.changeRate ?? 0;
@@ -44,7 +64,7 @@ const StockChartCard = () => {
   return (
     <div className="flex h-full flex-col rounded-2xl border border-blue-15 bg-white p-3">
       <div className="flex flex-col gap-4 px-5 py-5 xl:flex-row xl:items-center xl:justify-between xl:px-10.5 xl:py-6.5">
-        <div className="flex flex-wrap items-center gap-3 xl:gap-7.5">
+        <div className="flex flex-wrap items-center gap-3 xl:gap-4">
           <span className="text-[16px] font-bold text-gray-60">현재 주가</span>
           <span className="text-[28px] font-bold text-blue-60">
             {history ? history.currentStock.toFixed(2) : '-'}
@@ -58,7 +78,7 @@ const StockChartCard = () => {
           )}
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex shrink-0 gap-2">
           {PERIODS.map(({ key, label }) => (
             <button
               key={key}
