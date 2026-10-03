@@ -22,7 +22,7 @@ const Layout = () => {
         )}
 
         {/* 본문 틀: 폭 제한 + 가운데 + 공통 패딩 (배경 위에 올라옴) */}
-        <div className="relative mx-auto w-full max-w-360 px-6 pt-16 pb-10">
+        <div className="relative mx-auto w-full max-w-249.5 px-6 pt-16 pb-10">
           <div className="absolute top-16 right-0">
             <TopBar
               streakDays={4}
