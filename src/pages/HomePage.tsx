@@ -7,7 +7,7 @@ import StreakCard from '../components/home/streak/StreakCard';
 
 const HomePage = () => {
   return (
-    <div>
+    <div className="mx-auto w-full max-w-260">
       <HeroSection />
       <div className="flex flex-col gap-10 xl:flex-row xl:gap-6">
         <div className="flex min-w-0 flex-1 flex-col gap-10">

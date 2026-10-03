@@ -46,7 +46,7 @@ const RankingPage = () => {
   const data = MOCK_RANKING[type]; // API 연동 시 교체
 
   return (
-    <div>
+    <div className="mx-auto w-full max-w-260">
       <TapToggle
         tabs={TABS}
         value={type}
