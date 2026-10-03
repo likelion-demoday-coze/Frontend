@@ -1,10 +1,10 @@
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import type { RankingType } from '../types/ranking';
 import PageTitleSection from '../components/common/PageTitle';
 import TapToggle from '../components/ranking/TapToggle';
 import RankList from '../components/ranking/rank/RankList'; //랭킹
 import MyRankPanel from '../components/ranking/MyRankPanel';
-
+import { ROUTES } from '../constants/routes';
 import { MOCK_RANKING } from '../mocks/rankingMock';
 
 const TABS = [
@@ -45,6 +45,13 @@ const RankingPage = () => {
   const c = CONFIG[type];
   const data = MOCK_RANKING[type]; // API 연동 시 교체
 
+  const navigate = useNavigate();
+
+  const ACTION_PATH: Record<RankingType, string> = {
+    regular: ROUTES.QUIZ, // 정규장 → 문제 풀이
+    afterhours: ROUTES.TIME_ATTACK, // 시간외거래 → 타임어택
+  };
+
   return (
     <div className="mx-auto w-full max-w-260">
       <TapToggle
@@ -71,6 +78,7 @@ const RankingPage = () => {
           rank={data.me.rank}
           lastRank={data.lastRank}
           stats={data.stats}
+          onAction={() => navigate(ACTION_PATH[type])}
         />
       </div>
     </div>
