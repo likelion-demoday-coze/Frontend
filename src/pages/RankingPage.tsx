@@ -1,5 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import type { RankingType } from '../types/ranking';
+import PageTitleSection from '../components/common/PageTitle';
 import TapToggle from '../components/ranking/TapToggle';
 import RankList from '../components/ranking/rank/RankList'; //랭킹
 import MyRankPanel from '../components/ranking/MyRankPanel';
@@ -52,9 +53,8 @@ const RankingPage = () => {
         onChange={(key) => setParams({ tab: key }, { replace: true })}
       />
 
-      <div className="mt-9.5 flex flex-col gap-2">
-        <h1 className="text-[28px] font-semibold">{c.title}</h1>
-        <p className="text-sm text-gray-60">{c.description}</p>
+      <div className="mt-9.5">
+        <PageTitleSection title={c.title} description={c.description} />
       </div>
 
       <div className="mt-10 flex flex-col gap-10 lg:flex-row lg:gap-18">
