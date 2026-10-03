@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import StatPill from './StatPill';
 
 interface MyRankPanelProps {
