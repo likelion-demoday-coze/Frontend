@@ -10,25 +10,37 @@ import {
 } from '../../../api/attendance';
 import { ROUTES } from '../../../constants/routes';
 
-const DailyRewordCard = ({}) => {
+type ViewStatus = AttendanceStatus | 'loading' | 'error';
+
+const DailyRewardCard = () => {
   const navigate = useNavigate();
   //오늘의 보상 수령 상태 (조회 전에는 로딩중)
-  const [status, setStatus] = useState<AttendanceStatus | 'loading'>('loading');
-  const [isloading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState<ViewStatus>('loading');
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
+  const fetchStatus = () => {
+    let ignore = false; // 화면을 떠난 뒤 늦게 온 응답 무시
+    setStatus('loading');
     getAttendanceToday()
-      .then((res) => setStatus(res.status))
-      .catch(() => setStatus('AVAILABLE')); // 조회 실패 시 임시로 받기 가능 처리
-  }, []);
+      .then((res) => {
+        if (!ignore) setStatus(res.status);
+      })
+      .catch(() => {
+        if (!ignore) setStatus('error');
+      });
+    return () => {
+      ignore = true;
+    };
+  };
+
+  useEffect(() => fetchStatus(), []);
 
   const handleClaim = async () => {
-    if (isloading) return;
+    if (isLoading) return;
 
     setIsLoading(true);
     try {
       const res = await claimAttendanceReword();
-
       setStatus('CLAIMED');
       if (res.newlyClaimed) alert(`FISH ${res.grantedAmount}개를 받았어요!`);
       if (res.newlyClaimed) {
@@ -40,6 +52,28 @@ const DailyRewordCard = ({}) => {
       setIsLoading(false);
     }
   };
+
+  // 상태별 버튼 문구와 동작
+  const button = (() => {
+    switch (status) {
+      case 'loading':
+        return { label: '', onClick: undefined, disabled: true };
+      case 'error':
+        return { label: '다시 시도', onClick: fetchStatus, disabled: false };
+      case 'AVAILABLE':
+        return {
+          label: '🐟 오늘의 FISH 받기',
+          onClick: handleClaim,
+          disabled: isLoading,
+        };
+      default: // CLAIMED, PASS_ACTIVE
+        return {
+          label: '문제 풀러 가기',
+          onClick: () => navigate(ROUTES.QUIZ),
+          disabled: false,
+        };
+    }
+  })();
 
   const canClaim = status === 'AVAILABLE';
 
@@ -57,17 +91,19 @@ const DailyRewordCard = ({}) => {
       </Card>
 
       <button
-        onClick={canClaim ? handleClaim : () => navigate(ROUTES.QUIZ)}
-        className={`flex h-25 items-center justify-center rounded-4xl text-[22px] font-semibold py-4 px-6 cursor-pointer ${canClaim ? 'bg-blue-60 text-white shadow-[0_0_4px_0_#276AD8]' : 'border-2 border-green-40 bg-white text-blue-60 shadow-[0_0_4px_0_#276AD8]'}`}
+        type="button"
+        onClick={button.onClick}
+        disabled={button.disabled}
+        className={`flex h-25 cursor-pointer items-center justify-center rounded-4xl px-6 py-4 text-[22px] font-semibold disabled:cursor-not-allowed disazbled:opacity-50 ${
+          canClaim
+            ? 'border-2 border-green-40 bg-white text-blue-60 shadow-[0_0_4px_0_#276AD8]'
+            : 'bg-blue-60 text-white shadow-[0_0_4px_0_#276AD8]'
+        }`}
       >
-        {status === 'loading'
-          ? ''
-          : canClaim
-            ? '🐟 오늘의 FISH 받기'
-            : '문제 풀러 가기'}
+        {button.label}
       </button>
     </div>
   );
 };
 
-export default DailyRewordCard;
+export default DailyRewardCard;
