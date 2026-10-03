@@ -12,12 +12,11 @@ const Layout = () => {
   return (
     <div className="flex min-h-screen">
       <LeftNavbar />
-      {/* 사이드바 옆 전체 영역: 배경은 여기 기준으로 풀 폭 */}
+
       <div className="relative flex-1 overflow-x-hidden">
-        {/* 홈 전용 하늘색 배경: 틀 바깥, 맨 뒤에 깔림 */}
         {isHome && (
           <div
-            className={`absolute inset-x-0 top-0 -z-0 bg-blue-05 ${HERO_BG_HEIGHT}`}
+            className={`absolute inset-x-0 top-0 z-0 bg-blue-05 ${HERO_BG_HEIGHT}`}
             aria-hidden
           />
         )}

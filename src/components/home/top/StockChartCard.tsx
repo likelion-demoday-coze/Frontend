@@ -43,7 +43,6 @@ const StockChartCard = () => {
 
   return (
     <div className="flex h-full flex-col rounded-2xl border border-blue-15 bg-white p-3">
-      {/* 헤더: xl 미만은 세로(주가 정보 위, 탭 아래), xl 이상은 가로 */}
       <div className="flex flex-col gap-4 px-5 py-5 xl:flex-row xl:items-center xl:justify-between xl:px-10.5 xl:py-6.5">
         <div className="flex flex-wrap items-center gap-3 xl:gap-7.5">
           <span className="text-[16px] font-bold text-gray-60">현재 주가</span>
@@ -59,7 +58,6 @@ const StockChartCard = () => {
           )}
         </div>
 
-        {/* 기간 탭: 선택된 탭만 파란 테두리 */}
         <div className="flex gap-2">
           {PERIODS.map(({ key, label }) => (
             <button
@@ -77,7 +75,6 @@ const StockChartCard = () => {
         </div>
       </div>
 
-      {/* 차트 영역: 남는 높이를 채우되 최소 높이는 유지 */}
       <div className="min-h-65 flex-1 px-2 pb-2">
         {status === 'loading' && (
           <p className="flex h-full items-center justify-center text-sm text-gray-60">

@@ -6,7 +6,7 @@ import { fetchCsrfToken } from './api/axiosInstance';
 
 import ProtectedRoute from './components/guards/ProtectedRoute';
 
-import LoginPage from './pages/Auth/LoginPage';
+import LandingPage from './pages/Auth/LandingPage';
 import SignupPage from './pages/Auth/SignupPage';
 
 import HomePage from './pages/HomePage';
@@ -51,7 +51,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path={ROUTES.LOGIN} element={<LoginPage />}></Route>
+        <Route path={ROUTES.LANDING} element={<LandingPage />}></Route>
         <Route path={ROUTES.SIGNUP} element={<SignupPage />}></Route>
         {/*온보딩: 가입 완료 전이라 member가 없으므로 가드 밖에 둠*/}
         <Route path={ROUTES.ONBOARDING_TERMS} element={<TermsPage />} />
