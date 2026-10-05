@@ -41,7 +41,7 @@ export interface TimeAttackRanking {
   averageCorrectCount: number;
   rankings: TimeAttackRankingEntry[];
   myRanking: TimeAttackMyRanking | null; // 오늘 미참여면 null
-  page: { page: number; size: number; hasNext: boolean };
+  page: PageInfo;
 }
 
 export interface StockRankingEntry {
@@ -65,5 +65,5 @@ export interface StockRanking {
   averageStock: number;
   rankings: StockRankingEntry[];
   myRanking: StockMyRanking | null;
-  page: { page: number; size: number; hasNext: boolean };
+  page: PageInfo;
 }

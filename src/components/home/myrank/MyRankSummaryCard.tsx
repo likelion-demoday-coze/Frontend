@@ -17,18 +17,17 @@ const MyRankSummaryCard = ({
             {rank}
             <span className="px-2 text-[14px] text-gray-60">위</span>
           </span>
-          {change !== 0 && (
+          {!!change && (
             <span className="flex items-center gap-1 text-sm font-semibold">
-              <span
-                className={`${change > 0 ? 'text-red-55' : 'text-blue-50'}`}
-              >
+              <span className={change > 0 ? 'text-red-55' : 'text-blue-50'}>
                 {change > 0 ? '▲' : '▼'}
               </span>
               {Math.abs(change)}
             </span>
           )}
         </div>
-        <p className="text-[12px] text-gray-60">{footnote}</p>
+        {/* 안내문이 있을 때만 줄을 그림 */}
+        {footnote && <p className="text-[12px] text-gray-60">{footnote}</p>}
       </div>
       <ul className="flex min-w-0 flex-1 flex-col gap-4">
         {stats.map(({ label, value }) => (

@@ -1,4 +1,5 @@
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useRef } from 'react';
 import type { RankingType } from '../types/ranking';
 import PageTitleSection from '../components/common/PageTitle';
 import TapToggle from '../components/ranking/TapToggle';
@@ -64,11 +65,14 @@ const RankingPage = () => {
   );
   const view = type === 'regular' ? stock : timeAttack;
 
+  const scrollRef = useRef<HTMLDivElement>(null);
+
   // 목록 맨 아래의 감시 요소가 화면에 보이면 다음 20개를 불러옴
   const sentinelRef = useIntersect(
     view.loadMore,
     view.hasNext && view.status !== 'error', // 실패하면 자동 재시도하지 않음
-    view.items.length
+    view.items.length,
+    scrollRef
   );
 
   const ACTION_PATH: Record<RankingType, string> = {
@@ -91,8 +95,12 @@ const RankingPage = () => {
       <div className="mt-10 flex flex-col gap-10 lg:flex-row lg:gap-18">
         <div className="min-w-0 flex-1">
           {c.notice && <p className="text-xs text-blue-60">{c.notice}</p>}
-          <div className={c.notice ? 'mt-4' : ''}>
+          <div
+            ref={scrollRef}
+            className={`${c.notice ? 'mt-4' : ''} max-h-[calc(100vh-24rem)] overflow-y-auto`}
+          >
             <RankList me={view.me} items={view.items} />
+
             {/* 이 요소가 화면 근처에 오면 다음 페이지를 불러옴 */}
             <div ref={sentinelRef} className="h-px" />
 
