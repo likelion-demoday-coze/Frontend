@@ -71,7 +71,7 @@ const RankingPage = () => {
   const sentinelRef = useIntersect(
     view.loadMore,
     view.hasNext && view.status !== 'error', // 실패하면 자동 재시도하지 않음
-    view.items.length,
+    view.loadedCount, // view.items.length → view.loadedCount
     scrollRef
   );
 

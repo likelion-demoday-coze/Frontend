@@ -26,6 +26,9 @@ export const usePagedRanking = (
   const [hasNext, setHasNext] = useState(true);
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('loading');
 
+  //불러오기에 성공한 횟수(무한 로딩 방지)
+  const [loadedCount, setLoadedCount] = useState(0);
+
   // 기록용
   const nextPageRef = useRef(0); // 다음에 불러올 페이지 번호
   const hasNextRef = useRef(true);
@@ -59,6 +62,7 @@ export const usePagedRanking = (
       hasNextRef.current = response.hasNext;
       setHasNext(response.hasNext);
       nextPageRef.current += 1; // 성공했을 때만 다음 페이지로
+      setLoadedCount((c) => c + 1);
       setStatus('idle');
     } catch {
       setStatus('error');
@@ -85,5 +89,6 @@ export const usePagedRanking = (
     hasNext,
     status,
     loadMore,
+    loadedCount,
   };
 };

@@ -8,13 +8,13 @@ import CheckIcon from '../../assets/signup/check.svg?react';
 import CrossIcon from '../../assets/signup/cross.svg?react';
 import catImage from '../../assets/character/basic_pose_cat.svg';
 
-//최대 글자 수
-const MAX_LENGTH = 8;
-// 입력 중에는 조합 중인 자모(ㄱ, ㅏ 등)도 허용해서 한글 입력 시 에러가 깜빡이지 않게 함
-const LIVE_PATTERN = /^[가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9]*$/;
-
-// 중복확인 시에는 완성된 한글만 허용
-const STRICT_PATTERN = /^[가-힣a-zA-Z0-9]+$/;
+import {
+  NICKNAME_MAX,
+  NICKNAME_MIN,
+  LIVE_PATTERN,
+  STRICT_PATTERN,
+  ONLY_DIGITS,
+} from '../../utils/nickname';
 
 type Status =
   | 'idle' // 입력 전
@@ -22,8 +22,17 @@ type Status =
   | 'available' // 사용 가능
   | 'duplicate' // 중복
   | 'tooLong' // 글자 수 초과
+  | 'tooShort' // 글자 수 부족
+  | 'onlyDigits' // 숫자만 입력
   | 'invalid' // 사용 불가 문자
   | 'error'; // 서버 오류
+
+//에러인 경우 따로 스타일 뻄
+const ERROR_STYLE = {
+  border: 'border-red-55',
+  text: 'text-red-70',
+  bedge: 'text-[#F8003A]',
+};
 
 const STYLE: Record<Status, { border: string; text: string; bedge: string }> = {
   idle: {
@@ -41,26 +50,12 @@ const STYLE: Record<Status, { border: string; text: string; bedge: string }> = {
     text: 'text-green-85',
     bedge: 'text-green-65',
   },
-  duplicate: {
-    border: 'border-red-55',
-    text: 'text-red-70',
-    bedge: 'text-[#F8003A]',
-  },
-  tooLong: {
-    border: 'border-red-55',
-    text: 'text-red-70',
-    bedge: 'text-[#F8003A]',
-  },
-  invalid: {
-    border: 'border-red-55',
-    text: 'text-red-70',
-    bedge: 'text-[#F8003A]',
-  },
-  error: {
-    border: 'border-red-55',
-    text: 'text-red-70',
-    bedge: 'text-[#F8003A]',
-  },
+  duplicate: ERROR_STYLE,
+  tooLong: ERROR_STYLE,
+  tooShort: ERROR_STYLE,
+  onlyDigits: ERROR_STYLE,
+  invalid: ERROR_STYLE,
+  error: ERROR_STYLE,
 };
 
 const MESSAGE: Record<Status, string> = {
@@ -68,7 +63,9 @@ const MESSAGE: Record<Status, string> = {
   typing: '중복확인 버튼을 눌러주세요',
   available: '사용할 수 있는 닉네임이에요',
   duplicate: '이미 사용 중인 닉네임이에요',
-  tooLong: `최대 ${MAX_LENGTH}자까지 입력할 수 있어요`,
+  tooLong: `최대 ${NICKNAME_MAX}자까지 입력할 수 있어요`,
+  tooShort: `최소 ${NICKNAME_MIN}자부터 입력할 수 있어요`,
+  onlyDigits: '숫자만으로는 만들 수 없어요',
   invalid: '한글, 영문, 숫자만 사용할 수 있어요',
   error: '확인 중 오류가 발생했어요. 다시 시도해주세요',
 };
@@ -98,9 +95,9 @@ const SignupPage = () => {
 
   //닉네임이 바뀌고있으면 이전 결과를 무효
   const handleChange = (value: string) => {
-    const exceeded = value.length > MAX_LENGTH;
+    const exceeded = value.length > NICKNAME_MAX;
     //초과하면 끊어서 저장
-    setNickname(exceeded ? value.slice(0, MAX_LENGTH) : value);
+    setNickname(exceeded ? value.slice(0, NICKNAME_MAX) : value);
     //초과하면 true
     setIsTooLong(exceeded);
     resetResult();
@@ -116,44 +113,56 @@ const SignupPage = () => {
     inputRef.current?.focus();
   };
 
-  //랜더링마다 현재 닉네임에 허용되지 않는 글자가 있는지 계산
+  // → 화면, 중복확인, 가입에 쓰는 값이 항상 같음
   const hasInvalidChar = !LIVE_PATTERN.test(nickname);
+  const isOnlyDigits = ONLY_DIGITS.test(nickname);
+  const isTooShort = nickname.length > 0 && nickname.length < NICKNAME_MIN;
+
+  // 중복확인 전 단계의 규칙을 모두 통과했는지
+  const isValid =
+    nickname.length >= NICKNAME_MIN &&
+    !isTooLong &&
+    STRICT_PATTERN.test(nickname) && // 조합이 끝난 글자만
+    !isOnlyDigits;
 
   // 현재 화면에 보여줄 상태를 하나로 결정
-  // 위에서부터 우선순위 순으로 검사하고, 먼저 걸리는 상태를 사용함
+  // 위에서부터 우선순위 순으로 검사하고, 먼저 걸리는 상태를 사용함(순서체크)
   const status: Status = (() => {
-    if (!nickname) return 'idle'; // 비어있음 -> 입력 전
-    if (hasInvalidChar) return 'invalid'; // 허용되지 않는 문자 -> 최우선 에러
-    if (isTooLong) return 'tooLong'; // 8자 초과 시도
-    if (isChecked) return 'available'; // 중복확인 통과
-    if (isDuplicate) return 'duplicate'; // 중복
-    if (hasServerError) return 'error'; // 서버 오류
-    return 'typing'; // 그 외: 입력 중 (아직 중복확인 안 함)
+    if (!nickname) return 'idle';
+    if (hasInvalidChar) return 'invalid';
+    if (isTooLong) return 'tooLong';
+    if (isOnlyDigits) return 'onlyDigits';
+    if (isTooShort) return 'tooShort';
+    if (isChecked) return 'available';
+    if (isDuplicate) return 'duplicate';
+    if (hasServerError) return 'error';
+    return 'typing';
   })();
 
+  //항상 최신 닉네임을 가리킴
+  const latestNicknameRef = useRef(nickname);
+  latestNicknameRef.current = nickname;
+  // 체크 가능 조건
+  const canCheck = isValid && !isChecked && !isChecking;
+  //회원가입 가능 조건
+  const canSignup = isValid && isChecked && !isLoading;
+
   const handleCheckNickname = async () => {
-    const trimmed = nickname.trim();
+    if (!canCheck) return; // 규칙 위반, 확인 완료, 요청 중이면 종료
 
-    //비어있거나, 확인 완료 됐거나, 요청중이라면 -> 종료
-    if (!trimmed || isChecked || isChecking) return;
-
-    // 완성되지 않은 한글(자모만 남은 경우 등)이면 서버로 보내지 않음
-    // 이 경우 화면에는 hasInvalidChar 또는 typing 상태가 그대로 보임
-    if (!STRICT_PATTERN.test(trimmed)) {
-      setIsTooLong(false);
-      setNickname(trimmed); // 앞뒤 공백이 있었다면 정리
-      setHasServerError(false);
-      return;
-    }
-
+    const requested = nickname; // 이 값으로 요청함
     try {
-      setIsChecking(true); //확인중
-      //중복 여부 조회
-      const { available } = await checkNickname({ nickname: nickname?.trim() });
+      setIsChecking(true);
+      const { available } = await checkNickname({ nickname: requested });
+
+      // 응답이 오는 사이 입력이 바뀌었으면 이 응답은 버림
+      if (latestNicknameRef.current !== requested) return;
       setIsChecked(available);
       setIsDuplicate(!available); //중복은 아님
       setHasServerError(false); //서버에러도 아님
     } catch (error) {
+      // 입력이 바뀌었으면 에러 표시를 하지 않음
+      if (latestNicknameRef.current !== requested) return;
       console.error('닉네임 확인 실패', error);
       setIsChecked(false);
       setIsDuplicate(false);
@@ -164,21 +173,15 @@ const SignupPage = () => {
   };
 
   const handleSignup = async () => {
-    if (!nickname.trim()) {
-      alert('닉네임을 입력해주세요.');
-      return;
-    }
-    if (!isChecked) {
-      alert('닉네임 중복 확인을 해주세요.');
-      return;
-    }
+    if (!canSignup) return; // 규칙과 중복확인을 모두 통과해야만 진행
+
     try {
       setIsLoading(true);
       //토큰이 없으면 받은 후 가입요청
       if (!hasCsrfToken()) {
         await fetchCsrfToken();
       }
-      const result = await signup({ nickname: nickname.trim() });
+      const result = await signup({ nickname });
       useAuthstore.getState().setMember(result);
       navigate('/home');
     } catch (error) {
@@ -196,6 +199,8 @@ const SignupPage = () => {
   const isError =
     status === 'duplicate' ||
     status === 'tooLong' ||
+    status === 'tooShort' ||
+    status === 'onlyDigits' ||
     status === 'invalid' ||
     status === 'error';
 
@@ -224,8 +229,10 @@ const SignupPage = () => {
                   handleCheckNickname();
                 }
               }}
-              placeholder={`한글, 영문, 숫자 최대 ${MAX_LENGTH}자`}
+              placeholder={`한글, 영문, 숫자 ${NICKNAME_MIN}~${NICKNAME_MAX}자`}
               aria-invalid={isError}
+              aria-label="닉네임"
+              aria-describedby="nickname-message" // 아래 메시지와 연결
               className="min-w-0 flex-1 bg-transparent text-base outline-none"
             />
 
@@ -245,7 +252,7 @@ const SignupPage = () => {
             <span
               className={`text-sm tabular-nums ${style.bedge || 'text-gray-50'}`}
             >
-              {nickname.length}/{MAX_LENGTH}
+              {nickname.length}/{NICKNAME_MAX}
             </span>
           </div>
 
@@ -253,7 +260,7 @@ const SignupPage = () => {
           <button
             type="button"
             onClick={handleCheckNickname}
-            disabled={isChecked || isChecking}
+            disabled={!canCheck}
             className={`shrink-0 rounded-full px-4 py-2 text-[14px] font-bold transition ${
               isChecked
                 ? 'cursor-default bg-gray-20 text-gray-50'
@@ -268,6 +275,7 @@ const SignupPage = () => {
         <div className="mt-2 min-h-5 px-1">
           {status !== 'idle' && (
             <p
+              id="nickname-message"
               className={`flex items-center gap-1 text-[14px] ${style.text}`}
               role={isError ? 'alert' : undefined}
             >
@@ -284,7 +292,8 @@ const SignupPage = () => {
 
         <button
           onClick={handleSignup}
-          disabled={isLoading}
+          type="button"
+          disabled={!canSignup}
           className="mt-8 h-16 w-full rounded-lg bg-blue-60 text-[18px] font-semibold text-white transition hover:brightness-95 disabled:opacity-50"
         >
           {isLoading ? '가입 중...' : '시작하기'}
