@@ -6,7 +6,7 @@ import { fetchCsrfToken } from './api/axiosInstance';
 
 import ProtectedRoute from './components/guards/ProtectedRoute';
 
-import LoginPage from './pages/Auth/LoginPage';
+import LandingPage from './pages/Auth/LandingPage';
 import SignupPage from './pages/Auth/SignupPage';
 
 import HomePage from './pages/HomePage';
@@ -51,22 +51,24 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<LoginPage />}></Route>
-        <Route path="/signup" element={<SignupPage />}></Route>
+        <Route path={ROUTES.LANDING} element={<LandingPage />}></Route>
+        <Route path={ROUTES.SIGNUP} element={<SignupPage />}></Route>
         {/*온보딩: 가입 완료 전이라 member가 없으므로 가드 밖에 둠*/}
         <Route path={ROUTES.ONBOARDING_TERMS} element={<TermsPage />} />
         <Route path={ROUTES.ONBOARDING_NICKNAME} element={<NicknamePage />} />
         <Route path={ROUTES.ONBOARDING_TUTORIAL} element={<TutorialPage />} />
         {/*맛보기 퀴즈: 비로그인 공개*/}
         <Route path={ROUTES.TRY} element={<TryQuizPage />} />
+
         {/*로그인 안하면 로그인 페이지로 쫓겨나는 가드*/}
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
-            <Route path="/" element={<HomePage />}></Route>
+            <Route path={ROUTES.HOME} element={<HomePage />}></Route>
 
-            <Route path="/mypage" element={<MyPage />}></Route>
-            <Route path="/ranking" element={<RankingPage />}></Route>
-            <Route path="/shop" element={<ShopPage />}></Route>
+            <Route path={ROUTES.MYPAGE} element={<MyPage />}></Route>
+
+            <Route path={ROUTES.RANKING} element={<RankingPage />}></Route>
+            <Route path={ROUTES.SHOP} element={<ShopPage />}></Route>
 
             {/*문제풀이 (GNB 있는 화면)*/}
             <Route path={ROUTES.QUIZ} element={<QuizModePage />} />

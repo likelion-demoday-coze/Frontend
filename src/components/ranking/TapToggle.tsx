@@ -16,6 +16,7 @@ const TapToggle = <T extends string>({
       <button
         key={key}
         onClick={() => onChange(key)}
+        aria-pressed={value === key}
         className={`rounded-full flex gap-2 px-6 py-2 text-[14px] font-bold cursor-pointer ${value === key ? 'bg-white border border-blue-60 text-blue-60' : 'text-gray-60'}`}
       >
         {label}
