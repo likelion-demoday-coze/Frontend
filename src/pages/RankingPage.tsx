@@ -75,11 +75,6 @@ const RankingPage = () => {
     scrollRef
   );
 
-  const ACTION_PATH: Record<RankingType, string> = {
-    regular: ROUTES.QUIZ, // 정규장 → 문제 풀이
-    afterhours: ROUTES.TIME_ATTACK, // 시간외거래 → 타임어택
-  };
-
   return (
     <div className="mx-auto w-full max-w-260">
       <TapToggle

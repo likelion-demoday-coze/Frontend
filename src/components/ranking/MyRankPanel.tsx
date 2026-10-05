@@ -58,9 +58,17 @@ const MyRankPanel = ({
           </div>
         </div>
       </div>
+      <ul className="mt-24 flex flex-col gap-3">
+        {stats.map((s) => (
+          <StatPill key={s.label} {...s} />
+        ))}
+      </ul>
+
       <button
+        type="button"
         onClick={onAction}
-        className="mx-auto mt-18 block w-42 rounded-lg bg-blue-60 px-6 py-4 text-center text-[18px] font-semibold text-white cursor-pointer"
+        disabled={!onAction}
+        className="mx-auto mt-10 block w-42 cursor-pointer rounded-lg bg-blue-60 px-6 py-4 text-center text-[18px] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
       >
         {actionLabel}
       </button>

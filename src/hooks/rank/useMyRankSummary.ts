@@ -13,34 +13,41 @@ export const useMyRankSummary = () => {
     Promise.all([getStockRanking(0, 1), getTimeAttackRanking(0, 1)])
       .then(([stock, timeAttack]) => {
         if (ignore) return;
-        const cards: MyRankSummary[] = [];
+        const stockMy = stock.myRanking;
+        const timeAttackMy = timeAttack.myRanking;
 
-        // 정규장 카드: 내 기록이 있을 때만
-        if (stock.myRanking) {
-          cards.push({
+        const cards: MyRankSummary[] = [
+          {
             title: '주가 랭킹',
-            rank: stock.myRanking.rankingPosition,
+            rank: stockMy?.rankingPosition ?? null,
             stats: [
-              { label: '상위', value: `${stock.myRanking.topPercent}%` },
-              { label: '주가', value: stock.myRanking.currentStock.toFixed(2) },
-            ],
-          });
-        }
-
-        // 시간외거래 카드: 오늘 참여했을 때만
-        if (timeAttack.myRanking) {
-          cards.push({
-            title: '시간외거래 랭킹',
-            rank: timeAttack.myRanking.rankingPosition,
-            stats: [
-              { label: '상위', value: `${timeAttack.myRanking.topPercent}%` },
               {
-                label: '최고',
-                value: `${timeAttack.myRanking.correctCount}문제`,
+                label: '상위',
+                value: stockMy ? `${stockMy.topPercent}%` : '-',
+              },
+              {
+                label: '주가',
+                value: stockMy ? stockMy.currentStock.toFixed(2) : '-',
               },
             ],
-          });
-        }
+          },
+          {
+            title: '시간외거래 랭킹',
+            rank: timeAttackMy?.rankingPosition ?? null,
+            // 오늘 아직 안 했을 때만 안내문을 보여 줌
+            footnote: timeAttackMy ? undefined : '오늘은 아직 기록이 없어요',
+            stats: [
+              {
+                label: '상위',
+                value: timeAttackMy ? `${timeAttackMy.topPercent}%` : '-',
+              },
+              {
+                label: '최고',
+                value: timeAttackMy ? `${timeAttackMy.correctCount}문제` : '-',
+              },
+            ],
+          },
+        ];
 
         setData(cards);
         setStatus('done');

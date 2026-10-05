@@ -9,13 +9,15 @@ const MyRankSummaryCard = ({
   stats,
 }: MyRankSummary) => {
   return (
-    <Card className="flex gap-5 bg-white p-5">
+    <Card className="flex gap-5 bg-white p-5 h-full justify-between">
       <div className="flex shrink-0 flex-col gap-8.5">
         <h3 className="text-[14px] text-gray-60 font-semibold">{title}</h3>
         <div className="flex gap-4.5">
           <span className="flex items-center text-[24px] text-blue-60">
-            {rank}
-            <span className="px-2 text-[14px] text-gray-60">위</span>
+            {rank ?? '-'}
+            {rank !== null && (
+              <span className="px-2 text-[14px] text-gray-60">위</span>
+            )}
           </span>
           {!!change && (
             <span className="flex items-center gap-1 text-sm font-semibold">
@@ -29,7 +31,7 @@ const MyRankSummaryCard = ({
         {/* 안내문이 있을 때만 줄을 그림 */}
         {footnote && <p className="text-[12px] text-gray-60">{footnote}</p>}
       </div>
-      <ul className="flex min-w-0 flex-1 flex-col gap-4">
+      <ul className="flex w-30 shrink-0 flex-col gap-4">
         {stats.map(({ label, value }) => (
           <li
             key={label}
