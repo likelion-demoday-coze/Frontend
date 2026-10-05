@@ -15,6 +15,7 @@ const Layout = () => {
               streakDays={4}
               passOrCash={{ hasPass: true, remainingDays: 9 }}
             />
+            ㄴ
           </div>
           <main>
             <Outlet />
