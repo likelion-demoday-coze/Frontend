@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import PageTitle from '../../components/common/PageTitle';
 import ModeCard from '../../components/quiz/ModeCard';
-import { ROUTES } from '../../constants/routes';
+import StartConfirmModal from '../../components/quiz/StartConfirmModal';
+import { ROUTES, toRanking } from '../../constants/routes';
 import {
   DAILY_FISH_COST,
   TIME_ATTACK_FISH_COST,
@@ -13,31 +15,31 @@ type QuizMode = 'daily' | 'timeAttack';
 const QuizModePage = () => {
   const navigate = useNavigate();
   const [selectedMode, setSelectedMode] = useState<QuizMode | null>(null);
+  const [isTimeAttackConfirmOpen, setIsTimeAttackConfirmOpen] = useState(false);
   const { fishBalance, isPass, dailyAttempt, timeAttackAttempt } =
     useQuizEntryStatus();
 
-  //정규장은 횟수 소진 후에도 학습 가능, 시간외거래는 불가
-  const isTimeAttackExhausted =
-    timeAttackAttempt.used >= timeAttackAttempt.limit;
-  const canStart =
-    selectedMode === 'daily' ||
-    (selectedMode === 'timeAttack' && !isTimeAttackExhausted);
-
+  //정규장은 카테고리 선택으로, 시간외거래는 바로 시작 팝업
   const handleStart = () => {
-    if (!canStart) return;
-    navigate(selectedMode === 'daily' ? ROUTES.DAILY_QUIZ : ROUTES.TIME_ATTACK);
+    if (selectedMode === 'daily') navigate(ROUTES.DAILY_QUIZ);
+    if (selectedMode === 'timeAttack') setIsTimeAttackConfirmOpen(true);
+  };
+
+  const handleCloseConfirm = useCallback(
+    () => setIsTimeAttackConfirmOpen(false),
+    []
+  );
+
+  const handleStartTimeAttack = () => {
+    //TODO: 타임어택 세션 생성 API 연동 후 진행 화면으로 이동
   };
 
   return (
     <div className="flex flex-col gap-8 lg:gap-16">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl leading-9 font-semibold text-black lg:text-[28px]">
-          어떤 모드로 투자하시겠어요?
-        </h1>
-        <p className="text-base font-medium text-gray-60 lg:text-lg">
-          원하는 매매 방식을 선택하여 지식 수익률을 극대화하세요.
-        </p>
-      </div>
+      <PageTitle
+        title="어떤 모드로 투자하시겠어요?"
+        description="원하는 매매 방식을 선택하여 지식 수익률을 극대화하세요."
+      />
 
       <div className="flex flex-col items-center gap-10 lg:w-fit lg:gap-15">
         <div
@@ -75,12 +77,26 @@ const QuizModePage = () => {
         <button
           type="button"
           onClick={handleStart}
-          disabled={!canStart}
+          disabled={!selectedMode}
           className="h-14 w-full rounded-xl bg-blue-60 text-lg font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-10 disabled:text-gray-60 lg:h-16 lg:w-42"
         >
           투자 시작하기
         </button>
       </div>
+
+      {isTimeAttackConfirmOpen && (
+        <StartConfirmModal
+          mode="timeAttack"
+          fishCost={TIME_ATTACK_FISH_COST}
+          fishBalance={fishBalance}
+          isPass={isPass}
+          attempt={timeAttackAttempt}
+          onClose={handleCloseConfirm}
+          onStart={handleStartTimeAttack}
+          onCharge={() => navigate(ROUTES.SHOP)}
+          onRanking={() => navigate(toRanking('afterhours'))}
+        />
+      )}
     </div>
   );
 };

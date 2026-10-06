@@ -68,6 +68,7 @@ const DailyCategoryPage = () => {
 
       {isConfirmOpen && selectedCategory && (
         <StartConfirmModal
+          mode="daily"
           categoryLabel={QUIZ_CATEGORY_INFO[selectedCategory].label}
           fishCost={DAILY_FISH_COST}
           fishBalance={fishBalance}
