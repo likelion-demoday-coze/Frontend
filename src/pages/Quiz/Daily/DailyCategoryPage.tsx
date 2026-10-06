@@ -8,7 +8,8 @@ import {
   QUIZ_CATEGORY_INFO,
 } from '../../../constants/quizCategory';
 import { DAILY_FISH_COST } from '../../../constants/quizCost';
-import { ROUTES } from '../../../constants/routes';
+import { ROUTES, toDailyQuizPlay } from '../../../constants/routes';
+import { createSession, getActiveSession } from '../../../api/dailyQuiz';
 import useQuizEntryStatus from '../../../hooks/useQuizEntryStatus';
 import type { QuizCategory } from '../../../types/quiz';
 
@@ -19,6 +20,7 @@ const DailyCategoryPage = () => {
     null
   );
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
 
   const handleNext = () => {
     if (!selectedCategory) return;
@@ -27,8 +29,25 @@ const DailyCategoryPage = () => {
 
   const handleCloseConfirm = useCallback(() => setIsConfirmOpen(false), []);
 
-  const handleStart = () => {
-    //TODO: 세션 생성 API 연동 후 문제 풀이 화면으로 이동
+  const handleStart = async () => {
+    if (!selectedCategory || isStarting) return;
+    setIsStarting(true);
+    try {
+      //당일 진행 중인 세션이 있으면 새로 만들지 않고 이어 풀기
+      const active = await getActiveSession().catch(() => null);
+      const isResumable =
+        active?.status === 'IN_PROGRESS' ||
+        active?.status === 'ORIGINAL_COMPLETED';
+      const sessionId =
+        isResumable && active
+          ? active.sessionId
+          : (await createSession({ category: selectedCategory })).sessionId;
+      navigate(toDailyQuizPlay(sessionId));
+    } catch (error) {
+      console.error('정규장 세션 생성 실패', error);
+      alert('정규장을 시작하지 못했어요. 잠시 후 다시 시도해 주세요.');
+      setIsStarting(false);
+    }
   };
 
   return (
