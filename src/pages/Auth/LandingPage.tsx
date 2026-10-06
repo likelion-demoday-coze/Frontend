@@ -1,6 +1,6 @@
 import { startKaKaoLogin } from '../../api/auth';
 
-const LoginPage = () => {
+const LandingPage = () => {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6">
       <h1 className="text-2xl font-bold">로그인</h1>
@@ -14,4 +14,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default LandingPage;
