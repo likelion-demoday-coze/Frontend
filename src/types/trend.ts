@@ -1,6 +1,6 @@
 export interface EconomicTrendItem {
-  id: number;
-  category: string; // 예: '거시경제'
+  trendId: number;
+  displayOrder: number;
   title: string;
 }
 
@@ -16,10 +16,10 @@ export interface TodayEconomicTrend {
 export interface EconomicTrendDetail extends EconomicTrendItem {
   contentDate: string;
   generatedAt: string;
-  summary: string;
+  summary: string; //요약
   terms: {
     name: string;
-    description: string;
+    description: string; //용어
   }[];
   references: {
     title: string;
