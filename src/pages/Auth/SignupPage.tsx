@@ -142,7 +142,10 @@ const SignupPage = () => {
 
   //항상 최신 닉네임을 가리킴
   const latestNicknameRef = useRef(nickname);
-  latestNicknameRef.current = nickname;
+
+  useEffect(() => {
+    latestNicknameRef.current = nickname;
+  });
   // 체크 가능 조건
   const canCheck = isValid && !isChecked && !isChecking;
   //회원가입 가능 조건

@@ -18,9 +18,11 @@ const DailyRewardCard = () => {
   const [status, setStatus] = useState<ViewStatus>('loading');
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchStatus = () => {
-    let ignore = false; // 화면을 떠난 뒤 늦게 온 응답 무시
-    setStatus('loading');
+  const [retryCount, setRetryCount] = useState(0);
+
+  useEffect(() => {
+    let ignore = false;
+
     getAttendanceToday()
       .then((res) => {
         if (!ignore) setStatus(res.status);
@@ -28,12 +30,18 @@ const DailyRewardCard = () => {
       .catch(() => {
         if (!ignore) setStatus('error');
       });
+
+    // 화면을 떠나거나 새로운 조회가 시작되면 이전 응답은 무시해.
     return () => {
       ignore = true;
     };
-  };
+  }, [retryCount]);
 
-  useEffect(() => fetchStatus(), []);
+  const handleRetry = () => {
+    // 클릭 이벤트 안에서 로딩 상태를 바꾸는 건 괜찮아.
+    setStatus('loading');
+    setRetryCount((previous) => previous + 1);
+  };
 
   const handleClaim = async () => {
     if (isLoading) return;
@@ -59,7 +67,7 @@ const DailyRewardCard = () => {
       case 'loading':
         return { label: '', onClick: undefined, disabled: true };
       case 'error':
-        return { label: '다시 시도', onClick: fetchStatus, disabled: false };
+        return { label: '다시 시도', onClick: handleRetry, disabled: false };
       case 'AVAILABLE':
         return {
           label: '🐟 오늘의 FISH 받기',
