@@ -38,11 +38,25 @@ const DailyCategoryPage = () => {
       const isResumable =
         active?.status === 'IN_PROGRESS' ||
         active?.status === 'ORIGINAL_COMPLETED';
-      const sessionId =
-        isResumable && active
-          ? active.sessionId
-          : (await createSession({ category: selectedCategory })).sessionId;
-      navigate(toDailyQuizPlay(sessionId));
+
+      if (isResumable && active) {
+        //TODO: 이어 풀기 안내 디자인 나오면 confirm 교체
+        if (
+          active.category !== selectedCategory &&
+          !confirm(
+            `진행 중인 '${QUIZ_CATEGORY_INFO[active.category].label}' 정규장이 있어요.\n이어서 풀까요?`
+          )
+        ) {
+          setIsStarting(false);
+          setIsConfirmOpen(false);
+          return;
+        }
+        navigate(toDailyQuizPlay(active.sessionId));
+        return;
+      }
+
+      const created = await createSession({ category: selectedCategory });
+      navigate(toDailyQuizPlay(created.sessionId));
     } catch (error) {
       console.error('정규장 세션 생성 실패', error);
       alert('정규장을 시작하지 못했어요. 잠시 후 다시 시도해 주세요.');
