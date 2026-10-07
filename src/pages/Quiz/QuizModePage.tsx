@@ -19,8 +19,15 @@ const QuizModePage = () => {
   const { fishBalance, isPass, dailyAttempt, timeAttackAttempt } =
     useQuizEntryStatus();
 
+  const fishCost =
+    selectedMode === 'timeAttack' ? TIME_ATTACK_FISH_COST : DAILY_FISH_COST;
+  const isFishShort = !!selectedMode && !isPass && fishBalance < fishCost;
+
+  const goToShop = () => navigate(ROUTES.SHOP);
+
   //정규장은 카테고리 선택으로, 시간외거래는 바로 시작 팝업
   const handleStart = () => {
+    if (isFishShort) return goToShop();
     if (selectedMode === 'daily') navigate(ROUTES.DAILY_QUIZ);
     if (selectedMode === 'timeAttack') setIsTimeAttackConfirmOpen(true);
   };
@@ -48,28 +55,24 @@ const QuizModePage = () => {
           className="flex w-full flex-col gap-4 lg:flex-row lg:gap-5"
         >
           <ModeCard
-            title="정규장"
-            subtitle="매일 5문제 학습"
-            description="8개 섹터 중 하나를 선택해 주가를 올려보세요."
+            mode="daily"
             fishCost={DAILY_FISH_COST}
             fishBalance={fishBalance}
             isPass={isPass}
             attempt={dailyAttempt}
-            exhaustedMessage={'오늘 주가 반영 횟수를\n모두 소진하셨습니다'}
             selected={selectedMode === 'daily'}
             onSelect={() => setSelectedMode('daily')}
+            onCharge={goToShop}
           />
           <ModeCard
-            title="시간외거래"
-            subtitle="1분 타임어택 단타"
-            description="빠른 순발력으로 랭킹을 뒤집으세요."
+            mode="timeAttack"
             fishCost={TIME_ATTACK_FISH_COST}
             fishBalance={fishBalance}
             isPass={isPass}
             attempt={timeAttackAttempt}
-            exhaustedMessage={'오늘 학습 횟수를\n모두 소진하셨습니다'}
             selected={selectedMode === 'timeAttack'}
             onSelect={() => setSelectedMode('timeAttack')}
+            onCharge={goToShop}
           />
         </div>
 
@@ -78,9 +81,9 @@ const QuizModePage = () => {
           type="button"
           onClick={handleStart}
           disabled={!selectedMode}
-          className="h-14 w-full rounded-xl bg-blue-60 text-lg font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-10 disabled:text-gray-60 lg:h-16 lg:w-42"
+          className="h-14 w-full cursor-pointer rounded-xl bg-blue-60 text-lg font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-10 disabled:text-gray-60 lg:h-16 lg:w-42"
         >
-          투자 시작하기
+          {isFishShort ? 'FISH 충전하기' : '투자 시작하기'}
         </button>
       </div>
 
@@ -93,7 +96,7 @@ const QuizModePage = () => {
           attempt={timeAttackAttempt}
           onClose={handleCloseConfirm}
           onStart={handleStartTimeAttack}
-          onCharge={() => navigate(ROUTES.SHOP)}
+          onCharge={goToShop}
           onRanking={() => navigate(toRanking('afterhours'))}
         />
       )}
