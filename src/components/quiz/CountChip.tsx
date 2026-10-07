@@ -11,8 +11,8 @@ interface CountChipProps {
 
 const chipStyles: Record<CountChipType, string> = {
   correct: 'border-blue-60 bg-blue-05 text-blue-60',
-  wrong: 'border-red-55 bg-red-10 text-red-r',
-  combo: 'border-red-55 bg-yellow-05 text-yellow-45',
+  wrong: 'border-red-55 bg-red-02 text-red-r',
+  combo: 'border-red-55 bg-yellow-05 text-red-55',
 };
 
 const labels: Record<CountChipType, string> = {
