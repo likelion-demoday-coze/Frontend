@@ -1,3 +1,9 @@
+export interface TrendItem {
+  id: number;
+  category: string;
+  title: string;
+}
+
 export interface EconomicTrendItem {
   trendId: number;
   displayOrder: number;

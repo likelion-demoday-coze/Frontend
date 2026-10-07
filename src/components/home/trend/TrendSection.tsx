@@ -1,16 +1,10 @@
 import { useState, useEffect } from 'react';
-import {
-  getEconomicTrendDetail,
-  getTodayEconomicTrends,
-} from '../../../api/trend';
+import { getTodayEconomicTrends } from '../../../api/trend';
 import SectionTitle from '../../common/SectionTitle';
-import type {
-  EconomicTrendDetail,
-  EconomicTrendItem,
-} from '../../../types/trend';
+import type { EconomicTrendItem } from '../../../types/trend';
 
 import TrendCard from './TrendCard';
-import { MOCK_TRENDS } from '../../../mocks/trendMock';
+import TrendModal from './TrendModal';
 
 //정적 데이터
 const TOTAL_TRENDS = 3;
@@ -19,7 +13,7 @@ type LoadStore = 'loading' | 'done' | 'error';
 
 const TrendSection = () => {
   const [items, setItems] = useState<EconomicTrendItem[]>([]);
-  const [status, setStatus] = useState<LoadState>('loading');
+  const [status, setStatus] = useState<LoadStore>('loading');
   const [message, setMessage] = useState('');
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
@@ -36,7 +30,7 @@ const TrendSection = () => {
         }
         //준비 완료된 트랜드 개수가 반드시 3개여야되는지 검토 필요
         setItems(
-          [...res.items].sort((a, b) => (a.displayOrder = b.displayOrder))
+          [...res.items].sort((a, b) => a.displayOrder - b.displayOrder)
         );
         setStatus('done');
       })
@@ -47,6 +41,7 @@ const TrendSection = () => {
       ignore = true;
     };
   }, []);
+
   return (
     <div>
       <SectionTitle
@@ -63,6 +58,13 @@ const TrendSection = () => {
           />
         ))}
       </div>
+      {selectedIndex !== null && (
+        <TrendModal
+          items={items}
+          initialIndex={selectedIndex}
+          onClose={() => setSelectedIndex(null)}
+        />
+      )}
     </div>
   );
 };
