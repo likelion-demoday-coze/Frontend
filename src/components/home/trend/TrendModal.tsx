@@ -29,7 +29,7 @@ const TrendModal = ({ items, initialIndex, onClose }: TrendModalProps) => {
   //API 요청에 사용
   const trendId = items[index].trendId;
   //index가 2개면 마지막트랜드(총3개)
-  const isLast = index === 2;
+  const isLast = index === items.length - 1;
 
   //모달을 처음 켰을 때 실행
   useEffect(() => {
@@ -92,9 +92,8 @@ const TrendModal = ({ items, initialIndex, onClose }: TrendModalProps) => {
     >
       <div className="mb-8 flex items-center gap-4">
         <span className="rounded-xl border w-14 h-8 border-blue-60 bg-blue-05 px-3 py-2 text-[16px] text-blue-60 flex items-center justify-center">
-          {index + 1}/3
+          {index + 1}/{items.length}
         </span>
-
         {/* TODO 트렌드 받아오기 */}
         <span className="font-semibold text-[16px]">경제 트렌드</span>
 
@@ -124,6 +123,16 @@ const TrendModal = ({ items, initialIndex, onClose }: TrendModalProps) => {
       {status === 'error' && (
         <div className="py-20 text-center">
           <p>트렌드 상세 정보를 불러오지 못했어요.</p>
+          <button
+            type="button"
+            onClick={() => {
+              setStatus('loading');
+              setRetryCount((previous) => previous + 1);
+            }}
+            className="mt-4 cursor-pointer rounded-xl bg-blue-60 px-4 py-2 text-white"
+          >
+            다시 시도
+          </button>
         </div>
       )}
 
