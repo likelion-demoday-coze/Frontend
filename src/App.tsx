@@ -5,6 +5,7 @@ import useAuthstore from './stores/useAuthStore';
 import { fetchCsrfToken } from './api/axiosInstance';
 
 import ProtectedRoute from './components/guards/ProtectedRoute';
+import GuestOnlyRoute from './components/guards/GuestOnlyRoute';
 
 import LandingPage from './pages/Auth/LandingPage';
 import SignupPage from './pages/Auth/SignupPage';
@@ -51,9 +52,12 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path={ROUTES.LANDING} element={<LandingPage />}></Route>
-        <Route path={ROUTES.SIGNUP} element={<SignupPage />}></Route>
-        {/*온보딩: 가입 완료 전이라 member가 없으므로 가드 밖에 둠*/}
+        <Route element={<GuestOnlyRoute />}>
+          <Route path={ROUTES.LANDING} element={<LandingPage />}></Route>
+          <Route path={ROUTES.SIGNUP} element={<SignupPage />}></Route>
+        </Route>
+
+        {/*온보딩 -> 이거 곧 삭제할게요 튜토리얼도 닉네임페이지도 안씀!*/}
         <Route path={ROUTES.ONBOARDING_TERMS} element={<TermsPage />} />
         <Route path={ROUTES.ONBOARDING_NICKNAME} element={<NicknamePage />} />
         <Route path={ROUTES.ONBOARDING_TUTORIAL} element={<TutorialPage />} />
