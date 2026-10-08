@@ -79,7 +79,7 @@ const StockLineChart = ({
 
         {/* 파란 꺾은선 */}
         <Line
-          type="linear" // 점 사이를 직선으로 연결 (부드러운 곡선은 'monotone')
+          type="linear" // 점 사이를 직선으로 연결
           dataKey="value" // data의 어떤 값을 y축 높이로 쓸지
           stroke={LINE_COLOR}
           strokeWidth={2}
