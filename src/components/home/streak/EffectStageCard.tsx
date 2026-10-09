@@ -1,5 +1,5 @@
 const EffectStageCard = () => {
-  return <div>스트릭 고양이 스탬프</div>;
+  return <div>효과 경로</div>;
 };
 
 export default EffectStageCard;

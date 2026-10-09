@@ -4,6 +4,7 @@ import { signup, checkNickname } from '../../api/auth';
 import { fetchCsrfToken, hasCsrfToken } from '../../api/axiosInstance';
 import useAuthstore from '../../stores/useAuthStore';
 
+import textlogo from '../../assets/logos/coze_text_logo_black.svg';
 import CheckIcon from '../../assets/signup/check.svg?react';
 import CrossIcon from '../../assets/signup/cross.svg?react';
 import catImage from '../../assets/character/basic_pose_cat.svg';
@@ -141,7 +142,10 @@ const SignupPage = () => {
 
   //항상 최신 닉네임을 가리킴
   const latestNicknameRef = useRef(nickname);
-  latestNicknameRef.current = nickname;
+
+  useEffect(() => {
+    latestNicknameRef.current = nickname;
+  });
   // 체크 가능 조건
   const canCheck = isValid && !isChecked && !isChecking;
   //회원가입 가능 조건
@@ -205,107 +209,112 @@ const SignupPage = () => {
     status === 'error';
 
   return (
-    <div className="flex clamp min-h-screen flex-col items-center overflow-hidden px-4 pt-25">
-      <div className="mb-7 w-full max-w-135.25">
-        <div className="mb-13 text-left">
-          <h1 className="text-[28px] font-semibold">닉네임을 정해주세요</h1>
-          <p className="mt-2 text-[18px] text-gray-60">
-            랭킹에 공개되는 이름이에요. 마이페이지에서 언제든 바꿀 수 있어요.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-5">
-          <div
-            className={`flex h-14 flex-1 items-center rounded-xl border bg-white px-5 transition-colors ${style.border}`}
-          >
-            <input
-              ref={inputRef}
-              type="text"
-              value={nickname}
-              onChange={(e) => handleChange(e.target.value)}
-              onKeyDown={(e) => {
-                // Enter로 중복확인 가능
-                if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
-                  handleCheckNickname();
-                }
-              }}
-              placeholder={`한글, 영문, 숫자 ${NICKNAME_MIN}~${NICKNAME_MAX}자`}
-              aria-invalid={isError}
-              aria-label="닉네임"
-              aria-describedby="nickname-message" // 아래 메시지와 연결
-              className="min-w-0 flex-1 bg-transparent text-base outline-none"
-            />
-
-            {/* 입력 지우기 버튼: 입력값이 있을 때만 노출 */}
-            {nickname && (
-              <button
-                type="button"
-                onClick={handleClear}
-                aria-label="입력 지우기"
-                className="mr-3 flex h-3 w-3 items-center justify-center rounded-full bg-gray-10 text-gray-60 text-[10px] cursor-pointer"
-              >
-                ✕
-              </button>
-            )}
-
-            {/* 글자수 카운터  */}
-            <span
-              className={`text-sm tabular-nums ${style.bedge || 'text-gray-50'}`}
-            >
-              {nickname.length}/{NICKNAME_MAX}
-            </span>
+    <div>
+      <header className="mx-auto max-w-300 px-15 pt-6">
+        <img src={textlogo} alt="COZ:E" className="h-8" />
+      </header>
+      <div className="flex clamp min-h-screen flex-col items-center overflow-hidden px-4 pt-15">
+        <div className="mb-7 w-full max-w-135.25">
+          <div className="mb-13 text-left">
+            <h1 className="text-[28px] font-semibold">닉네임을 정해주세요</h1>
+            <p className="mt-2 text-[18px] text-gray-60">
+              랭킹에 공개되는 이름이에요. 마이페이지에서 언제든 바꿀 수 있어요.
+            </p>
           </div>
 
-          {/* 중복 확인 버튼 */}
+          <div className="flex items-center gap-5">
+            <div
+              className={`flex h-14 flex-1 items-center rounded-xl border bg-white px-5 transition-colors ${style.border}`}
+            >
+              <input
+                ref={inputRef}
+                type="text"
+                value={nickname}
+                onChange={(e) => handleChange(e.target.value)}
+                onKeyDown={(e) => {
+                  // Enter로 중복확인 가능
+                  if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+                    handleCheckNickname();
+                  }
+                }}
+                placeholder={`한글, 영문, 숫자 ${NICKNAME_MIN}~${NICKNAME_MAX}자`}
+                aria-invalid={isError}
+                aria-label="닉네임"
+                aria-describedby="nickname-message" // 아래 메시지와 연결
+                className="min-w-0 flex-1 bg-transparent text-base outline-none"
+              />
+
+              {/* 입력 지우기 버튼: 입력값이 있을 때만 노출 */}
+              {nickname && (
+                <button
+                  type="button"
+                  onClick={handleClear}
+                  aria-label="입력 지우기"
+                  className="mr-3 flex h-3 w-3 items-center justify-center rounded-full bg-gray-10 text-gray-60 text-[10px] cursor-pointer"
+                >
+                  ✕
+                </button>
+              )}
+
+              {/* 글자수 카운터  */}
+              <span
+                className={`text-sm tabular-nums ${style.bedge || 'text-gray-50'}`}
+              >
+                {nickname.length}/{NICKNAME_MAX}
+              </span>
+            </div>
+
+            {/* 중복 확인 버튼 */}
+            <button
+              type="button"
+              onClick={handleCheckNickname}
+              disabled={!canCheck}
+              className={`shrink-0 rounded-full px-4 py-2 text-[14px] font-bold transition ${
+                isChecked
+                  ? 'cursor-default bg-gray-20 text-gray-50'
+                  : 'bg-blue-60 text-white hover:brightness-95 disabled:opacity-50'
+              }`}
+            >
+              {isChecked ? '확인완료' : isChecking ? '확인 중...' : '중복확인'}
+            </button>
+          </div>
+
+          {/* 입력중일땐 아무것도 안뜸*/}
+          <div className="mt-2 min-h-5 px-1">
+            {status !== 'idle' && (
+              <p
+                id="nickname-message"
+                className={`flex items-center gap-1 text-[14px] ${style.text}`}
+                role={isError ? 'alert' : undefined}
+              >
+                {status === 'available' && (
+                  <CheckIcon aria-hidden className={`h-3 w-3 ${style.bedge}`} />
+                )}
+                {isError && (
+                  <CrossIcon aria-hidden className={`h-3 w-3 ${style.bedge}`} />
+                )}
+                {MESSAGE[status]}
+              </p>
+            )}
+          </div>
+
           <button
+            onClick={handleSignup}
             type="button"
-            onClick={handleCheckNickname}
-            disabled={!canCheck}
-            className={`shrink-0 rounded-full px-4 py-2 text-[14px] font-bold transition ${
-              isChecked
-                ? 'cursor-default bg-gray-20 text-gray-50'
-                : 'bg-blue-60 text-white hover:brightness-95 disabled:opacity-50'
-            }`}
+            disabled={!canSignup}
+            className="mt-8 h-16 w-full rounded-lg bg-blue-60 text-[18px] font-semibold text-white transition hover:brightness-95 disabled:opacity-50"
           >
-            {isChecked ? '확인완료' : isChecking ? '확인 중...' : '중복확인'}
+            {isLoading ? '가입 중...' : '시작하기'}
           </button>
         </div>
 
-        {/* 입력중일땐 아무것도 안뜸*/}
-        <div className="mt-2 min-h-5 px-1">
-          {status !== 'idle' && (
-            <p
-              id="nickname-message"
-              className={`flex items-center gap-1 text-[14px] ${style.text}`}
-              role={isError ? 'alert' : undefined}
-            >
-              {status === 'available' && (
-                <CheckIcon aria-hidden className={`h-3 w-3 ${style.bedge}`} />
-              )}
-              {isError && (
-                <CrossIcon aria-hidden className={`h-3 w-3 ${style.bedge}`} />
-              )}
-              {MESSAGE[status]}
-            </p>
-          )}
+        <div className="relative -mt-10 h-[510px] w-218.75 shrink-0 overflow-hidden">
+          <div className="absolute top-74 left-7 z-10 rounded-full bg-blue-50 px-3 py-2 text-sm font-bold text-blue-05">
+            뭐라고 불러주면 될까 냥?
+          </div>
+
+          <img src={catImage} alt="고양이" className="block h-auto w-full" />
         </div>
-
-        <button
-          onClick={handleSignup}
-          type="button"
-          disabled={!canSignup}
-          className="mt-8 h-16 w-full rounded-lg bg-blue-60 text-[18px] font-semibold text-white transition hover:brightness-95 disabled:opacity-50"
-        >
-          {isLoading ? '가입 중...' : '시작하기'}
-        </button>
-      </div>
-
-      <div className="relative -mt-10 h-[510px] w-218.75 shrink-0 overflow-hidden">
-        <div className="absolute top-74 left-7 z-10 rounded-full bg-blue-50 px-3 py-2 text-sm font-bold text-blue-05">
-          뭐라고 불러주면 될까 냥?
-        </div>
-
-        <img src={catImage} alt="고양이" className="block h-auto w-full" />
       </div>
     </div>
   );

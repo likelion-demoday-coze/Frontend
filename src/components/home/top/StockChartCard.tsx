@@ -31,7 +31,7 @@ const StockChartCard = () => {
 
   useEffect(() => {
     let ignore = false; //탭을 너무 빠르게 바꿨을 때 늦게 온 옛 응답 무시
-    setStatus('loading');
+
     getStockGraph(period)
       .then((res) => {
         if (ignore) return;
@@ -45,6 +45,14 @@ const StockChartCard = () => {
       ignore = true;
     };
   }, [period]);
+
+  const handlePeriodChange = (nextPeriod: StockPeriod) => {
+    // 같은 탭은 요청이 다시 실행되지 않으므로 로딩으로 바꾸지 않아.
+    if (nextPeriod === period) return;
+
+    setStatus('loading');
+    setPeriod(nextPeriod);
+  };
 
   //증감율 계산
   const rate = history?.changeRate ?? 0;
@@ -81,7 +89,7 @@ const StockChartCard = () => {
           {PERIODS.map(({ key, label }) => (
             <button
               key={key}
-              onClick={() => setPeriod(key)}
+              onClick={() => handlePeriodChange(key)}
               className={`flex items-center rounded-full border px-4 py-2 ${
                 period === key
                   ? 'border-blue-60 font-bold text-blue-60'

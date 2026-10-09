@@ -36,7 +36,10 @@ export const usePagedRanking = (
 
   // fetchPage가 바뀌어도 loadMore를 새로 만들지 않도록 ref에 최신 함수를 보관
   const fetchPageRef = useRef(fetchPage);
-  fetchPageRef.current = fetchPage;
+
+  useEffect(() => {
+    fetchPageRef.current = fetchPage;
+  }, [fetchPage]);
 
   const loadMore = useCallback(async () => {
     if (loadingRef.current || !hasNextRef.current) return;
