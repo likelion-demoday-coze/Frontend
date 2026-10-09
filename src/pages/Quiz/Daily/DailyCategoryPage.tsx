@@ -34,7 +34,7 @@ const DailyCategoryPage = () => {
     setIsStarting(true);
     try {
       //당일 진행 중인 세션이 있으면 새로 만들지 않고 이어 풀기
-      const active = await getActiveSession().catch(() => null);
+      const active = await getActiveSession();
       const isResumable =
         active?.status === 'IN_PROGRESS' ||
         active?.status === 'ORIGINAL_COMPLETED';

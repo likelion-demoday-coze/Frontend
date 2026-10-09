@@ -2,12 +2,14 @@ import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageTitle from '../../components/common/PageTitle';
 import ModeCard from '../../components/quiz/ModeCard';
+import ResumeQuizModal from '../../components/quiz/ResumeQuizModal';
 import StartConfirmModal from '../../components/quiz/StartConfirmModal';
-import { ROUTES, toRanking } from '../../constants/routes';
+import { ROUTES, toDailyQuizPlay, toRanking } from '../../constants/routes';
 import {
   DAILY_FISH_COST,
   TIME_ATTACK_FISH_COST,
 } from '../../constants/quizCost';
+import useActiveDailySession from '../../hooks/useActiveDailySession';
 import useQuizEntryStatus from '../../hooks/useQuizEntryStatus';
 
 type QuizMode = 'daily' | 'timeAttack';
@@ -16,17 +18,22 @@ const QuizModePage = () => {
   const navigate = useNavigate();
   const [selectedMode, setSelectedMode] = useState<QuizMode | null>(null);
   const [isTimeAttackConfirmOpen, setIsTimeAttackConfirmOpen] = useState(false);
+  const [isResumeOpen, setIsResumeOpen] = useState(false);
   const { fishBalance, isPass, dailyAttempt, timeAttackAttempt } =
     useQuizEntryStatus();
+  const { activeSession } = useActiveDailySession();
 
+  const isResumable = selectedMode === 'daily' && !!activeSession;
   const fishCost =
     selectedMode === 'timeAttack' ? TIME_ATTACK_FISH_COST : DAILY_FISH_COST;
-  const isFishShort = !!selectedMode && !isPass && fishBalance < fishCost;
+  const isFishShort =
+    !!selectedMode && !isResumable && !isPass && fishBalance < fishCost;
 
   const goToShop = () => navigate(ROUTES.SHOP);
 
-  //정규장은 카테고리 선택으로, 시간외거래는 바로 시작 팝업
+  //정규장은 이어 풀기 또는 카테고리 선택으로, 시간외거래는 바로 시작 팝업
   const handleStart = () => {
+    if (isResumable) return setIsResumeOpen(true);
     if (isFishShort) return goToShop();
     if (selectedMode === 'daily') navigate(ROUTES.DAILY_QUIZ);
     if (selectedMode === 'timeAttack') setIsTimeAttackConfirmOpen(true);
@@ -36,6 +43,7 @@ const QuizModePage = () => {
     () => setIsTimeAttackConfirmOpen(false),
     []
   );
+  const handleCloseResume = useCallback(() => setIsResumeOpen(false), []);
 
   const handleStartTimeAttack = () => {
     //TODO: 타임어택 세션 생성 API 연동 후 진행 화면으로 이동
@@ -60,6 +68,7 @@ const QuizModePage = () => {
             fishBalance={fishBalance}
             isPass={isPass}
             attempt={dailyAttempt}
+            isInProgress={!!activeSession}
             selected={selectedMode === 'daily'}
             onSelect={() => setSelectedMode('daily')}
             onCharge={goToShop}
@@ -86,6 +95,14 @@ const QuizModePage = () => {
           {isFishShort ? 'FISH 충전하기' : '투자 시작하기'}
         </button>
       </div>
+
+      {isResumeOpen && activeSession && (
+        <ResumeQuizModal
+          session={activeSession}
+          onClose={handleCloseResume}
+          onResume={() => navigate(toDailyQuizPlay(activeSession.sessionId))}
+        />
+      )}
 
       {isTimeAttackConfirmOpen && (
         <StartConfirmModal

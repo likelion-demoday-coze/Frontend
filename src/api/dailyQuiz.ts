@@ -1,3 +1,4 @@
+import { isAxiosError } from 'axios';
 import api from './axiosInstance';
 import type { ApiResponse } from '../types/api';
 import type {
@@ -30,13 +31,23 @@ export const createSession = async (payload: CreateSessionRequest) => {
   return data.result;
 };
 
-//진행 중인 세션 조회 (이어 풀기용)
-//TODO: 진행 중 세션이 없을 때 null인지 에러 응답인지 백엔드 확인 필요
+//진행 중인 세션 조회 (이어 풀기용, 없으면 SESSION_NOT_FOUND → null)
 export const getActiveSession = async () => {
-  const { data } = await api.get<ApiResponse<ActiveQuizSession | null>>(
-    `${BASE}/sessions/active`
-  );
-  return data.result;
+  try {
+    const { data } = await api.get<ApiResponse<ActiveQuizSession>>(
+      `${BASE}/sessions/active`
+    );
+    return data.result;
+  } catch (error) {
+    if (
+      isAxiosError<ApiResponse<null>>(error) &&
+      (error.response?.data?.code === 'SESSION_NOT_FOUND' ||
+        error.response?.status === 404)
+    ) {
+      return null;
+    }
+    throw error;
+  }
 };
 
 //세션 상세 조회 (문제, 보기, 풀이 여부)
