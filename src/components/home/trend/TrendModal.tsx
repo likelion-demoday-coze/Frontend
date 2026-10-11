@@ -107,7 +107,7 @@ const TrendModal = ({ items, initialIndex, onClose }: TrendModalProps) => {
         </button>
       </div>
 
-      {/* 제목은 목록 API에서 이미 받았으므로 로딩 중에도 표시 */}
+      {/* 제목은 목록 API에서 이미 받았으므로 로딩 중에도 표시 가능함 */}
       <h2 id={titleId} className="text-[24px] font-semibold text-black">
         {items[index].title}
       </h2>

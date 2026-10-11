@@ -215,7 +215,7 @@ export default function TutorialPreview({ type }: { type: PreviewType }) {
             ))}
           </div>
 
-          <div className="mx-5 mt-5 flex items-center justify-center gap-1">
+          <div className="mx-5 mt-5 flex items-center justsify-center gap-1">
             {STREAK_EFFECTS.map((effect, index) => (
               <div
                 key={effect.days}

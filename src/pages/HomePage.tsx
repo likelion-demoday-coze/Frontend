@@ -5,7 +5,7 @@ import TrendSection from '../components/home/trend/TrendSection';
 
 import MyRankingSection from '../components/home/myrank/MyRankingSection';
 
-import StreakCard from '../components/home/streak/StreakCard';
+import StreakSection from '../components/home/streak/StreakSection';
 
 const HomePage = () => {
   const [isTutorialOpen, setIsTutorialOpen] = useState(true);
@@ -18,7 +18,7 @@ const HomePage = () => {
           <MyRankingSection />
         </div>
         <div className="xl:w-95">
-          <StreakCard />
+          <StreakSection />
         </div>
       </div>
       {isTutorialOpen && (
