@@ -138,7 +138,7 @@ const ModeCard = ({
 
       <div className="flex flex-col items-end gap-3 border-t border-gray-20 pt-3">
         <div className="flex w-full items-center justify-between gap-2">
-          <span className="flex items-center gap-3 text-base leading-6.5 font-semibold text-gray-60">
+          <span className="flex items-center gap-3 text-base leading-6.5 font-semibold text-blue-60">
             FISH
             {isPass && !isInProgress && (
               <span className="rounded-[20px] bg-blue-50 px-2 py-1 text-xs leading-5.5 font-bold text-blue-05">
@@ -150,11 +150,11 @@ const ModeCard = ({
         </div>
         <div className="flex w-full flex-col gap-2">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-base leading-6.5 font-semibold text-gray-60">
+            <span className="text-base leading-6.5 font-semibold text-blue-60">
               {attemptLabel}
             </span>
             <span
-              className={`text-sm leading-4.5 ${isDisabled ? 'font-bold text-red-55' : 'font-semibold text-gray-60'}`}
+              className={`text-sm leading-4.5 ${isExhausted ? 'font-bold text-red-55' : 'font-semibold text-gray-60'}`}
             >
               {attempt.used}/{attempt.limit}회 사용
             </span>
