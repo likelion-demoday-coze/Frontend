@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getAttendanceToday } from '../api/attendance';
 import { getFishBalance } from '../api/fish';
+import { getStreakRecovery } from '../api/streak';
 import { getTimeAttackToday } from '../api/timeAttack';
 
 export interface QuizAttempt {
@@ -13,17 +14,23 @@ export interface QuizEntryStatus {
   isPass: boolean;
   dailyAttempt: QuizAttempt;
   timeAttackAttempt: QuizAttempt;
+  isRecovering: boolean;
 }
 
-//문제풀이 입장에 필요한 생선 잔액, 패스 여부, 오늘 횟수
+//문제풀이 입장에 필요한 생선 잔액, 패스 여부, 오늘 횟수, 복구 진행 여부
 const useQuizEntryStatus = () => {
   const [status, setStatus] = useState<QuizEntryStatus | null>(null);
   const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     let ignore = false;
-    Promise.all([getFishBalance(), getAttendanceToday(), getTimeAttackToday()])
-      .then(([fishBalance, attendance, timeAttack]) => {
+    Promise.all([
+      getFishBalance(),
+      getAttendanceToday(),
+      getTimeAttackToday(),
+      getStreakRecovery().catch(() => null),
+    ])
+      .then(([fishBalance, attendance, timeAttack, recovery]) => {
         if (ignore) return;
         const isPass = attendance.status === 'PASS_ACTIVE';
         setStatus({
@@ -35,6 +42,7 @@ const useQuizEntryStatus = () => {
             used: timeAttack.usedAttemptCount,
             limit: timeAttack.dailyAttemptLimit,
           },
+          isRecovering: recovery?.status === 'PENDING',
         });
       })
       .catch((error) => {

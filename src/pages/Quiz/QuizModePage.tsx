@@ -48,7 +48,8 @@ const QuizModePage = () => {
     );
   }
 
-  const { fishBalance, isPass, dailyAttempt, timeAttackAttempt } = status;
+  const { fishBalance, isPass, dailyAttempt, timeAttackAttempt, isRecovering } =
+    status;
   const isResumable = selectedMode === 'daily' && !!activeSession;
   const fishCost =
     selectedMode === 'timeAttack' ? TIME_ATTACK_FISH_COST : DAILY_FISH_COST;
@@ -86,6 +87,7 @@ const QuizModePage = () => {
             isPass={isPass}
             attempt={dailyAttempt}
             isInProgress={!!activeSession}
+            isRecovering={isRecovering}
             selected={selectedMode === 'daily'}
             onSelect={() => setSelectedMode('daily')}
             onCharge={goToShop}

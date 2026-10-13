@@ -13,6 +13,7 @@ interface ModeCardProps {
   isPass: boolean;
   attempt: QuizAttempt;
   isInProgress?: boolean;
+  isRecovering?: boolean;
   selected: boolean;
   onSelect: () => void;
   onCharge: () => void;
@@ -52,6 +53,7 @@ const ModeCard = ({
   isPass,
   attempt,
   isInProgress = false,
+  isRecovering = false,
   selected,
   onSelect,
   onCharge,
@@ -81,6 +83,11 @@ const ModeCard = ({
               text: `반영 ${attempt.limit}/${attempt.limit}회 완료 · 이제 학습만 가능`,
             }
           : null;
+
+  //TODO: 복구 후 연속 학습일 API 나오면 '끝까지 풀면 N일'로 교체
+  const recoveryNotice = isRecovering
+    ? '⟳ 복구 진행 중 · 끝까지 풀면 복구돼요'
+    : null;
 
   const fishValue: ReactNode = isInProgress ? (
     <span className="font-bold text-blue-60">이미 차감됨 · 추가 차감 없음</span>
@@ -132,6 +139,11 @@ const ModeCard = ({
             className={`rounded-lg border px-3 py-2 text-center text-xs leading-4.5 font-semibold break-keep ${notice.tone === 'info' ? 'border-blue-60 text-blue-60' : 'border-yellow-45 text-red-55'}`}
           >
             {notice.text}
+          </p>
+        )}
+        {recoveryNotice && (
+          <p className="rounded-lg border border-purple-45 px-3 py-2 text-center text-xs leading-4.5 font-semibold break-keep text-purple-45">
+            {recoveryNotice}
           </p>
         )}
       </div>
