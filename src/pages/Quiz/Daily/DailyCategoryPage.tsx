@@ -15,7 +15,7 @@ import type { QuizCategory } from '../../../types/quiz';
 
 const DailyCategoryPage = () => {
   const navigate = useNavigate();
-  const { fishBalance, isPass, dailyAttempt } = useQuizEntryStatus();
+  const { status } = useQuizEntryStatus();
   const [selectedCategory, setSelectedCategory] = useState<QuizCategory | null>(
     null
   );
@@ -93,20 +93,20 @@ const DailyCategoryPage = () => {
       <button
         type="button"
         onClick={handleNext}
-        disabled={!selectedCategory}
+        disabled={!selectedCategory || !status}
         className="mt-auto h-14 w-full cursor-pointer rounded-xl bg-blue-60 text-lg font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-10 disabled:text-gray-60 lg:mt-17.5 lg:h-16 lg:w-42"
       >
         카테고리 선택
       </button>
 
-      {isConfirmOpen && selectedCategory && (
+      {isConfirmOpen && selectedCategory && status && (
         <StartConfirmModal
           mode="daily"
           categoryLabel={QUIZ_CATEGORY_INFO[selectedCategory].label}
           fishCost={DAILY_FISH_COST}
-          fishBalance={fishBalance}
-          isPass={isPass}
-          attempt={dailyAttempt}
+          fishBalance={status.fishBalance}
+          isPass={status.isPass}
+          attempt={status.dailyAttempt}
           onClose={handleCloseConfirm}
           onStart={handleStart}
           onCharge={() => navigate(ROUTES.SHOP)}
