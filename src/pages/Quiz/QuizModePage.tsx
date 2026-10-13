@@ -4,7 +4,7 @@ import PageTitle from '../../components/common/PageTitle';
 import ModeCard from '../../components/quiz/ModeCard';
 import ResumeQuizModal from '../../components/quiz/ResumeQuizModal';
 import StartConfirmModal from '../../components/quiz/StartConfirmModal';
-import { ROUTES, toDailyQuizPlay, toRanking } from '../../constants/routes';
+import { ROUTES, toDailyQuizPlay } from '../../constants/routes';
 import {
   DAILY_FISH_COST,
   TIME_ATTACK_FISH_COST,
@@ -114,7 +114,6 @@ const QuizModePage = () => {
           onClose={handleCloseConfirm}
           onStart={handleStartTimeAttack}
           onCharge={goToShop}
-          onRanking={() => navigate(toRanking('afterhours'))}
         />
       )}
     </div>
