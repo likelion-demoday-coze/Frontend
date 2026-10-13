@@ -82,6 +82,7 @@ const DailyCategoryPage = () => {
               key={category}
               label={QUIZ_CATEGORY_INFO[category].label}
               description={QUIZ_CATEGORY_INFO[category].description}
+              icon={QUIZ_CATEGORY_INFO[category].icon}
               selected={selectedCategory === category}
               onSelect={() => setSelectedCategory(category)}
             />
@@ -102,7 +103,7 @@ const DailyCategoryPage = () => {
       {isConfirmOpen && selectedCategory && status && (
         <StartConfirmModal
           mode="daily"
-          categoryLabel={QUIZ_CATEGORY_INFO[selectedCategory].label}
+          category={selectedCategory}
           fishCost={DAILY_FISH_COST}
           fishBalance={status.fishBalance}
           isPass={status.isPass}

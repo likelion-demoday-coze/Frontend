@@ -1,5 +1,7 @@
 import type { KeyboardEvent, ReactNode } from 'react';
 import ArrowIcon from '../../assets/icons/arrow.svg?react';
+import dailyIcon from '../../assets/quiz/mode_daily.png';
+import timeAttackIcon from '../../assets/quiz/mode_time_attack.png';
 import type { QuizAttempt } from '../../hooks/useQuizEntryStatus';
 
 type QuizMode = 'daily' | 'timeAttack';
@@ -18,19 +20,27 @@ interface ModeCardProps {
 
 const content: Record<
   QuizMode,
-  { title: string; subtitle: string; description: string; attemptLabel: string }
+  {
+    title: string;
+    subtitle: string;
+    description: string;
+    attemptLabel: string;
+    icon: string;
+  }
 > = {
   daily: {
     title: '정규장',
     subtitle: '매일 5문제 학습',
     description: '8개 섹터 중 하나를 선택해 주가를 올려보세요.',
     attemptLabel: '오늘 주가 반영',
+    icon: dailyIcon,
   },
   timeAttack: {
     title: '시간외거래',
     subtitle: '1분 타임어택 단타',
     description: '1분 동안 최대한 많이 맞혀 오늘의 랭킹을 뒤집으세요.',
     attemptLabel: '오늘 도전',
+    icon: timeAttackIcon,
   },
 };
 
@@ -46,7 +56,7 @@ const ModeCard = ({
   onSelect,
   onCharge,
 }: ModeCardProps) => {
-  const { title, subtitle, description, attemptLabel } = content[mode];
+  const { title, subtitle, description, attemptLabel, icon } = content[mode];
   const isExhausted = attempt.used >= attempt.limit;
   //시간외거래는 횟수를 다 쓰면 선택 불가, 정규장은 학습만 가능
   const isDisabled = mode === 'timeAttack' && isExhausted;
@@ -111,11 +121,7 @@ const ModeCard = ({
                 {subtitle}
               </span>
             </div>
-            {/*TODO: 모드 아이콘 디자인 나오면 교체*/}
-            <span
-              aria-hidden="true"
-              className="size-16 shrink-0 rounded-[20px] bg-gray-10 lg:size-20"
-            />
+            <img src={icon} alt="" className="size-16 shrink-0 lg:size-20" />
           </div>
           <p className="max-w-58.5 text-base leading-6.5 font-medium break-keep text-gray-60">
             {description}

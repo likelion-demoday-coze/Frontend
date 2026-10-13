@@ -7,6 +7,7 @@ interface DialogAction {
 }
 
 interface QuizDialogProps {
+  icon: string;
   title: ReactNode;
   description: string;
   children?: ReactNode;
@@ -17,6 +18,7 @@ interface QuizDialogProps {
 
 //퀴즈 시작·이어 풀기 팝업 공통 틀
 const QuizDialog = ({
+  icon,
   title,
   description,
   children,
@@ -48,11 +50,7 @@ const QuizDialog = ({
       >
         <div className="flex w-full flex-col gap-6">
           <div className="flex flex-col items-center gap-4">
-            {/*TODO: 아이콘 디자인 나오면 교체*/}
-            <span
-              aria-hidden="true"
-              className="size-20 rounded-[20px] bg-gray-10"
-            />
+            <img src={icon} alt="" className="size-20" />
             <div className="flex flex-col items-center gap-1 text-center">
               <h2
                 id={titleId}

@@ -1,11 +1,14 @@
 import QuizDialog from './QuizDialog';
+import timeAttackIcon from '../../assets/quiz/mode_time_attack.png';
+import { QUIZ_CATEGORY_INFO } from '../../constants/quizCategory';
 import type { QuizAttempt } from '../../hooks/useQuizEntryStatus';
+import type { QuizCategory } from '../../types/quiz';
 
 type QuizMode = 'daily' | 'timeAttack';
 
 interface StartConfirmModalProps {
   mode: QuizMode;
-  categoryLabel?: string;
+  category?: QuizCategory;
   fishCost: number;
   fishBalance: number;
   isPass: boolean;
@@ -18,7 +21,7 @@ interface StartConfirmModalProps {
 //정규장·시간외거래 시작 팝업
 const StartConfirmModal = ({
   mode,
-  categoryLabel,
+  category,
   fishCost,
   fishBalance,
   isPass,
@@ -28,6 +31,7 @@ const StartConfirmModal = ({
   onCharge,
 }: StartConfirmModalProps) => {
   const isDaily = mode === 'daily';
+  const categoryInfo = category && QUIZ_CATEGORY_INFO[category];
   const isExhausted = attempt.used >= attempt.limit;
   const isFishShort = !isPass && fishBalance < fishCost;
 
@@ -71,10 +75,11 @@ const StartConfirmModal = ({
 
   return (
     <QuizDialog
+      icon={categoryInfo?.icon ?? timeAttackIcon}
       title={
         isDaily ? (
           <>
-            <strong className="font-semibold">{categoryLabel}</strong>{' '}
+            <strong className="font-semibold">{categoryInfo?.label}</strong>{' '}
             카테고리로 시작할까요?
           </>
         ) : (

@@ -1,6 +1,7 @@
 interface CategoryCardProps {
   label: string;
   description: string;
+  icon: string;
   selected: boolean;
   onSelect: () => void;
 }
@@ -9,6 +10,7 @@ interface CategoryCardProps {
 const CategoryCard = ({
   label,
   description,
+  icon,
   selected,
   onSelect,
 }: CategoryCardProps) => {
@@ -20,11 +22,7 @@ const CategoryCard = ({
       onClick={onSelect}
       className={`flex h-full w-full cursor-pointer flex-col items-center gap-3 rounded-[20px] border bg-white px-3 py-4 lg:px-5 ${selected ? 'border-blue-50 shadow-[0_0_4px_var(--color-blue-50)]' : 'border-gray-20'}`}
     >
-      {/*TODO: 카테고리 아이콘 디자인 나오면 교체*/}
-      <span
-        aria-hidden="true"
-        className="size-16 rounded-[20px] bg-gray-10 lg:size-20"
-      />
+      <img src={icon} alt="" className="size-16 lg:size-20" />
       <strong
         className={`text-xl leading-9 lg:text-2xl ${selected ? 'font-bold text-blue-60' : 'font-semibold text-black'}`}
       >

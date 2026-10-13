@@ -19,8 +19,11 @@ const ResumeQuizModal = ({
   onClose,
   onResume,
 }: ResumeQuizModalProps) => {
+  const { label, icon } = QUIZ_CATEGORY_INFO[session.category];
+
   return (
     <QuizDialog
+      icon={icon}
       title="진행 중인 학습이 있어요"
       description="이어서 풀면 생선이 추가로 차감되지 않아요."
       secondary={{ label: '닫기', onClick: onClose }}
@@ -30,9 +33,7 @@ const ResumeQuizModal = ({
       <dl className="flex w-full flex-col gap-2 rounded-lg bg-blue-05 px-5 py-2.25 text-sm leading-4.5 font-bold">
         <div className="flex items-center justify-between gap-2 border-b border-gray-20 pb-2">
           <dt className="text-gray-60">카테고리</dt>
-          <dd className="text-gray-80">
-            {QUIZ_CATEGORY_INFO[session.category].label}
-          </dd>
+          <dd className="text-gray-80">{label}</dd>
         </div>
         <div className="flex items-center justify-between gap-2 border-b border-gray-20 pb-2">
           <dt className="text-gray-60">진행</dt>
