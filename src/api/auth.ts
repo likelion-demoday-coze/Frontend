@@ -30,6 +30,7 @@ export interface NicknameResult {
 export interface getMeResult {
   memberId: number;
   nickname: string;
+  tutorialCompleted: boolean;
 }
 
 //카카오 로그인 -> 브라우저 직접 이동
@@ -68,4 +69,17 @@ export const logout = async () => {
 
   clearCsrfToken();
   await fetchCsrfToken();
+};
+
+// 최초 튜토리얼 완료 처리
+export const completeTutorial = async () => {
+  const { data } = await api.patch<ApiResponse<getMeResult>>(
+    '/api/v1/members/me/tutorial'
+  );
+
+  if (!data.isSuccess) {
+    throw new Error(data.message);
+  }
+
+  return data.result;
 };

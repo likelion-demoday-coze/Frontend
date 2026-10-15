@@ -20,8 +20,7 @@ export const STREAK_SCENARIOS: {
 
 const LABELS = ['월', '화', '수', '목', '금', '토', '일'];
 
-// 시안에 나온 헤더 숫자를 확인하기 위한 예시 값
-// 실제 연속학습 일수 계산 정책을 구현한 것은 아니야.
+//헤더 숫자 확인용
 const CURRENT_DAYS: Record<StreakView, number> = {
   learning: 7,
   broken: 0,
