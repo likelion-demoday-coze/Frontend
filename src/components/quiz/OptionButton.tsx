@@ -16,7 +16,7 @@ const containerStyles: Record<OptionStatus, string> = {
   selected:
     'border-blue-50 bg-white font-bold text-blue-45 shadow-[0_0_2px_var(--color-blue-50)]',
   correct: 'border-green-65 bg-green-15 font-bold text-green-80',
-  wrong: 'border-red-55 bg-red-10 font-bold text-red-55',
+  wrong: 'border-red-55 bg-red-05 font-bold text-red-55',
 };
 
 const badgeStyles: Record<OptionStatus, string> = {

@@ -1,9 +1,9 @@
-//라우트 경로 모음 - <Route path>에는 ROUTES, 이동(navigate, Link)에는 경로 생성 함수 사용
+import type { RankingType } from '../types/ranking';
 
 export const ROUTES = {
   LANDING: '/',
   HOME: '/home',
-  SIGNUP: '/signup', //백엔드가 신규 회원을 보내는 경로 → 온보딩 약관으로 이동
+  SIGNUP: '/signup', //백엔드가 신규 회원을 보내는 경로
 
   //온보딩
   ONBOARDING_TERMS: '/onboarding/terms',
@@ -23,7 +23,7 @@ export const ROUTES = {
   TIME_ATTACK_PLAY: '/quiz/time-attack/:sessionId',
   TIME_ATTACK_RESULT: '/quiz/time-attack/:sessionId/result',
 
-  //랭킹 (?tab=stock | time-attack)
+  //랭킹 (?tab=regular | afterhours)
   RANKING: '/ranking',
 
   //마이페이지
@@ -38,9 +38,6 @@ export const ROUTES = {
   PAYMENT_FAIL: '/shop/payment/fail',
 } as const;
 
-export type RankingTab = 'stock' | 'time-attack';
-
-//sessionId 등 값이 들어가는 경로 생성 함수
 export const toDailyQuizPlay = (sessionId: number) =>
   `/quiz/daily/${sessionId}`;
 export const toDailyQuizReview = (sessionId: number) =>
@@ -51,4 +48,4 @@ export const toTimeAttackPlay = (sessionId: number) =>
   `/quiz/time-attack/${sessionId}`;
 export const toTimeAttackResult = (sessionId: number) =>
   `/quiz/time-attack/${sessionId}/result`;
-export const toRanking = (tab: RankingTab) => `/ranking?tab=${tab}`;
+export const toRanking = (tab: RankingType) => `/ranking?tab=${tab}`;
