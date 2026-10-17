@@ -102,7 +102,7 @@ const DailyRewardCard = () => {
         type="button"
         onClick={button.onClick}
         disabled={button.disabled}
-        className={`flex h-25 cursor-pointer items-center justify-center rounded-4xl px-6 py-4 text-[22px] font-semibold disabled:cursor-not-allowed disazbled:opacity-50 ${
+        className={`flex h-25 cursor-pointer items-center justify-center rounded-4xl px-6 py-4 text-[22px] font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${
           canClaim
             ? 'border-2 border-green-40 bg-white text-blue-60 shadow-[0_0_4px_0_#276AD8]'
             : 'bg-blue-60 text-white shadow-[0_0_4px_0_#276AD8]'

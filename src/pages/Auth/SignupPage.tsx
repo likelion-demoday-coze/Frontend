@@ -186,7 +186,10 @@ const SignupPage = () => {
         await fetchCsrfToken();
       }
       const result = await signup({ nickname });
-      useAuthstore.getState().setMember(result);
+      useAuthstore.getState().setMember({
+        ...result,
+        tutorialCompleted: false,
+      });
       navigate('/home');
     } catch (error) {
       console.error('회원가입 실패', error);

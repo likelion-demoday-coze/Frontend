@@ -1,15 +1,11 @@
 import { create } from 'zustand';
-
-interface Member {
-  memberId: number;
-  nickname: string;
-}
+import type { getMeResult } from '../api/auth';
 
 interface AuthState {
-  member: Member | null;
+  member: getMeResult | null;
   isInitialized: boolean;
 
-  setMember: (member: Member) => void;
+  setMember: (member: getMeResult) => void;
   clearAuth: () => void;
   setInitialized: () => void;
 }
@@ -19,7 +15,9 @@ const useAuthstore = create<AuthState>()((set) => ({
   isInitialized: false,
 
   setMember: (member) => set({ member }),
+
   clearAuth: () => set({ member: null }),
+
   setInitialized: () => set({ isInitialized: true }),
 }));
 
