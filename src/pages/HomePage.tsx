@@ -17,6 +17,9 @@ const HomePage = () => {
 
   const completingRef = useRef(false);
 
+  //임시
+  /*const isTutorialOpen = !isTutorialDismissed;*/
+
   const isTutorialOpen =
     isInitialized &&
     member?.tutorialCompleted === false &&

@@ -23,8 +23,15 @@ const LeftNavbar = () => {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   const closeMenu = useCallback(() => {
+    if (!isVisible) {
+      // 진입 애니메이션 시작 전이면 바로 닫기
+      setIsMenuOpen(false);
+      return;
+    }
+
+    // 이미 표시됐다면 퇴장 애니메이션 실행
     setIsVisible(false);
-  }, []);
+  }, [isVisible]);
 
   useEffect(() => {
     if (!isMenuOpen) return;

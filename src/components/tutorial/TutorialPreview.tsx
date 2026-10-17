@@ -58,7 +58,8 @@ export default function TutorialPreview({ type }: { type: PreviewType }) {
     case 'stock':
       return (
         <div aria-hidden="true" className={previewClassName}>
-          <div className="absolute left-6 top-4 z-10 flex items-end gap-4">
+          {/* 상단 주가 */}
+          <div className="absolute inset-x-4 top-4 z-10 flex flex-wrap items-end gap-2">
             <div>
               <p className="text-[14px] text-gray-40">시작 주가</p>
               <p className="mt-1 text-[20px]">100.00</p>
@@ -72,10 +73,11 @@ export default function TutorialPreview({ type }: { type: PreviewType }) {
             </p>
           </div>
 
+          {/* 배경 그래프 */}
           <svg
             viewBox="0 0 480 200"
             preserveAspectRatio="none"
-            className="absolute inset-0 size-full"
+            className="pointer-events-none absolute inset-0 size-full"
           >
             <polyline
               points="20,140 110,103 195,103 280,78 365,78 455,42"
@@ -96,22 +98,21 @@ export default function TutorialPreview({ type }: { type: PreviewType }) {
             />
           </svg>
 
-          <div className="absolute inset-x-4 bottom-2 flex items-center gap-2">
+          {/* 진화 카드: 좁은 화면에서는 가로 스크롤 */}
+          <div className="absolute inset-x-4 bottom-2 flex items-center gap-2 overflow-x-auto pb-2">
             {STOCK_LEVELS.map((level, index) => (
               <Fragment key={level.name}>
                 <div
-                  className={`flex h-20 min-w-0 flex-1 items-center gap-2 overflow-hidden rounded-xl border bg-white px-2 py-2 ${
+                  className={`flex h-20 min-w-[148px] flex-1 shrink-0 items-center gap-2 rounded-xl border bg-white px-2 py-2 ${
                     index === 0 ? 'border-yellow-45' : 'border-gray-20'
                   }`}
                 >
-                  {/* 확대 없이 정해진 이미지 영역 안에 표시 */}
                   <img
                     src={level.image}
                     alt=""
                     className="h-16 w-14 shrink-0 object-contain"
                   />
 
-                  {/* 남은 공간에 단계 이름과 주가 표시 */}
                   <div className="flex min-w-0 flex-1 flex-col gap-1 text-center">
                     <p className="whitespace-nowrap text-[14px] font-semibold text-black">
                       {level.name}
@@ -124,12 +125,7 @@ export default function TutorialPreview({ type }: { type: PreviewType }) {
                 </div>
 
                 {index < STOCK_LEVELS.length - 1 && (
-                  <span
-                    aria-hidden="true"
-                    className="shrink-0 text-sm text-gray-40"
-                  >
-                    ›
-                  </span>
+                  <span className="shrink-0 text-sm text-gray-40">›</span>
                 )}
               </Fragment>
             ))}
@@ -291,26 +287,33 @@ export default function TutorialPreview({ type }: { type: PreviewType }) {
 
     case 'start':
       return (
-        <div aria-hidden="true" className={previewClassName}>
-          {/* 상단 안내 */}
-          <div className="absolute inset-x-0 top-2 flex justify-center px-2">
-            <p className="rounded-full border border-blue-60 bg-white px-4 py-2 text-[12px] text-black">
+        <div
+          aria-hidden="true"
+          className="relative flex min-h-50 min-w-0 shrink-0 flex-col gap-3 overflow-hidden rounded-2xl border border-blue-15 bg-blue-05 p-3"
+        >
+          {/* 안내 문구: 줄바꿈되면 필요한 높이를 차지 */}
+          <div className="flex justify-center">
+            <p className="rounded-full border border-blue-60 bg-white px-4 py-2 text-center text-[12px] text-black">
               정규장 퀴즈를 풀고도{' '}
               <strong className="font-bold text-blue-60">생선 50개</strong>가
               남아요!
             </p>
           </div>
 
-          {/* 생선 사용 흐름 */}
-          <div className="absolute inset-x-4 bottom-3 flex items-center gap-2">
+          {/* 생선 사용 흐름: 좁은 화면에서는 가로 스크롤 */}
+          <div className="mt-auto flex w-full min-w-0 items-center gap-2 overflow-x-auto pb-2">
             {/* 현재 생선 */}
-            <div className="flex h-31 min-w-0 flex-1 flex-col items-center rounded-[20px] bg-white px-2 pt-3">
-              <p className="text-[13px] font-medium text-gray-60">
+            <div className="flex h-31 min-w-[120px] flex-1 shrink-0 flex-col items-center rounded-[20px] bg-white px-2 pt-3">
+              <p className="whitespace-nowrap text-[13px] font-medium text-gray-60">
                 지금 내 생선
               </p>
 
               <div className="mt-2 flex items-center justify-center gap-2">
-                <img src={fishImage} alt="" className="size-7 object-contain" />
+                <img
+                  src={fishImage}
+                  alt=""
+                  className="size-7 shrink-0 object-contain"
+                />
                 <span className="text-[24px] font-bold text-black">0</span>
               </div>
             </div>
@@ -318,15 +321,21 @@ export default function TutorialPreview({ type }: { type: PreviewType }) {
             <span className="shrink-0 text-xl font-bold text-white">→</span>
 
             {/* 출석 보상 */}
-            <div className="flex h-31 min-w-0 flex-1 flex-col items-center rounded-[20px] bg-white px-2 pt-3">
-              <p className="text-[13px] font-medium text-gray-60">출석 보상</p>
+            <div className="flex h-31 min-w-[120px] flex-1 shrink-0 flex-col items-center rounded-[20px] bg-white px-2 pt-3">
+              <p className="whitespace-nowrap text-[13px] font-medium text-gray-60">
+                출석 보상
+              </p>
 
               <div className="mt-2 flex items-center justify-center gap-1">
-                <img src={fishImage} alt="" className="size-7 object-contain" />
+                <img
+                  src={fishImage}
+                  alt=""
+                  className="size-7 shrink-0 object-contain"
+                />
                 <span className="text-[24px] font-bold text-blue-60">+100</span>
               </div>
 
-              <span className="mt-2 rounded-full border border-blue-60 px-4 py-1.5 text-[12px] font-bold text-blue-60">
+              <span className="mt-2 whitespace-nowrap rounded-full border border-blue-60 px-4 py-1.5 text-[12px] font-bold text-blue-60">
                 매일 1번
               </span>
             </div>
@@ -334,17 +343,21 @@ export default function TutorialPreview({ type }: { type: PreviewType }) {
             <span className="shrink-0 text-xl font-bold text-white">→</span>
 
             {/* 정규장 입장 */}
-            <div className="flex h-31 min-w-0 flex-1 flex-col items-center rounded-[20px] bg-white px-2 pt-3">
-              <p className="text-[13px] font-medium text-gray-60">
+            <div className="flex h-31 min-w-[120px] flex-1 shrink-0 flex-col items-center rounded-[20px] bg-white px-2 pt-3">
+              <p className="whitespace-nowrap text-[13px] font-medium text-gray-60">
                 정규장 입장
               </p>
 
               <div className="mt-2 flex items-center justify-center gap-1">
-                <img src={fishImage} alt="" className="size-7 object-contain" />
+                <img
+                  src={fishImage}
+                  alt=""
+                  className="size-7 shrink-0 object-contain"
+                />
                 <span className="text-[24px] font-bold text-red-55">-50</span>
               </div>
 
-              <span className="mt-2 rounded-full border border-blue-60 px-4 py-1.5 text-[12px] font-bold text-blue-60">
+              <span className="mt-2 whitespace-nowrap rounded-full border border-blue-60 px-4 py-1.5 text-[12px] font-bold text-blue-60">
                 퀴즈 1회
               </span>
             </div>
