@@ -1,6 +1,18 @@
 import api from './axiosInstance';
 import type { ApiResponse } from '../types/api';
 
+export interface MyStreak {
+  date: string;
+  currentStreak: number;
+  learnedToday: boolean;
+  lastLearningDate: string | null;
+}
+
+export const getMyStreak = async () => {
+  const { data } = await api.get<ApiResponse<MyStreak>>('/api/v1/streaks/me');
+  return data.result;
+};
+
 export interface StreakRecovery {
   eventId: number;
   missedDate: string;

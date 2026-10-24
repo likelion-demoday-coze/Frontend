@@ -1,9 +1,11 @@
 import { Outlet } from 'react-router-dom';
 import LeftNavbar from './LeftNavbar';
 import TopBar from './Topbar/Topbar';
+import { useMyStreak } from '../../hooks/useMyStreak';
 
 //임시값 넣어둠
 const Layout = () => {
+  const streakState = useMyStreak();
   return (
     <div className="flex min-h-screen">
       <LeftNavbar />
@@ -12,12 +14,12 @@ const Layout = () => {
         <div className="relative mx-auto w-full max-w-360 px-6 pt-16 pb-10">
           <div className="absolute top-16 right-33.25">
             <TopBar
-              streakDays={4}
+              streakDays={streakState.streak?.currentStreak ?? null}
               passOrCash={{ hasPass: true, remainingDays: 9 }}
             />
           </div>
           <main>
-            <Outlet />
+            <Outlet context={streakState} />
           </main>
         </div>
       </div>
