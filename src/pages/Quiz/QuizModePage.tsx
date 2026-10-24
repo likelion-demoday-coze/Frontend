@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import PageTitle from '../../components/common/PageTitle';
 import ModeCard from '../../components/quiz/ModeCard';
 import ResumeQuizModal from '../../components/quiz/ResumeQuizModal';
@@ -16,7 +16,11 @@ type QuizMode = 'daily' | 'timeAttack';
 
 const QuizModePage = () => {
   const navigate = useNavigate();
-  const [selectedMode, setSelectedMode] = useState<QuizMode | null>(null);
+  const [params] = useSearchParams();
+  const [selectedMode, setSelectedMode] = useState<QuizMode | null>(() => {
+    const mode = params.get('mode');
+    return mode === 'daily' || mode === 'timeAttack' ? mode : null;
+  });
   const [isTimeAttackConfirmOpen, setIsTimeAttackConfirmOpen] = useState(false);
   const [isResumeOpen, setIsResumeOpen] = useState(false);
   const { status, isError } = useQuizEntryStatus();

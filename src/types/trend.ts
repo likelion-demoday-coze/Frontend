@@ -8,6 +8,8 @@ export interface EconomicTrendItem {
   trendId: number;
   displayOrder: number;
   title: string;
+  category: string;
+  categoryName: string;
 }
 
 export interface TodayEconomicTrend {

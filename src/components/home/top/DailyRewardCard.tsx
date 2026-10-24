@@ -9,6 +9,7 @@ import {
   getAttendanceToday,
 } from '../../../api/attendance';
 import { ROUTES } from '../../../constants/routes';
+import DailyRewardModal from './DailyRewardModal';
 
 type ViewStatus = AttendanceStatus | 'loading' | 'error';
 
@@ -17,6 +18,7 @@ const DailyRewardCard = () => {
   //오늘의 보상 수령 상태 (조회 전에는 로딩중)
   const [status, setStatus] = useState<ViewStatus>('loading');
   const [isLoading, setIsLoading] = useState(false);
+  const [rewardAmount, setRewardAmount] = useState<number | null>(null);
 
   const [retryCount, setRetryCount] = useState(0);
 
@@ -50,7 +52,7 @@ const DailyRewardCard = () => {
     try {
       const res = await claimAttendanceReword();
       setStatus('CLAIMED');
-      if (res.newlyClaimed) alert(`FISH ${res.grantedAmount}개를 받았어요!`);
+      if (res.newlyClaimed) setRewardAmount(res.grantedAmount);
       if (res.newlyClaimed) {
         //topbar 갱신하기(흠)
       }
@@ -110,6 +112,16 @@ const DailyRewardCard = () => {
       >
         {button.label}
       </button>
+      {rewardAmount !== null && (
+        <DailyRewardModal
+          amount={rewardAmount}
+          onClose={() => setRewardAmount(null)}
+          onQuiz={() => {
+            setRewardAmount(null);
+            navigate(ROUTES.QUIZ);
+          }}
+        />
+      )}
     </div>
   );
 };

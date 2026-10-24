@@ -62,11 +62,12 @@ const TrendSection = () => {
             {message}
           </p>
         ) : (
-          <div className="mt-4 grid grid-cols-1 gap-3 xl:grid-cols-3">
+          <div className="mt-4 grid grid-cols-3 gap-3">
             {items.map((item, index) => (
               <TrendCard
                 key={item.trendId}
-                category="경제 트렌드"
+                category={item.categoryName}
+                categoryCode={item.category}
                 title={item.title}
                 onClick={() => setSelectedIndex(index)}
               />

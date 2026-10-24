@@ -1,5 +1,6 @@
 import { Card } from '../../common/Card';
 import type { MyRankSummary } from '../../../types/myRank';
+import { Link } from 'react-router-dom';
 
 const MyRankSummaryCard = ({
   title,
@@ -7,6 +8,7 @@ const MyRankSummaryCard = ({
   change,
   footnote,
   stats,
+  challengeTo,
 }: MyRankSummary) => {
   return (
     <Card className="flex gap-5 bg-white p-5 h-full justify-between">
@@ -31,6 +33,14 @@ const MyRankSummaryCard = ({
         {/* 안내문이 있을 때만 줄을 그림 */}
         {footnote && <p className="text-[12px] text-gray-60">{footnote}</p>}
       </div>
+      {challengeTo ? (
+        <Link
+          to={challengeTo}
+          className="flex w-30 shrink-0 items-center justify-center self-center rounded-2xl bg-blue-60 px-3 py-4 text-[14px] font-semibold text-white"
+        >
+          도전하기
+        </Link>
+      ) : (
       <ul className="flex w-30 shrink-0 flex-col gap-4">
         {stats.map(({ label, value }) => (
           <li
@@ -44,6 +54,7 @@ const MyRankSummaryCard = ({
           </li>
         ))}
       </ul>
+      )}
     </Card>
   );
 };
