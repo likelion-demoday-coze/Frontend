@@ -58,7 +58,7 @@ const StreakCard = ({
       : 'text-yellow-45';
 
   return (
-    <Card className="h-[490px] mt-4 flex w-full flex-col bg-white p-5">
+    <Card className="min-h-[490px] mt-4 flex w-full flex-col bg-white p-5">
       {/* 상단: 일수 + 설명 + 버튼 또는 최고 기록 */}
       <div className="mb-5 flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">

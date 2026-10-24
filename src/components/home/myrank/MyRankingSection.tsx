@@ -7,7 +7,7 @@ const MyRankingSection = () => {
   return (
     <div>
       <SectionTitle title="내 랭킹" linkTo="/ranking" linkLabel="전체보기" />
-      <div className="mt-4 flex flex-col gap-6 xl:flex-row">
+      <div className="mt-4 flex flex-row gap-6">
         {status === 'loading' && (
           <p className="text-sm text-gray-60">불러오는 중...</p>
         )}

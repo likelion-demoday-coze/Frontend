@@ -25,13 +25,13 @@ const StreakEffectTree = ({ data }: StreakEffectTreeProps) => {
       : 100;
 
   return (
-    <div>
+    <div className="@container">
       <h3 className="mb-4 text-[13px] font-semibold text-gray-40">
         이펙트 트리
       </h3>
       <div className="relative">
-        {/* 이펙트 카드 4개를 같은 너비로 배치 */}
-        <ul className="grid grid-cols-4 gap-2">
+        {/* 사용 가능한 너비가 300px 이상이면 한 줄로 배치 */}
+        <ul className="grid grid-cols-2 gap-2 @[300px]:grid-cols-4">
           {effects.map((effect) => (
             <StreakEffectItem key={effect.id} effect={effect} />
           ))}
@@ -39,14 +39,14 @@ const StreakEffectTree = ({ data }: StreakEffectTreeProps) => {
 
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 grid grid-cols-4 gap-2"
+          className="pointer-events-none absolute inset-0 grid grid-cols-2 gap-2 @[300px]:grid-cols-4"
         >
           {effects.map((effect, index) => (
             <div key={effect.id} className="relative">
               {/* 마지막 카드 오른쪽에는 화살표가 없어. */}
               {index < effects.length - 1 && (
-                <span className="absolute -right-0.5 top-1/2 -translate-y-1/2 text-gray-40">
-                  <img src={right} alt=">" />
+                <span className={`absolute -right-2 top-1/2 w-2 -translate-y-1/2 justify-center ${index % 2 === 0 ? 'flex' : 'hidden @[300px]:flex'}`}>
+                  <img src={right} alt="" className="h-[9px] w-[5px]" />
                 </span>
               )}
             </div>

@@ -11,8 +11,8 @@ const MyRankSummaryCard = ({
   challengeTo,
 }: MyRankSummary) => {
   return (
-    <Card className="flex gap-5 bg-white p-5 h-full justify-between">
-      <div className="flex shrink-0 flex-col gap-8.5">
+    <Card className="flex gap-2 xl:gap-5 bg-white p-5 h-full justify-between">
+      <div className="flex min-w-0 max-w-full flex-col gap-8.5">
         <h3 className="text-[14px] text-gray-60 font-semibold">{title}</h3>
         <div className="flex gap-4.5">
           <span className="flex items-center text-[24px] text-blue-60">
@@ -36,7 +36,7 @@ const MyRankSummaryCard = ({
       {challengeTo ? (
         <Link
           to={challengeTo}
-          className="flex w-30 shrink-0 items-center justify-center self-center rounded-2xl bg-blue-60 px-3 py-4 text-[14px] font-semibold text-white"
+          className="flex w-30 min-w-0 shrink items-center justify-center self-center whitespace-nowrap rounded-2xl bg-blue-60 px-2 py-3 xl:px-3 xl:py-4 text-[14px] font-semibold text-white"
         >
           도전하기
         </Link>

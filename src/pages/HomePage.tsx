@@ -49,12 +49,12 @@ const HomePage = () => {
   return (
     <div className="mx-auto w-full max-w-260">
       <HeroSection />
-      <div className="mt-12 flex flex-col gap-10 xl:flex-row xl:gap-6">
-        <div className="flex min-w-0 flex-1 flex-col gap-10">
+      <div className="mt-12 flex flex-row gap-6">
+        <div className="flex min-w-0 flex-2 flex-col gap-10 xl:flex-1">
           <TrendSection />
           <MyRankingSection />
         </div>
-        <div className="xl:w-95">
+        <div className="min-w-0 flex-1 xl:w-95 xl:flex-none">
           <StreakSection />
         </div>
       </div>

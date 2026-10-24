@@ -33,7 +33,7 @@ const StreakEffectItem = ({ effect }: StreakEffectItemProps) => {
 
   return (
     <li
-      className={`relative flex h-20 w-17 min-w-0 flex-col items-center justify-end rounded-lg border px-4 py-1 text-center ${STATUS_CLASSES[effect.status]}`}
+      className={`relative flex h-20 w-full min-w-0 flex-col items-center justify-end rounded-lg border px-1 py-1 text-center ${STATUS_CLASSES[effect.status]}`}
     >
       {image ? (
         <img
