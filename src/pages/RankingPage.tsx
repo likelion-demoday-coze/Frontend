@@ -5,6 +5,7 @@ import PageTitleSection from '../components/common/PageTitle';
 import TapToggle from '../components/ranking/TapToggle';
 import RankList from '../components/ranking/rank/RankList'; //랭킹
 import MyRankPanel from '../components/ranking/MyRankPanel';
+import RankingRewardBanner from '../components/ranking/RankingRewardBanner';
 import { ROUTES } from '../constants/routes';
 import {
   fetchStockPage,
@@ -84,15 +85,19 @@ const RankingPage = () => {
       />
 
       <div className="mt-9.5">
-        <PageTitleSection title={c.title} description={c.description} />
+        <PageTitleSection title={c.title} />
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+          <p className="text-[18px] text-gray-60">{c.description}</p>
+          {c.notice && <p className="text-xs text-blue-60">{c.notice}</p>}
+        </div>
       </div>
 
       <div className="mt-10 flex flex-col gap-10 lg:flex-row lg:gap-18">
         <div className="min-w-0 flex-1">
-          {c.notice && <p className="text-xs text-blue-60">{c.notice}</p>}
+          <RankingRewardBanner />
           <div
             ref={scrollRef}
-            className={`${c.notice ? 'mt-4' : ''} max-h-[calc(100vh-24rem)] overflow-y-auto`}
+            className="max-h-[calc(100vh-24rem)] overflow-y-auto"
           >
             <RankList me={view.me} items={view.items} />
 
@@ -125,13 +130,17 @@ const RankingPage = () => {
         </div>
 
         {/* 내 기록이 없으면(오늘 미참여 등) 패널을 숨김 → 시안 확인 후 정하기 */}
-        {view.me && (
+        {(view.me || type === 'afterhours') && (
           <MyRankPanel
             criteria={c.criteria}
             actionLabel={c.actionLabel}
-            rank={view.me.rank}
+            rank={view.me?.rank ?? null}
             lastRank={view.totalMemberCount}
-            stats={view.stats}
+            stats={view.stats.length ? view.stats : [
+              { label: '상위', value: '-' },
+              { label: '나의 최고 기록', value: '-' },
+              { label: '유저 평균 정답수', value: '-' },
+            ]}
             onAction={() => navigate(ACTION_PATH[type])}
           />
         )}

@@ -3,7 +3,7 @@ import StatPill from './StatPill';
 interface MyRankPanelProps {
   title?: string;
   criteria: string; //누적 주가 기준
-  rank: number;
+  rank: number | null;
   lastRank: number; // 꼴찌 순위
   stats: { label: string; value: string }[];
   actionLabel: string; // 버튼 문구 (탭마다 다름)
@@ -20,7 +20,7 @@ const MyRankPanel = ({
   onAction,
 }: MyRankPanelProps) => {
   const percent =
-    lastRank > 1 ? ((lastRank - rank) / (lastRank - 1)) * 100 : 100;
+    rank === null ? 0 : lastRank > 1 ? ((lastRank - rank) / (lastRank - 1)) * 100 : 100;
 
   return (
     <aside className="h-fit w-full shrink-0 rounded-2xl border border-blue-15 p-5 lg:w-87">
@@ -28,8 +28,8 @@ const MyRankPanel = ({
       <p className="mt-1 text-xs text-gray-60">{criteria}</p>
 
       <p className="mt-14 text-center text-[24px] text-blue-60">
-        {rank}
-        <span className="pl-1.5 text-[14px] text-gray-60">위</span>
+        {rank ?? '-'}
+        {rank !== null && <span className="pl-1.5 text-[14px] text-gray-60">위</span>}
       </p>
       <div className="px-7">
         <div className="relative mt-4 h-px bg-gray-20">
@@ -43,7 +43,7 @@ const MyRankPanel = ({
           <span className="absolute top-1/2 right-0 h-2 w-2 translate-x-1/2 -translate-y-1/2 rounded-full bg-gray-20" />
 
           {/* 내 위치: 동그라미(바 위)와 라벨(바 아래)을 분리 */}
-          <span
+          {rank !== null && <><span
             className="absolute top-1/2 z-10 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-60"
             style={{ left: `${percent}%` }}
           />
@@ -56,6 +56,7 @@ const MyRankPanel = ({
               내 순위
             </span>
           </div>
+          </>}
         </div>
       </div>
       <ul className="mt-24 flex flex-col gap-3">
