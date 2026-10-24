@@ -4,13 +4,14 @@ import RankRow from './RankRow';
 interface RankListProps {
   me?: MyRank;
   items: RankItem[];
+  isStock?: boolean;
 }
 
-const RankList = ({ me, items }: RankListProps) => (
+const RankList = ({ me, items, isStock }: RankListProps) => (
   <ul className="flex flex-col ">
-    {me && <RankRow {...me} isMe />}
+    {me && <RankRow {...me} isMe isStock={isStock} />}
     {items.map((item) => (
-      <RankRow key={item.rank} {...item} />
+      <RankRow key={item.rank} {...item} isStock={isStock} />
     ))}
   </ul>
 );

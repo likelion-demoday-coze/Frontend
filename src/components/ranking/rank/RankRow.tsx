@@ -23,6 +23,7 @@ const RANK_IMAGES: Record<number, string> = {
 
 interface RankRowProps extends MyRank {
   isMe?: boolean;
+  isStock?: boolean;
 }
 //큰 타입에서, 필요한 속성만을 골라서 새로운 타입을 만듦 ->Pick
 const RankNumber = ({
@@ -52,6 +53,7 @@ const RankNumber = ({
 };
 
 const RankRow = ({
+  isStock,
   rank,
   nickname,
   score,
@@ -71,7 +73,7 @@ const RankRow = ({
       <span className="flex-1 text-[16px] font-semibold text-gray-60">
         {nickname}
       </span>
-      <ScoreBadge value={score} />
+      <ScoreBadge value={score} isStock={isStock} />
     </li>
   );
 };

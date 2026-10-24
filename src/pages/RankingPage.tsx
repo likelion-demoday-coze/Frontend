@@ -99,7 +99,7 @@ const RankingPage = () => {
             ref={scrollRef}
             className="max-h-[calc(100vh-24rem)] overflow-y-auto"
           >
-            <RankList me={view.me} items={view.items} />
+            <RankList me={view.me} items={view.items} isStock={type === 'regular'} />
 
             {/* 이 요소가 화면 근처에 오면 다음 페이지를 불러옴 */}
             <div ref={sentinelRef} className="h-px" />
