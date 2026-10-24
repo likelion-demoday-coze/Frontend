@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef } from 'react';
-import fishImage from '../../../assets/icons/fish.png';
+import fishImage from '../../../assets/store/Fish_Bunddle 1.svg';
 
 interface DailyRewardModalProps {
   amount: number;

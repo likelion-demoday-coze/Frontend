@@ -10,6 +10,7 @@ import {
 } from '../../../api/attendance';
 import { ROUTES } from '../../../constants/routes';
 import DailyRewardModal from './DailyRewardModal';
+import fishImage from '../../../assets/store/Fish_a.svg';
 
 type ViewStatus = AttendanceStatus | 'loading' | 'error';
 
@@ -72,7 +73,7 @@ const DailyRewardCard = () => {
         return { label: '다시 시도', onClick: handleRetry, disabled: false };
       case 'AVAILABLE':
         return {
-          label: '🐟 오늘의 FISH 받기',
+          label: '오늘의 FISH 받기',
           onClick: handleClaim,
           disabled: isLoading,
         };
@@ -110,6 +111,7 @@ const DailyRewardCard = () => {
             : 'bg-blue-60 text-white shadow-[0_0_4px_0_#276AD8]'
         }`}
       >
+        {canClaim && <img src={fishImage} alt="" className="mr-2 size-7 object-contain" />}
         {button.label}
       </button>
       {rewardAmount !== null && (

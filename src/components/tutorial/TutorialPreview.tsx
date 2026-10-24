@@ -5,7 +5,7 @@ import basic_1 from '../../assets/character/basic_1.svg';
 import basic_2 from '../../assets/character/basic_2.svg';
 import basic_3 from '../../assets/character/basic_3.svg';
 import completetoday from '../../assets/streak/complete_today.svg';
-import fishImage from '../../assets/payment/Fish.svg';
+import fishImage from '../../assets/store/Fish_a.svg';
 import tutorial_cat from '../../assets/home/tutorial_cat.svg';
 import category_set from '../../assets/home/category_log_set.svg';
 import green_circle from '../../assets/stock/green_circle.svg';
