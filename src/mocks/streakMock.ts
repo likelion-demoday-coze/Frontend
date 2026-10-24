@@ -100,9 +100,9 @@ const WEEK_STATUSES: Record<StreakView, StreakDayStatus[]> = {
 // 이펙트 기준과 이름은 디자인 확인용 예시
 // 실제 기준은 기획 또는 서버 명세 확인 후 교체해야 해.
 const EFFECT_STEPS = [
-  { id: 'effect-3', requiredDays: 3, name: '반짝' },
-  { id: 'effect-7', requiredDays: 7, name: '반짝' },
-  { id: 'effect-14', requiredDays: 14, name: '반짝' },
+  { id: 'effect-3', requiredDays: 3, name: '동전' },
+  { id: 'effect-7', requiredDays: 7, name: '은화' },
+  { id: 'effect-14', requiredDays: 14, name: '금화' },
   { id: 'effect-21', requiredDays: 21, name: '시크릿' },
 ];
 
