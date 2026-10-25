@@ -43,7 +43,7 @@ const TrendCard = ({ category, categoryCode, title, onClick }: TrendCardProps) =
         <img
           src={background}
           alt=""
-          className="pointer-events-none absolute top-0 right-0 w-49.25 h-43 object-contain"
+          className="pointer-events-none absolute top-0 right-0 w-49.25 h-43 object-contain object-top-right"
         />
       )}
       <div className="relative text-[16px] text-gray-60">{category}</div>

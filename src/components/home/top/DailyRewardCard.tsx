@@ -96,7 +96,7 @@ const DailyRewardCard = () => {
           alt=""
           className="absolute bottom-0 left-1/2 -translate-x-1/2"
         />
-        <p className="absolute top-10 left-1/2 -translate-x-1/2 rounded-full bg-blue-50 px-3 py-2 text-[16px] font-semibold whitespace-nowrap text-white">
+        <p className="absolute top-10 left-1/2 w-max max-w-[calc(100%-24px)] -translate-x-1/2 rounded-full bg-blue-50 px-3 py-2 text-center text-[14px] xl:text-[16px] font-semibold break-keep text-white">
           오늘의 생선 받아가라 냥
         </p>
       </Card>
@@ -105,13 +105,13 @@ const DailyRewardCard = () => {
         type="button"
         onClick={button.onClick}
         disabled={button.disabled}
-        className={`flex h-25 cursor-pointer items-center justify-center rounded-4xl px-6 py-4 text-[22px] font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${
+        className={`flex min-h-25 cursor-pointer items-center justify-center rounded-4xl px-3 py-4 text-[16px] xl:px-6 xl:text-[22px] text-center break-keep font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${
           canClaim
             ? 'border-2 border-green-40 bg-white text-blue-60 shadow-[0_0_4px_0_#276AD8]'
             : 'bg-blue-60 text-white shadow-[0_0_4px_0_#276AD8]'
         }`}
       >
-        {canClaim && <img src={fishImage} alt="" className="mr-2 size-7 object-contain" />}
+        {canClaim && <img src={fishImage} alt="" className="mr-2 size-7 shrink-0 object-contain" />}
         {button.label}
       </button>
       {rewardAmount !== null && (

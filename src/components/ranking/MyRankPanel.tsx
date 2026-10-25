@@ -8,6 +8,7 @@ interface MyRankPanelProps {
   stats: { label: string; value: string }[];
   actionLabel: string; // 버튼 문구 (탭마다 다름)
   onAction?: () => void;
+  emptyMessage?: string;
 }
 
 const MyRankPanel = ({
@@ -18,6 +19,7 @@ const MyRankPanel = ({
   stats,
   actionLabel,
   onAction,
+  emptyMessage,
 }: MyRankPanelProps) => {
   const percent =
     rank === null ? 0 : lastRank > 1 ? ((lastRank - rank) / (lastRank - 1)) * 100 : 100;
@@ -28,9 +30,12 @@ const MyRankPanel = ({
       <p className="mt-1 text-xs text-gray-60">{criteria}</p>
 
       <p className="mt-14 text-center text-[24px] text-blue-60">
-        {rank ?? '-'}
+        {rank ?? (emptyMessage ? null : '-')}
         {rank !== null && <span className="pl-1.5 text-[14px] text-gray-60">위</span>}
       </p>
+      {rank === null && emptyMessage && (
+        <p className="mt-2 text-center text-sm text-gray-60">{emptyMessage}</p>
+      )}
       <div className="px-7">
         <div className="relative mt-4 h-px bg-gray-20">
           {/* 채워진 부분 */}

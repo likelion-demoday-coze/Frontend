@@ -99,7 +99,11 @@ const RankingPage = () => {
             ref={scrollRef}
             className="max-h-[calc(100vh-24rem)] overflow-y-auto"
           >
-            <RankList me={view.me} items={view.items} isStock={type === 'regular'} />
+            <RankList
+              me={view.me}
+              items={view.items}
+              isStock={type === 'regular'}
+            />
 
             {/* 이 요소가 화면 근처에 오면 다음 페이지를 불러옴 */}
             <div ref={sentinelRef} className="h-px" />
@@ -135,12 +139,21 @@ const RankingPage = () => {
             criteria={c.criteria}
             actionLabel={c.actionLabel}
             rank={view.me?.rank ?? null}
+            emptyMessage={
+              type === 'afterhours' && view.status === 'idle' && !view.me
+                ? '오늘은 아직 참여하지 않았어요!'
+                : undefined
+            }
             lastRank={view.totalMemberCount}
-            stats={view.stats.length ? view.stats : [
-              { label: '상위', value: '-' },
-              { label: '나의 최고 기록', value: '-' },
-              { label: '유저 평균 정답수', value: '-' },
-            ]}
+            stats={
+              view.stats.length
+                ? view.stats
+                : [
+                    { label: '상위', value: '-' },
+                    { label: '나의 최고 기록', value: '-' },
+                    { label: '유저 평균 정답수', value: '-' },
+                  ]
+            }
             onAction={() => navigate(ACTION_PATH[type])}
           />
         )}
