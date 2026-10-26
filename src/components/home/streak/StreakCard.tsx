@@ -58,7 +58,7 @@ const StreakCard = ({
       : 'text-yellow-45';
 
   return (
-    <Card className="min-h-[490px] mt-4 flex w-full flex-col bg-white p-5">
+    <Card className="min-h-[450px] mt-4 flex w-full flex-col bg-white p-5">
       {/* 상단: 일수 + 설명 + 버튼 또는 최고 기록 */}
       <div className="mb-5 flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
@@ -98,7 +98,7 @@ const StreakCard = ({
           </button>
         ) : bestDays !== null ? (
           //최고기록 보여줌 TODO : 최고기록 받아서 보여주기
-          <span className="shrink-0 rounded-lg border border-yellow-45 px-2.5 py-2 text-[11px] font-semibold text-yellow-45">
+          <span className="shrink-0 rounded-lg border border-yellow-45 px-2.5 py-2 text-[16px] font-semibold text-yellow-45">
             최고기록 {bestDays}일
           </span>
         ) : null}

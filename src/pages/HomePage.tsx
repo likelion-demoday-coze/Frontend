@@ -54,7 +54,7 @@ const HomePage = () => {
           <TrendSection />
           <MyRankingSection />
         </div>
-        <div className="min-w-0 md:flex-1 xl:w-95 xl:flex-none">
+        <div className="min-w-0 md:flex-1 xl:w-90 xl:flex-none">
           <StreakSection />
         </div>
       </div>
