@@ -4,7 +4,7 @@ import type { PassOrCash } from '../../../types/PassOrCash';
 import streak_icon from '../../../assets/navbar/streak_icon.svg';
 
 interface TopBarProps {
-  streakDays: number;
+  streakDays: number | null;
   passOrCash: PassOrCash;
 }
 
@@ -13,7 +13,7 @@ const TopBar = ({ streakDays, passOrCash }: TopBarProps) => {
     <header className="flex gap-4">
       <StatItem
         icon={<img src={streak_icon} />}
-        label={`${streakDays}일`}
+        label={streakDays === null ? '-' : `${streakDays}일`}
       ></StatItem>
       <PassOrCashItem {...passOrCash} />
     </header>

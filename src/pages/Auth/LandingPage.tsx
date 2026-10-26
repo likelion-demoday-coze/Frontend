@@ -6,16 +6,34 @@ import { startKaKaoLogin } from '../../api/auth';
 import { ROUTES } from '../../constants/routes';
 import kakaologo from '../../assets/landing/kakao_login_logo.svg';
 
-const QUESTION =
-  '기업의 주된 영업활동에서 발생한 수익에서 매출원가와 판매관리비를 뺀 순수한 이익을 뜻하는 용어는?';
-
-// 말풍선 5개/위치/크기 설정
 const BUBBLES = [
-  { pos: 'top-20 left-0', large: false },
-  { pos: 'top-56 -right-30 z-10', large: true },
-  { pos: 'top-80 left-5 ', large: false },
-  { pos: 'bottom-20 left-8 z-10', large: false },
-  { pos: 'right-0 bottom-12 ', large: false },
+  {
+    pos: 'top-20 left-0',
+    large: false,
+    question: '기준금리가 오르면 이미 발행된 채권의 가격은 보통 어떻게 될까요?',
+  },
+  {
+    pos: 'top-56 -right-30 z-10',
+    large: true,
+    question: '물가가 전반적으로 지속해서 오르는 현상을 무엇이라고 할까요?',
+  },
+  {
+    pos: 'top-80 left-5',
+    large: false,
+    question:
+      '월급에서 세금과 4대 보험료를 빼고 실제로 받는 금액을 무엇이라고 할까요?',
+  },
+  {
+    pos: 'bottom-20 left-8 z-10',
+    large: false,
+    question:
+      '기업의 매출액에서 매출원가와 판매관리비를 뺀 이익을 무엇이라고 할까요?',
+  },
+  {
+    pos: 'right-0 bottom-12',
+    large: false,
+    question: '원·달러 환율이 오르면 미국 여행에 필요한 원화는 더 많아질까요?',
+  },
 ];
 
 const LandingPage = () => {
@@ -83,7 +101,7 @@ const LandingPage = () => {
             className="absolute top-6 -right-20 w-150"
           />
 
-          {BUBBLES.map(({ pos, large }) => (
+          {BUBBLES.map(({ pos, large, question }) => (
             <p
               key={pos}
               className={`absolute rounded-2xl bg-white leading-relaxed font-medium shadow-[0_4px_16px_rgba(0,0,0,0.08)] ${pos} ${
@@ -92,7 +110,7 @@ const LandingPage = () => {
                   : 'w-70 px-4 py-3 text-[11px]'
               }`}
             >
-              {QUESTION}
+              {question}
             </p>
           ))}
 

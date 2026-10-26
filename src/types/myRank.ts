@@ -3,5 +3,6 @@ export interface MyRankSummary {
   rank: number | null;
   change?: number; // 양수 ▲, 음수 ▼
   footnote?: string; //
+  challengeTo?: string;
   stats: { label: string; value: string }[]; // 알약 2개
 }

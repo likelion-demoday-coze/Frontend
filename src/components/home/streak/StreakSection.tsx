@@ -1,35 +1,60 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../../constants/routes';
-import { getMockStreak } from '../../../mocks/streakMock';
-import type { StreakView } from '../../../types/streak';
+import type { StreakData } from '../../../types/streak';
+import { useStreakContext } from '../../../hooks/useMyStreak';
 import StreakCard from './StreakCard';
 import SectionTitle from '../../common/SectionTitle';
 
+const EFFECT_STEPS = [
+  { id: 'effect-3', requiredDays: 3, name: '동전' },
+  { id: 'effect-7', requiredDays: 7, name: '은화' },
+  { id: 'effect-14', requiredDays: 14, name: '금화' },
+  { id: 'effect-21', requiredDays: 21, name: '시크릿' },
+];
+
 const StreakSection = () => {
   const navigate = useNavigate();
-
-  // 현재 선택한 디자인 상태
-  // 실제 API 연동 전이므로 화면 미리보기만 관리
-  const [view] = useState<StreakView>('learning');
-
-  // 선택한 상태에서 계산할 수 있는 데이터이므로
-  // 별도 state나 useEffect 없이 바로 생성
-  const data = getMockStreak(view);
+  const { streak, isError } = useStreakContext();
+  const currentDays = streak?.currentStreak ?? 0;
+  const nextStep = EFFECT_STEPS.find((step) => step.requiredDays > currentDays);
+  const previousStep = [...EFFECT_STEPS].reverse().find(
+    (step) => step.requiredDays <= currentDays
+  );
+  const data: StreakData = {
+    view: streak?.learnedToday ? 'completed' : 'learning',
+    currentDays,
+    bestDays: null,
+    days: [],
+    effects: EFFECT_STEPS.map((step) => ({
+      ...step,
+      status: step.requiredDays <= currentDays
+        ? 'active'
+        : step.id === nextStep?.id ? 'upcoming' : 'locked',
+    })),
+    progress: {
+      from: previousStep?.requiredDays ?? 0,
+      to: nextStep?.requiredDays ?? 21,
+      current: currentDays,
+      nextName: nextStep?.name ?? '',
+    },
+    remainingDays: nextStep ? nextStep.requiredDays - currentDays : 0,
+  };
 
   return (
     <section className="w-full">
       <SectionTitle title="연속학습" />
-      <StreakCard
-        data={data}
-        deadlineLabel={view === 'restorePending' ? '오늘 23:59' : undefined}
-        onRestore={() => {
-          alert('디자인 미리보기입니다. 복구 API는 아직 연결하지 않았어요.');
-        }}
-        onStartQuiz={() => {
-          navigate(ROUTES.QUIZ);
-        }}
-      />
+      {streak ? (
+        <StreakCard
+          data={data}
+          showWeek={false}
+          onRestore={() => {}}
+          onStartQuiz={() => navigate(ROUTES.QUIZ)}
+        />
+      ) : (
+        <p className="mt-4 text-sm text-gray-60">
+          {isError ? '연속학습 정보를 불러오지 못했어요.' : '불러오는 중...'}
+        </p>
+      )}
     </section>
   );
 };

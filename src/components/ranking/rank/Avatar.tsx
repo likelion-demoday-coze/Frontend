@@ -3,18 +3,18 @@ interface AvatarProps {
   size?: number;
 }
 
-const Avatar = ({ src, size = 32 }: AvatarProps) =>
+const Avatar = ({ src, size = 40 }: AvatarProps) =>
   src ? (
     <img
       src={src}
       alt=""
       style={{ width: size, height: size }}
-      className="rounded-full object-cover"
+      className="rounded-full border border-blue-15 object-cover"
     />
   ) : (
     <div
       style={{ width: size, height: size }}
-      className="rounded-full bg-gray-20"
+      className="rounded-full border border-blue-15 bg-gray-20"
     />
   );
 

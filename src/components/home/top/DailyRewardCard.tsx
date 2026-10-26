@@ -9,6 +9,8 @@ import {
   getAttendanceToday,
 } from '../../../api/attendance';
 import { ROUTES } from '../../../constants/routes';
+import DailyRewardModal from './DailyRewardModal';
+import fishImage from '../../../assets/store/Fish_a.svg';
 
 type ViewStatus = AttendanceStatus | 'loading' | 'error';
 
@@ -17,6 +19,7 @@ const DailyRewardCard = () => {
   //오늘의 보상 수령 상태 (조회 전에는 로딩중)
   const [status, setStatus] = useState<ViewStatus>('loading');
   const [isLoading, setIsLoading] = useState(false);
+  const [rewardAmount, setRewardAmount] = useState<number | null>(null);
 
   const [retryCount, setRetryCount] = useState(0);
 
@@ -50,7 +53,7 @@ const DailyRewardCard = () => {
     try {
       const res = await claimAttendanceReword();
       setStatus('CLAIMED');
-      if (res.newlyClaimed) alert(`FISH ${res.grantedAmount}개를 받았어요!`);
+      if (res.newlyClaimed) setRewardAmount(res.grantedAmount);
       if (res.newlyClaimed) {
         //topbar 갱신하기(흠)
       }
@@ -70,7 +73,7 @@ const DailyRewardCard = () => {
         return { label: '다시 시도', onClick: handleRetry, disabled: false };
       case 'AVAILABLE':
         return {
-          label: '🐟 오늘의 FISH 받기',
+          label: '오늘의 FISH 받기',
           onClick: handleClaim,
           disabled: isLoading,
         };
@@ -93,7 +96,7 @@ const DailyRewardCard = () => {
           alt=""
           className="absolute bottom-0 left-1/2 -translate-x-1/2"
         />
-        <p className="absolute top-10 left-1/2 -translate-x-1/2 rounded-full bg-blue-50 px-3 py-2 text-[16px] font-semibold whitespace-nowrap text-white">
+        <p className="absolute top-10 left-1/2 w-max max-w-[calc(100%-24px)] -translate-x-1/2 rounded-full bg-blue-50 px-3 py-2 text-center text-[14px] xl:text-[16px] font-semibold break-keep text-white">
           오늘의 생선 받아가라 냥
         </p>
       </Card>
@@ -102,14 +105,25 @@ const DailyRewardCard = () => {
         type="button"
         onClick={button.onClick}
         disabled={button.disabled}
-        className={`flex h-25 cursor-pointer items-center justify-center rounded-4xl px-6 py-4 text-[22px] font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${
+        className={`flex min-h-25 cursor-pointer items-center justify-center rounded-4xl px-3 py-4 text-[16px] xl:px-6 xl:text-[22px] text-center break-keep font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${
           canClaim
             ? 'border-2 border-green-40 bg-white text-blue-60 shadow-[0_0_4px_0_#276AD8]'
             : 'bg-blue-60 text-white shadow-[0_0_4px_0_#276AD8]'
         }`}
       >
+        {canClaim && <img src={fishImage} alt="" className="mr-2 size-7 shrink-0 object-contain" />}
         {button.label}
       </button>
+      {rewardAmount !== null && (
+        <DailyRewardModal
+          amount={rewardAmount}
+          onClose={() => setRewardAmount(null)}
+          onQuiz={() => {
+            setRewardAmount(null);
+            navigate(ROUTES.QUIZ);
+          }}
+        />
+      )}
     </div>
   );
 };

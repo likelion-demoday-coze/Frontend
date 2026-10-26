@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getStockRanking, getTimeAttackRanking } from '../../api/ranking';
 import type { MyRankSummary } from '../../types/myRank';
+import { ROUTES } from '../../constants/routes';
 
 export const useMyRankSummary = () => {
   const [data, setData] = useState<MyRankSummary[] | null>(null);
@@ -20,6 +21,7 @@ export const useMyRankSummary = () => {
           {
             title: '주가 랭킹',
             rank: stockMy?.rankingPosition ?? null,
+            challengeTo: stockMy ? undefined : `${ROUTES.QUIZ}?mode=daily`,
             stats: [
               {
                 label: '상위',
@@ -34,6 +36,7 @@ export const useMyRankSummary = () => {
           {
             title: '시간외거래 랭킹',
             rank: timeAttackMy?.rankingPosition ?? null,
+            challengeTo: timeAttackMy ? undefined : `${ROUTES.QUIZ}?mode=timeAttack`,
             // 오늘 아직 안 했을 때만 안내문을 보여 줌
             footnote: timeAttackMy ? undefined : '오늘은 아직 기록이 없어요',
             stats: [

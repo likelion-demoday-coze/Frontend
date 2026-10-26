@@ -19,6 +19,7 @@ interface StreakCardProps {
 
   // 복구 신청 후 학습 기한 안내
   deadlineLabel?: string;
+  showWeek?: boolean;
 }
 
 // 상태별 헤더 설명
@@ -37,6 +38,7 @@ const StreakCard = ({
   onStartQuiz,
   isRestoring = false,
   deadlineLabel,
+  showWeek = true,
 }: StreakCardProps) => {
   const { view, currentDays, bestDays } = data;
 
@@ -56,7 +58,7 @@ const StreakCard = ({
       : 'text-yellow-45';
 
   return (
-    <Card className="h-[490px] mt-4 flex w-full flex-col bg-white p-5">
+    <Card className="min-h-[490px] mt-4 flex w-full flex-col bg-white p-5">
       {/* 상단: 일수 + 설명 + 버튼 또는 최고 기록 */}
       <div className="mb-5 flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
@@ -103,7 +105,7 @@ const StreakCard = ({
       </div>
 
       {/* 월~일 학습 기록 */}
-      <StreakWeek days={data.days} />
+      {showWeek && <StreakWeek days={data.days} />}
 
       {/* 상태별 안내 문구 */}
       <div className="mt-5">

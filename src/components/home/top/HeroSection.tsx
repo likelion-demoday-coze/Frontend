@@ -19,12 +19,12 @@ const HeroSection = () => {
           className="text-blue-60"
         />
 
-        <div className="mt-9.5 flex flex-col gap-10 xl:flex-row">
-          <div className="min-w-0 flex-1">
+        <div className="mt-9.5 flex flex-col gap-6 md:flex-row xl:gap-10">
+          <div className="min-w-0 md:flex-2 xl:flex-1">
             <StockChartCard />
           </div>
 
-          <div className="xl:w-95 xl:shrink-0">
+          <div className="min-w-0 md:flex-1 xl:w-95 xl:flex-none xl:shrink-0">
             <DailyRewardCard />
           </div>
         </div>
