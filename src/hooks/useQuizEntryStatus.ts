@@ -35,7 +35,7 @@ const useQuizEntryStatus = () => {
     ])
       .then(([fishBalance, attendance, dailyToday, timeAttack, recovery]) => {
         if (ignore) return;
-        const isPass = attendance.status === 'PASS_ACTIVE';
+        const isPass = dailyToday.passApplied;
         setStatus({
           fishBalance,
           isPass,
