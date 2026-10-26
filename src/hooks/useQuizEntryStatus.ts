@@ -29,21 +29,28 @@ const useQuizEntryStatus = () => {
     Promise.all([
       getFishBalance(),
       getAttendanceToday(),
-      getDailyQuizToday(),
+      getDailyQuizToday().catch((error) => {
+        console.error('정규장 오늘 정보 조회 실패', error);
+        return null;
+      }),
       getTimeAttackToday(),
       getStreakRecovery().catch(() => null),
     ])
       .then(([fishBalance, attendance, dailyToday, timeAttack, recovery]) => {
         if (ignore) return;
-        const isPass = dailyToday.passApplied;
+        //정규장 정보 조회 실패 시 출석 상태로 대신 판단
+        const isPass =
+          dailyToday?.passApplied ?? attendance.status === 'PASS_ACTIVE';
         setStatus({
           fishBalance,
           isPass,
           canClaimAttendance: attendance.status === 'AVAILABLE',
-          dailyAttempt: {
-            used: dailyToday.usedStockReflectionCount,
-            limit: dailyToday.stockReflectionLimit,
-          },
+          dailyAttempt: dailyToday
+            ? {
+                used: dailyToday.usedStockReflectionCount,
+                limit: dailyToday.stockReflectionLimit,
+              }
+            : { used: 0, limit: isPass ? 3 : 2 },
           timeAttackAttempt: {
             used: timeAttack.usedAttemptCount,
             limit: timeAttack.dailyAttemptLimit,
