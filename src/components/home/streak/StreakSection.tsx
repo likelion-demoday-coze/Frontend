@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { isAxiosError } from 'axios';
 import { getStreakRecovery, requestStreakRecovery } from '../../../api/streak';
@@ -8,7 +8,6 @@ import type { StreakData, StreakDayStatus } from '../../../types/streak';
 import { useStreakContext } from '../../../hooks/useMyStreak';
 import StreakCard from './StreakCard';
 import SectionTitle from '../../common/SectionTitle';
-import { getMockStreak } from '../../../mocks/streakMock';
 
 const EFFECT_STEPS = [
   { id: 'effect-3', requiredDays: 3, name: '동전' },
@@ -19,9 +18,6 @@ const EFFECT_STEPS = [
 
 const StreakSection = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  // 개발 중 URL에 ?streakPreview=recovered를 붙이면 하루 빠진 기록을 복구한 화면 미리보기
-  const isRecoveryPreview = import.meta.env.DEV && searchParams.get('streakPreview') === 'recovered';
   const { streak, isError } = useStreakContext();
   const [recovery, setRecovery] = useState<StreakRecovery | null>(null);
   const [recoveryError, setRecoveryError] = useState('');
@@ -39,8 +35,7 @@ const StreakSection = () => {
   }, []);
 
   const handleRestore = async () => {
-    // 미리보기에서는 실제 복구 요청을 보내지 않음
-    if (isRecoveryPreview || !recovery?.requestable || restoreLock.current) return;
+    if (!recovery?.requestable || restoreLock.current) return;
     restoreLock.current = true;
     setIsRestoring(true);
     setRecoveryError('');
@@ -110,12 +105,9 @@ const StreakSection = () => {
   return (
     <section className="w-full">
       <SectionTitle title="연속학습" />
-      {isRecoveryPreview && (
-        <p className="mt-2 text-xs text-gray-60">하루 빠진 기록 복구 후 학습 완료 미리보기 · 실제 복구권은 사용되지 않습니다.</p>
-      )}
-      {isRecoveryPreview || streak ? (
+      {streak ? (
         <StreakCard
-          data={isRecoveryPreview ? getMockStreak('completed') : data}
+          data={data}
           onRestore={handleRestore}
           isRestoring={isRestoring}
           deadlineLabel={recovery?.expiresAt
