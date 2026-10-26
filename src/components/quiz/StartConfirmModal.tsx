@@ -1,6 +1,7 @@
 import QuizDialog from './QuizDialog';
 import timeAttackIcon from '../../assets/quiz/mode_time_attack.png';
 import { QUIZ_CATEGORY_INFO } from '../../constants/quizCategory';
+import type { FishShortAction } from '../../hooks/useFishShortAction';
 import type { QuizAttempt } from '../../hooks/useQuizEntryStatus';
 import type { QuizCategory } from '../../types/quiz';
 
@@ -15,7 +16,7 @@ interface StartConfirmModalProps {
   attempt: QuizAttempt;
   onClose: () => void;
   onStart: () => void;
-  onCharge: () => void;
+  fishShortAction: FishShortAction;
 }
 
 //정규장·시간외거래 시작 팝업
@@ -28,7 +29,7 @@ const StartConfirmModal = ({
   attempt,
   onClose,
   onStart,
-  onCharge,
+  fishShortAction,
 }: StartConfirmModalProps) => {
   const isDaily = mode === 'daily';
   const categoryInfo = category && QUIZ_CATEGORY_INFO[category];
@@ -97,7 +98,7 @@ const StartConfirmModal = ({
       }}
       primary={
         isFishShort
-          ? { label: 'FISH 충전하기', onClick: onCharge }
+          ? fishShortAction
           : {
               label: isDaily ? '정규장 시작' : '시간외거래 시작',
               onClick: onStart,

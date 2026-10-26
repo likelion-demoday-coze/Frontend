@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 interface DialogAction {
   label: string;
   onClick: () => void;
+  disabled?: boolean;
 }
 
 interface QuizDialogProps {
@@ -78,8 +79,9 @@ const QuizDialog = ({
           <button
             type="button"
             onClick={primary.onClick}
+            disabled={primary.disabled}
             autoFocus
-            className="h-14 flex-1 cursor-pointer rounded-xl bg-blue-60 text-lg font-semibold text-white lg:h-16 lg:w-42 lg:flex-none"
+            className="h-14 flex-1 cursor-pointer rounded-xl bg-blue-60 text-lg font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-10 disabled:text-gray-60 lg:h-16 lg:w-42 lg:flex-none"
           >
             {primary.label}
           </button>

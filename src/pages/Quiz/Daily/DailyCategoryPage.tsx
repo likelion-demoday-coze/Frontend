@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageTitle from '../../../components/common/PageTitle';
+import DailyRewardModal from '../../../components/home/top/DailyRewardModal';
 import CategoryCard from '../../../components/quiz/CategoryCard';
 import StartConfirmModal from '../../../components/quiz/StartConfirmModal';
 import {
@@ -8,14 +9,19 @@ import {
   QUIZ_CATEGORY_INFO,
 } from '../../../constants/quizCategory';
 import { DAILY_FISH_COST } from '../../../constants/quizCost';
-import { ROUTES, toDailyQuizPlay } from '../../../constants/routes';
+import { toDailyQuizPlay } from '../../../constants/routes';
 import { createSession, getActiveSession } from '../../../api/dailyQuiz';
+import useFishShortAction from '../../../hooks/useFishShortAction';
 import useQuizEntryStatus from '../../../hooks/useQuizEntryStatus';
 import type { QuizCategory } from '../../../types/quiz';
 
 const DailyCategoryPage = () => {
   const navigate = useNavigate();
-  const { status } = useQuizEntryStatus();
+  const { status, applyAttendanceClaim } = useQuizEntryStatus();
+  const fishShort = useFishShortAction({
+    canClaimAttendance: !!status?.canClaimAttendance,
+    onClaimed: applyAttendanceClaim,
+  });
   const [selectedCategory, setSelectedCategory] = useState<QuizCategory | null>(
     null
   );
@@ -110,7 +116,15 @@ const DailyCategoryPage = () => {
           attempt={status.dailyAttempt}
           onClose={handleCloseConfirm}
           onStart={handleStart}
-          onCharge={() => navigate(ROUTES.SHOP)}
+          fishShortAction={fishShort.action}
+        />
+      )}
+
+      {fishShort.rewardAmount !== null && (
+        <DailyRewardModal
+          amount={fishShort.rewardAmount}
+          onClose={fishShort.closeReward}
+          onQuiz={fishShort.closeReward}
         />
       )}
     </div>

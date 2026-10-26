@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getAttendanceToday } from '../api/attendance';
 import { getFishBalance } from '../api/fish';
 import { getStreakRecovery } from '../api/streak';
@@ -12,6 +12,7 @@ export interface QuizAttempt {
 export interface QuizEntryStatus {
   fishBalance: number;
   isPass: boolean;
+  canClaimAttendance: boolean;
   dailyAttempt: QuizAttempt;
   timeAttackAttempt: QuizAttempt;
   isRecovering: boolean;
@@ -36,6 +37,7 @@ const useQuizEntryStatus = () => {
         setStatus({
           fishBalance,
           isPass,
+          canClaimAttendance: attendance.status === 'AVAILABLE',
           //TODO: 정규장 오늘 주가 반영 횟수 API 나오면 교체 (지금은 0회 사용으로 고정)
           dailyAttempt: { used: 0, limit: isPass ? 3 : 2 },
           timeAttackAttempt: {
@@ -54,7 +56,13 @@ const useQuizEntryStatus = () => {
     };
   }, []);
 
-  return { status, isError };
+  const applyAttendanceClaim = useCallback((fishBalance: number) => {
+    setStatus(
+      (prev) => prev && { ...prev, fishBalance, canClaimAttendance: false }
+    );
+  }, []);
+
+  return { status, isError, applyAttendanceClaim };
 };
 
 export default useQuizEntryStatus;
