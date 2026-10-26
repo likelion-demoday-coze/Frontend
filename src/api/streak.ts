@@ -29,8 +29,42 @@ export interface StreakRecovery {
   status: 'AVAILABLE' | 'PENDING' | 'RECOVERED' | 'EXPIRED';
   requestable: boolean;
   method: 'ITEM' | 'PASS' | null;
+  requestedAt: string | null;
   expiresAt: string | null;
+  recoveredAt: string | null;
+  quantityAfterRequest: number | null;
+  stockAfterRecovery: number | null;
+  streakAfterRecovery: number | null;
 }
+
+export interface StreakPenaltyNotification {
+  eventId: number;
+  missedDate: string;
+  penaltyAppliedAt: string;
+  stockBeforePenalty: number;
+  stockAfterPenalty: number;
+  decreaseAmount: number;
+  streakBeforePenalty: number;
+  recoveryStatus: StreakRecovery['status'];
+}
+
+// 미확인인 최신 하락만 조회. 팝업 표시 및 확인 처리는 별도
+export const getStreakPenaltyNotification = async () => {
+  const { data } = await api.get<ApiResponse<StreakPenaltyNotification | null>>(
+    '/api/v1/streaks/penalty-notification'
+  );
+  if (!data.isSuccess) throw new Error(data.message);
+  return data.result;
+};
+
+export const acknowledgeStreakPenaltyNotification = async (eventId: number) => {
+  const { data } = await api.post<ApiResponse<{
+    eventId: number;
+    acknowledgedAt: string;
+  }>>(`/api/v1/streaks/penalty-notifications/${eventId}/acknowledgment`);
+  if (!data.isSuccess) throw new Error(data.message);
+  return data.result;
+};
 
 // /api/v1/streaks/recoveries/{eventId} 응답
 export interface StreakRecoveryDetail extends StreakRecovery {

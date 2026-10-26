@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { Card } from '../../common/Card';
 import basicCat from '../../../assets/character/basic_1.svg';
@@ -24,17 +24,6 @@ type ViewStatus = AttendanceStatus | 'loading' | 'error';
 
 const DailyRewardCard = () => {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const previewStage = searchParams.get('characterPreview');
-  const isCharacterPreview = import.meta.env.DEV && ['1', '2', '3'].includes(previewStage ?? '');
-  const previewStreak = Number(searchParams.get('characterStreak') ?? '21');
-  const updatePreview = (key: string, value: string) => {
-    setSearchParams((previous) => {
-      const next = new URLSearchParams(previous);
-      next.set(key, value);
-      return next;
-    }, { replace: true });
-  };
   //오늘의 보상 수령 상태 (조회 전에는 로딩중)
   const [status, setStatus] = useState<ViewStatus>('loading');
   const [isLoading, setIsLoading] = useState(false);
@@ -55,13 +44,11 @@ const DailyRewardCard = () => {
   }, []);
 
   // 캐릭터 조회 응답의 현재 주가로 기본 / 큰손냥 / 귀족냥 결정
-  const currentStock = isCharacterPreview
-    ? previewStage === '3' ? 10000 : previewStage === '2' ? 1000 : 0
-    : character?.currentStock ?? 0;
+  const currentStock = character?.currentStock ?? 0;
   const catImage = currentStock >= 10000 ? nobleCat
     : currentStock >= 1000 ? bigHandCat : basicCat;
   // 스트릭으로 달성한 가장 높은 단계의 배경 하나만 적용
-  const streakDays = isCharacterPreview ? previewStreak : character?.currentStreak ?? 0;
+  const streakDays = character?.currentStreak ?? 0;
   const backgroundImage = streakDays >= 21 ? diamondBackground
     : streakDays >= 14 ? goldBackground
     : streakDays >= 7 ? silverBackground
@@ -134,31 +121,14 @@ const DailyRewardCard = () => {
 
   return (
     <div className="flex flex-col gap-6 xl:h-full">
-      {isCharacterPreview && (
-        <div className="flex flex-wrap items-center gap-2 text-xs text-gray-60">
-          <span>캐릭터 미리보기</span>
-          <select aria-label="미리보기 캐릭터" value={previewStage ?? '1'} onChange={(event) => updatePreview('characterPreview', event.target.value)}>
-            <option value="1">기본냥</option>
-            <option value="2">큰손냥</option>
-            <option value="3">귀족냥</option>
-          </select>
-          <select aria-label="미리보기 스트릭 배경" value={String(previewStreak)} onChange={(event) => updatePreview('characterStreak', event.target.value)}>
-            <option value="0">배경 없음</option>
-            <option value="3">3일 · 동</option>
-            <option value="7">7일 · 은</option>
-            <option value="14">14일 · 금</option>
-            <option value="21">21일 · 다이아</option>
-          </select>
-        </div>
-      )}
       <Card className="relative min-h-55.5 overflow-hidden border-blue-15 bg-white xl:flex-1">
         {backgroundImage && (
           <img src={backgroundImage} alt="" className="absolute inset-0 size-full object-cover" />
         )}
-        {isCharacterPreview || character ? (
+        {character ? (
           <img
             src={catImage}
-            alt={isCharacterPreview ? '캐릭터 미리보기' : character?.stageName}
+            alt={character.stageName}
             className="absolute bottom-0 left-1/2 size-48 -translate-x-1/2 object-contain"
           />
         ) : (
@@ -174,7 +144,7 @@ const DailyRewardCard = () => {
       <button
         type="button"
         onClick={button.onClick}
-        disabled={isCharacterPreview || button.disabled}
+        disabled={button.disabled}
         className={`flex min-h-25 cursor-pointer items-center justify-center rounded-4xl px-3 py-4 text-[16px] xl:px-6 xl:text-[22px] text-center break-keep font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${
           canClaim
             ? 'border-2 border-green-40 bg-white text-blue-60 shadow-[0_0_4px_0_#276AD8]'

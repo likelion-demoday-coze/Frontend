@@ -97,7 +97,6 @@ const StreakCard = ({
             퀴즈 풀러가기
           </button>
         ) : bestDays !== null ? (
-          //최고기록 보여줌 TODO : 최고기록 받아서 보여주기
           <span className="shrink-0 rounded-lg border border-yellow-45 px-2.5 py-2 text-[16px] font-semibold text-yellow-45">
             최고기록 {bestDays}일
           </span>
