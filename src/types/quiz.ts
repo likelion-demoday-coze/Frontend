@@ -55,6 +55,15 @@ export interface QuizSessionDetail extends ActiveQuizSession {
   questions: QuizQuestion[];
 }
 
+export interface DailyQuizToday {
+  passApplied: boolean;
+  stockReflectionLimit: number;
+  todayOriginalAnswerCount: number;
+  usedStockReflectionCount: number;
+  remainingStockReflectionCount: number;
+  fishCost: number;
+}
+
 export interface CreateSessionRequest {
   category: QuizCategory;
 }

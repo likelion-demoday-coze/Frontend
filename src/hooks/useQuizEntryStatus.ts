@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getAttendanceToday } from '../api/attendance';
+import { getDailyQuizToday } from '../api/dailyQuiz';
 import { getFishBalance } from '../api/fish';
 import { getStreakRecovery } from '../api/streak';
 import { getTimeAttackToday } from '../api/timeAttack';
@@ -28,18 +29,21 @@ const useQuizEntryStatus = () => {
     Promise.all([
       getFishBalance(),
       getAttendanceToday(),
+      getDailyQuizToday(),
       getTimeAttackToday(),
       getStreakRecovery().catch(() => null),
     ])
-      .then(([fishBalance, attendance, timeAttack, recovery]) => {
+      .then(([fishBalance, attendance, dailyToday, timeAttack, recovery]) => {
         if (ignore) return;
         const isPass = attendance.status === 'PASS_ACTIVE';
         setStatus({
           fishBalance,
           isPass,
           canClaimAttendance: attendance.status === 'AVAILABLE',
-          //TODO: 정규장 오늘 주가 반영 횟수 API 나오면 교체 (지금은 0회 사용으로 고정)
-          dailyAttempt: { used: 0, limit: isPass ? 3 : 2 },
+          dailyAttempt: {
+            used: dailyToday.usedStockReflectionCount,
+            limit: dailyToday.stockReflectionLimit,
+          },
           timeAttackAttempt: {
             used: timeAttack.usedAttemptCount,
             limit: timeAttack.dailyAttemptLimit,
