@@ -6,7 +6,7 @@ export interface Storeitems {
   description: string;
 }
 
-export interface PurchaseItem {
+export interface PurchaseItems {
   purchaseId: number;
   itemId: number;
   quantity: number;
@@ -17,7 +17,7 @@ export interface PurchaseItem {
   createdAt: string | null;
 }
 
-export interface MyItem {
+export interface MyItems {
   itemId: number;
   itemCode: string;
   name: string;

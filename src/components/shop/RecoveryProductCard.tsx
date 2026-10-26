@@ -2,9 +2,13 @@ import recoveryImage from '../../assets/store/Recover_Ticket_Orange.svg';
 
 interface RecoveryProductCardProps {
   ownedCount?: number;
+  fishPrice?: number;
+  disabled?: boolean;
+  isPurchasing?: boolean;
+  onPurchase?: () => void;
 }
 
-const RecoveryProductCard = ({ ownedCount }: RecoveryProductCardProps) => (
+const RecoveryProductCard = ({ ownedCount, fishPrice, disabled = true, isPurchasing = false, onPurchase }: RecoveryProductCardProps) => (
   <article className="flex flex-col gap-8 rounded-3xl border border-gray-20 bg-white p-6 sm:flex-row sm:items-center lg:gap-12 lg:p-9">
     <div className="flex w-44 shrink-0 justify-center self-center lg:w-48">
       <div className="size-30 rounded-3xl bg-yellow-05">
@@ -20,8 +24,8 @@ const RecoveryProductCard = ({ ownedCount }: RecoveryProductCardProps) => (
         연속학습 중단 다음 날에만 복구 가능<br />사용 후 환불 불가
       </p>
     </div>
-    <button type="button" disabled title="교환 준비 중" className="h-16 w-36 shrink-0 cursor-not-allowed self-end rounded-xl border border-blue-60 bg-white text-xl font-bold text-blue-60 sm:self-center">
-      FISH 200
+    <button type="button" disabled={disabled} onClick={onPurchase} className="h-16 w-36 shrink-0 cursor-pointer disabled:cursor-not-allowed self-end rounded-xl border border-blue-60 bg-white text-xl font-bold text-blue-60 sm:self-center">
+      {isPurchasing ? '구매 중...' : `FISH ${fishPrice ?? '-'}`}
     </button>
   </article>
 );
