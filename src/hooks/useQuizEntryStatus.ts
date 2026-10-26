@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getAttendanceToday } from '../api/attendance';
+import { getDailyQuizToday } from '../api/dailyQuiz';
 import { getFishBalance } from '../api/fish';
 import { getStreakRecovery } from '../api/streak';
 import { getTimeAttackToday } from '../api/timeAttack';
@@ -12,6 +13,7 @@ export interface QuizAttempt {
 export interface QuizEntryStatus {
   fishBalance: number;
   isPass: boolean;
+  canClaimAttendance: boolean;
   dailyAttempt: QuizAttempt;
   timeAttackAttempt: QuizAttempt;
   isRecovering: boolean;
@@ -27,17 +29,28 @@ const useQuizEntryStatus = () => {
     Promise.all([
       getFishBalance(),
       getAttendanceToday(),
+      getDailyQuizToday().catch((error) => {
+        console.error('정규장 오늘 정보 조회 실패', error);
+        return null;
+      }),
       getTimeAttackToday(),
       getStreakRecovery().catch(() => null),
     ])
-      .then(([fishBalance, attendance, timeAttack, recovery]) => {
+      .then(([fishBalance, attendance, dailyToday, timeAttack, recovery]) => {
         if (ignore) return;
-        const isPass = attendance.status === 'PASS_ACTIVE';
+        //정규장 정보 조회 실패 시 출석 상태로 대신 판단
+        const isPass =
+          dailyToday?.passApplied ?? attendance.status === 'PASS_ACTIVE';
         setStatus({
           fishBalance,
           isPass,
-          //TODO: 정규장 오늘 주가 반영 횟수 API 나오면 교체 (지금은 0회 사용으로 고정)
-          dailyAttempt: { used: 0, limit: isPass ? 3 : 2 },
+          canClaimAttendance: attendance.status === 'AVAILABLE',
+          dailyAttempt: dailyToday
+            ? {
+                used: dailyToday.usedStockReflectionCount,
+                limit: dailyToday.stockReflectionLimit,
+              }
+            : { used: 0, limit: isPass ? 3 : 2 },
           timeAttackAttempt: {
             used: timeAttack.usedAttemptCount,
             limit: timeAttack.dailyAttemptLimit,
@@ -54,7 +67,13 @@ const useQuizEntryStatus = () => {
     };
   }, []);
 
-  return { status, isError };
+  const applyAttendanceClaim = useCallback((fishBalance: number) => {
+    setStatus(
+      (prev) => prev && { ...prev, fishBalance, canClaimAttendance: false }
+    );
+  }, []);
+
+  return { status, isError, applyAttendanceClaim };
 };
 
 export default useQuizEntryStatus;

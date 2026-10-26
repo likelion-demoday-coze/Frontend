@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import PageTitle from '../../components/common/PageTitle';
+import DailyRewardModal from '../../components/home/top/DailyRewardModal';
 import ModeCard from '../../components/quiz/ModeCard';
 import ResumeQuizModal from '../../components/quiz/ResumeQuizModal';
 import StartConfirmModal from '../../components/quiz/StartConfirmModal';
@@ -10,6 +11,7 @@ import {
   TIME_ATTACK_FISH_COST,
 } from '../../constants/quizCost';
 import useActiveDailySession from '../../hooks/useActiveDailySession';
+import useFishShortAction from '../../hooks/useFishShortAction';
 import useQuizEntryStatus from '../../hooks/useQuizEntryStatus';
 
 type QuizMode = 'daily' | 'timeAttack';
@@ -23,8 +25,12 @@ const QuizModePage = () => {
   });
   const [isTimeAttackConfirmOpen, setIsTimeAttackConfirmOpen] = useState(false);
   const [isResumeOpen, setIsResumeOpen] = useState(false);
-  const { status, isError } = useQuizEntryStatus();
+  const { status, isError, applyAttendanceClaim } = useQuizEntryStatus();
   const { activeSession } = useActiveDailySession();
+  const fishShort = useFishShortAction({
+    canClaimAttendance: !!status?.canClaimAttendance,
+    onClaimed: applyAttendanceClaim,
+  });
 
   const handleCloseConfirm = useCallback(
     () => setIsTimeAttackConfirmOpen(false),
@@ -60,12 +66,10 @@ const QuizModePage = () => {
   const isFishShort =
     !!selectedMode && !isResumable && !isPass && fishBalance < fishCost;
 
-  const goToShop = () => navigate(ROUTES.SHOP);
-
   //정규장은 이어 풀기 또는 카테고리 선택으로, 시간외거래는 바로 시작 팝업
   const handleStart = () => {
     if (isResumable) return setIsResumeOpen(true);
-    if (isFishShort) return goToShop();
+    if (isFishShort) return fishShort.action.onClick();
     if (selectedMode === 'daily') navigate(ROUTES.DAILY_QUIZ);
     if (selectedMode === 'timeAttack') setIsTimeAttackConfirmOpen(true);
   };
@@ -94,7 +98,6 @@ const QuizModePage = () => {
             isRecovering={isRecovering}
             selected={selectedMode === 'daily'}
             onSelect={() => setSelectedMode('daily')}
-            onCharge={goToShop}
           />
           <ModeCard
             mode="timeAttack"
@@ -104,7 +107,6 @@ const QuizModePage = () => {
             attempt={timeAttackAttempt}
             selected={selectedMode === 'timeAttack'}
             onSelect={() => setSelectedMode('timeAttack')}
-            onCharge={goToShop}
           />
         </div>
 
@@ -112,10 +114,10 @@ const QuizModePage = () => {
         <button
           type="button"
           onClick={handleStart}
-          disabled={!selectedMode}
+          disabled={!selectedMode || (isFishShort && fishShort.action.disabled)}
           className="h-14 w-full cursor-pointer rounded-xl bg-blue-60 text-lg font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-10 disabled:text-gray-60 lg:h-16 lg:w-42"
         >
-          {isFishShort ? 'FISH 충전하기' : '투자 시작하기'}
+          {isFishShort ? fishShort.action.label : '투자 시작하기'}
         </button>
       </div>
 
@@ -136,7 +138,15 @@ const QuizModePage = () => {
           attempt={timeAttackAttempt}
           onClose={handleCloseConfirm}
           onStart={handleStartTimeAttack}
-          onCharge={goToShop}
+          fishShortAction={fishShort.action}
+        />
+      )}
+
+      {fishShort.rewardAmount !== null && (
+        <DailyRewardModal
+          amount={fishShort.rewardAmount}
+          onClose={fishShort.closeReward}
+          onQuiz={fishShort.closeReward}
         />
       )}
     </div>

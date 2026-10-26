@@ -1,5 +1,4 @@
 import type { KeyboardEvent, ReactNode } from 'react';
-import ArrowIcon from '../../assets/icons/arrow.svg?react';
 import dailyIcon from '../../assets/quiz/mode_daily.png';
 import timeAttackIcon from '../../assets/quiz/mode_time_attack.png';
 import type { QuizAttempt } from '../../hooks/useQuizEntryStatus';
@@ -16,7 +15,6 @@ interface ModeCardProps {
   isRecovering?: boolean;
   selected: boolean;
   onSelect: () => void;
-  onCharge: () => void;
 }
 
 const content: Record<
@@ -56,7 +54,6 @@ const ModeCard = ({
   isRecovering = false,
   selected,
   onSelect,
-  onCharge,
 }: ModeCardProps) => {
   const { title, subtitle, description, attemptLabel, icon } = content[mode];
   const isExhausted = attempt.used >= attempt.limit;
@@ -180,19 +177,6 @@ const ModeCard = ({
             ))}
           </div>
         </div>
-        <button
-          type="button"
-          onClick={(event) => {
-            event.stopPropagation();
-            onCharge();
-          }}
-          tabIndex={isFishShort ? 0 : -1}
-          aria-hidden={!isFishShort}
-          className={`flex cursor-pointer items-center text-sm leading-4.5 font-semibold text-blue-60 ${isFishShort ? '' : 'invisible'}`}
-        >
-          생선 충전하기
-          <ArrowIcon aria-hidden="true" className="h-4 w-2" />
-        </button>
       </div>
     </div>
   );

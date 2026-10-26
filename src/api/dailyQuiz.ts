@@ -4,6 +4,7 @@ import type { ApiResponse } from '../types/api';
 import type {
   ActiveQuizSession,
   CreateSessionRequest,
+  DailyQuizToday,
   OriginalAnswerResult,
   QuizCategory,
   QuizResult,
@@ -20,6 +21,12 @@ export const getCategories = async () => {
     `${BASE}/categories`
   );
   return data.result.map((item) => item.category);
+};
+
+//오늘 정규장 주가 반영 횟수 조회
+export const getDailyQuizToday = async () => {
+  const { data } = await api.get<ApiResponse<DailyQuizToday>>(`${BASE}/today`);
+  return data.result;
 };
 
 //정규장 세션 생성 (생선 차감, 패스 회원은 무료)
