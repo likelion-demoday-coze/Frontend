@@ -26,12 +26,16 @@ const StreakSection = () => {
 
   useEffect(() => {
     let active = true;
-    getStreakRecovery().then((result) => {
-      if (active) setRecovery(result);
-    }).catch(() => {
-      if (active) setRecoveryError('복구 상태를 불러오지 못했어요.');
-    });
-    return () => { active = false; };
+    getStreakRecovery()
+      .then((result) => {
+        if (active) setRecovery(result);
+      })
+      .catch(() => {
+        if (active) setRecoveryError('복구 상태를 불러오지 못했어요.');
+      });
+    return () => {
+      active = false;
+    };
   }, []);
 
   const handleRestore = async () => {
@@ -45,9 +49,13 @@ const StreakSection = () => {
       // 상단 스트릭을 포함한 서버 최신 기록을 다시 조회
       window.location.reload();
     } catch (error) {
-      setRecoveryError(isAxiosError(error)
-        ? error.response?.data?.message ?? '복구 신청에 실패했어요.'
-        : error instanceof Error ? error.message : '복구 신청에 실패했어요.');
+      setRecoveryError(
+        isAxiosError(error)
+          ? (error.response?.data?.message ?? '복구 신청에 실패했어요.')
+          : error instanceof Error
+            ? error.message
+            : '복구 신청에 실패했어요.'
+      );
     } finally {
       restoreLock.current = false;
       setIsRestoring(false);
@@ -55,25 +63,41 @@ const StreakSection = () => {
   };
   const currentDays = streak?.currentStreak ?? 0;
   const nextStep = EFFECT_STEPS.find((step) => step.requiredDays > currentDays);
-  const previousStep = [...EFFECT_STEPS].reverse().find(
-    (step) => step.requiredDays <= currentDays
-  );
+  const previousStep = [...EFFECT_STEPS]
+    .reverse()
+    .find((step) => step.requiredDays <= currentDays);
   const data: StreakData = {
-    view: recovery?.status === 'PENDING' ? 'restorePending'
-      : recovery?.status === 'AVAILABLE' && recovery.requestable
-        ? streak?.learnedToday ? 'restarted' : 'broken'
-        : recovery?.status === 'EXPIRED' && !streak?.learnedToday ? 'expired'
-        : streak?.learnedToday ? 'completed' : 'learning',
+    view:
+      recovery?.status === 'PENDING'
+        ? 'restorePending'
+        : recovery?.status === 'AVAILABLE'
+          ? !recovery.requestable
+            ? 'recoveryUnavailable'
+            : streak?.learnedToday
+              ? 'restarted'
+              : 'broken'
+          : recovery?.status === 'EXPIRED' && !streak?.learnedToday
+            ? 'expired'
+            : streak?.learnedToday
+              ? 'completed'
+              : 'learning',
     currentDays,
     bestDays: streak?.highestStreak ?? null,
     // 서버의 날짜별 기록을 기존 요일 아이콘 데이터로 변환
     days: (streak?.days ?? []).map((day) => {
       let status: StreakDayStatus = 'incomplete';
       if (day.today) {
-        status = day.status === 'COMPLETED' ? 'todayCompleted' : 'todayIncomplete';
-      } else if (day.date === recovery?.missedDate && recovery.status === 'RECOVERED') {
+        status =
+          day.status === 'COMPLETED' ? 'todayCompleted' : 'todayIncomplete';
+      } else if (
+        day.date === recovery?.missedDate &&
+        recovery.status === 'RECOVERED'
+      ) {
         status = 'restored';
-      } else if (day.date === recovery?.missedDate && (recovery.status === 'AVAILABLE' || recovery.status === 'PENDING')) {
+      } else if (
+        day.date === recovery?.missedDate &&
+        (recovery.status === 'AVAILABLE' || recovery.status === 'PENDING')
+      ) {
         status = 'pending';
       } else if (!day.future && day.status === 'COMPLETED') {
         status = 'completed';
@@ -89,9 +113,12 @@ const StreakSection = () => {
     }),
     effects: EFFECT_STEPS.map((step) => ({
       ...step,
-      status: step.requiredDays <= currentDays
-        ? 'active'
-        : step.id === nextStep?.id ? 'upcoming' : 'locked',
+      status:
+        step.requiredDays <= currentDays
+          ? 'active'
+          : step.id === nextStep?.id
+            ? 'upcoming'
+            : 'locked',
     })),
     progress: {
       from: previousStep?.requiredDays ?? 0,
@@ -109,10 +136,15 @@ const StreakSection = () => {
         <StreakCard
           data={data}
           onRestore={handleRestore}
+          onShop={() => navigate(ROUTES.SHOP)}
           isRestoring={isRestoring}
-          deadlineLabel={recovery?.expiresAt
-            ? new Date(recovery.expiresAt).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })
-            : undefined}
+          deadlineLabel={
+            recovery?.expiresAt
+              ? new Date(recovery.expiresAt).toLocaleString('ko-KR', {
+                  timeZone: 'Asia/Seoul',
+                })
+              : undefined
+          }
           onStartQuiz={() => navigate(ROUTES.QUIZ)}
         />
       ) : (
@@ -120,7 +152,11 @@ const StreakSection = () => {
           {isError ? '연속학습 정보를 불러오지 못했어요.' : '불러오는 중...'}
         </p>
       )}
-      {recoveryError && <p role="alert" className="mt-2 text-xs text-red-55">{recoveryError}</p>}
+      {recoveryError && (
+        <p role="alert" className="mt-2 text-xs text-red-55">
+          {recoveryError}
+        </p>
+      )}
     </section>
   );
 };

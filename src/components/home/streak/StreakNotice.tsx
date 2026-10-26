@@ -12,7 +12,10 @@ interface StreakNoticeProps {
 const StreakNotice = ({ view, deadlineLabel }: StreakNoticeProps) => {
   //복구 관련 사항
   const isRecovery =
-    view === 'broken' || view === 'restorePending' || view === 'restarted';
+    view === 'broken' ||
+    view === 'recoveryUnavailable' ||
+    view === 'restorePending' ||
+    view === 'restarted';
 
   // 오늘 학습 완료
   const isCompleted = view === 'completed';
@@ -37,6 +40,12 @@ const StreakNotice = ({ view, deadlineLabel }: StreakNoticeProps) => {
       title = '어제 학습을 쉬어서 연속학습이 끊겼어요';
 
       description = '오늘 23:59까지 복구하기로 연속학습을 이어갈 수 있어요';
+      break;
+
+    case 'recoveryUnavailable':
+      title = '지금은 연속학습 복구를 신청할 수 없어요';
+      description =
+        '상점에서 복구권 보유 수량과 구매에 필요한 FISH를 확인해 주세요';
       break;
 
     case 'restorePending':

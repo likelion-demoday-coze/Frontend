@@ -58,10 +58,12 @@ export const getStreakPenaltyNotification = async () => {
 };
 
 export const acknowledgeStreakPenaltyNotification = async (eventId: number) => {
-  const { data } = await api.post<ApiResponse<{
-    eventId: number;
-    acknowledgedAt: string;
-  }>>(`/api/v1/streaks/penalty-notifications/${eventId}/acknowledgment`);
+  const { data } = await api.post<
+    ApiResponse<{
+      eventId: number;
+      acknowledgedAt: string;
+    }>
+  >(`/api/v1/streaks/penalty-notifications/${eventId}/acknowledgment`);
   if (!data.isSuccess) throw new Error(data.message);
   return data.result;
 };

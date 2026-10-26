@@ -27,9 +27,12 @@ const STATUS_CLASSES = {
 
 const StreakEffectItem = ({ effect }: StreakEffectItemProps) => {
   const isPaused = effect.status === 'paused';
-  const image = effect.requiredDays === 21
-    ? (effect.status === 'active' || isPaused ? treasure : undefined)
-    : EFFECT_IMAGES[effect.requiredDays];
+  const image =
+    effect.requiredDays === 21
+      ? effect.status === 'active' || isPaused
+        ? treasure
+        : undefined
+      : EFFECT_IMAGES[effect.requiredDays];
 
   return (
     <li

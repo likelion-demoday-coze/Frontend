@@ -7,5 +7,6 @@ export const getMyCharacter = async () => {
   const { data } = await api.get<ApiResponse<MyCharacter>>(
     '/api/v1/characters/me'
   );
+  if (!data.isSuccess) throw new Error(data.message);
   return data.result;
 };
