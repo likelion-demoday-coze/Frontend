@@ -31,3 +31,12 @@ export interface PaymentHistories {
   totalPages: number;
   hasNext: boolean;
 }
+
+export interface PaymentProduct {
+  productId: number;
+  productCode: string;
+  productType: string;
+  name: string;
+  price: number;
+  passDurationHours: number;
+}

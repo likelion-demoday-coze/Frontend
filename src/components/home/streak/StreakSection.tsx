@@ -1,13 +1,13 @@
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useRef, useState } from 'react';
-import { isAxiosError } from 'axios';
-import { getStreakRecovery, requestStreakRecovery } from '../../../api/streak';
+import { useEffect, useState } from 'react';
+import { getStreakRecovery } from '../../../api/streak';
 import type { StreakRecovery } from '../../../api/streak';
 import { ROUTES } from '../../../constants/routes';
 import type { StreakData, StreakDayStatus } from '../../../types/streak';
 import { useStreakContext } from '../../../hooks/useMyStreak';
 import StreakCard from './StreakCard';
 import SectionTitle from '../../common/SectionTitle';
+import { useStreakRecoveryAction } from '../../../hooks/useStreakRecoveryAction';
 
 const EFFECT_STEPS = [
   { id: 'effect-3', requiredDays: 3, name: '동전' },
@@ -21,8 +21,7 @@ const StreakSection = () => {
   const { streak, isError } = useStreakContext();
   const [recovery, setRecovery] = useState<StreakRecovery | null>(null);
   const [recoveryError, setRecoveryError] = useState('');
-  const [isRestoring, setIsRestoring] = useState(false);
-  const restoreLock = useRef(false);
+  const recoveryAction = useStreakRecoveryAction();
 
   useEffect(() => {
     let active = true;
@@ -38,29 +37,6 @@ const StreakSection = () => {
     };
   }, []);
 
-  const handleRestore = async () => {
-    if (!recovery?.requestable || restoreLock.current) return;
-    restoreLock.current = true;
-    setIsRestoring(true);
-    setRecoveryError('');
-    try {
-      const result = await requestStreakRecovery(recovery.eventId);
-      setRecovery(result);
-      // 상단 스트릭을 포함한 서버 최신 기록을 다시 조회
-      window.location.reload();
-    } catch (error) {
-      setRecoveryError(
-        isAxiosError(error)
-          ? (error.response?.data?.message ?? '복구 신청에 실패했어요.')
-          : error instanceof Error
-            ? error.message
-            : '복구 신청에 실패했어요.'
-      );
-    } finally {
-      restoreLock.current = false;
-      setIsRestoring(false);
-    }
-  };
   const currentDays = streak?.currentStreak ?? 0;
   const nextStep = EFFECT_STEPS.find((step) => step.requiredDays > currentDays);
   const previousStep = [...EFFECT_STEPS]
@@ -132,12 +108,15 @@ const StreakSection = () => {
   return (
     <section className="w-full">
       <SectionTitle title="연속학습" />
+      {recoveryAction.modal}
       {streak ? (
         <StreakCard
           data={data}
-          onRestore={handleRestore}
+          onRestore={() => {
+            if (recovery) void recoveryAction.start(recovery.eventId);
+          }}
           onShop={() => navigate(ROUTES.SHOP)}
-          isRestoring={isRestoring}
+          isRestoring={recoveryAction.isSubmitting}
           deadlineLabel={
             recovery?.expiresAt
               ? new Date(recovery.expiresAt).toLocaleString('ko-KR', {
