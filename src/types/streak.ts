@@ -2,6 +2,7 @@
 export type StreakView =
   | 'learning' // 연속학습 유지 중, 오늘은 아직 학습 전
   | 'broken' // 연속학습 끊김, 복구 신청 가능
+  | 'recoveryUnavailable' // 하락 기록은 있지만 현재 복구 신청 불가
   | 'restorePending' // 복구 신청 완료, 정규장 학습을 기다리는 중
   | 'completed' // 오늘 정규장 학습 완료
   | 'restarted' // 끊긴 뒤 오늘 학습부터 새로 시작, 이전 기록 복구 가능

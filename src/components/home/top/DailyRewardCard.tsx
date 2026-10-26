@@ -2,7 +2,15 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Card } from '../../common/Card';
-import catImage from '../../../assets/character/basic_pose_cat.svg';
+import basicCat from '../../../assets/character/basic_1.svg';
+import bigHandCat from '../../../assets/character/basic_2.svg';
+import nobleCat from '../../../assets/character/basic_3.svg';
+import bronzeBackground from '../../../assets/character/background/bronze_bg.svg';
+import silverBackground from '../../../assets/character/background/silver_bg.svg';
+import goldBackground from '../../../assets/character/background/gold_bg.svg';
+import diamondBackground from '../../../assets/character/background/diamond_bg.svg';
+import { getMyCharacter } from '../../../api/character';
+import type { MyCharacter } from '../../../types/character';
 import type { AttendanceStatus } from '../../../types/attendance';
 import {
   claimAttendanceReword,
@@ -22,6 +30,29 @@ const DailyRewardCard = () => {
   const [rewardAmount, setRewardAmount] = useState<number | null>(null);
 
   const [retryCount, setRetryCount] = useState(0);
+  const [character, setCharacter] = useState<MyCharacter | null>(null);
+  const [characterError, setCharacterError] = useState(false);
+
+  useEffect(() => {
+    let ignore = false;
+    getMyCharacter().then((result) => {
+      if (!ignore) setCharacter(result);
+    }).catch(() => {
+      if (!ignore) setCharacterError(true);
+    });
+    return () => { ignore = true; };
+  }, []);
+
+  // 캐릭터 조회 응답의 현재 주가로 기본 / 큰손냥 / 귀족냥 결정
+  const currentStock = character?.currentStock ?? 0;
+  const catImage = currentStock >= 10000 ? nobleCat
+    : currentStock >= 1000 ? bigHandCat : basicCat;
+  // 스트릭으로 달성한 가장 높은 단계의 배경 하나만 적용
+  const streakDays = character?.currentStreak ?? 0;
+  const backgroundImage = streakDays >= 21 ? diamondBackground
+    : streakDays >= 14 ? goldBackground
+    : streakDays >= 7 ? silverBackground
+    : streakDays >= 3 ? bronzeBackground : undefined;
 
   useEffect(() => {
     let ignore = false;
@@ -91,11 +122,20 @@ const DailyRewardCard = () => {
   return (
     <div className="flex flex-col gap-6 xl:h-full">
       <Card className="relative min-h-55.5 overflow-hidden border-blue-15 bg-white xl:flex-1">
-        <img
-          src={catImage}
-          alt=""
-          className="absolute bottom-0 left-1/2 -translate-x-1/2"
-        />
+        {backgroundImage && (
+          <img src={backgroundImage} alt="" className="absolute inset-0 size-full object-cover" />
+        )}
+        {character ? (
+          <img
+            src={catImage}
+            alt={character.stageName}
+            className="absolute bottom-0 left-1/2 size-48 -translate-x-1/2 object-contain"
+          />
+        ) : (
+          <p className="absolute bottom-6 w-full text-center text-sm text-gray-60">
+            {characterError ? '캐릭터를 불러오지 못했어요.' : '캐릭터 불러오는 중...'}
+          </p>
+        )}
         <p className="absolute top-10 left-1/2 w-max max-w-[calc(100%-24px)] -translate-x-1/2 rounded-full bg-blue-50 px-3 py-2 text-center text-[14px] xl:text-[16px] font-semibold break-keep text-white">
           오늘의 생선 받아가라 냥
         </p>

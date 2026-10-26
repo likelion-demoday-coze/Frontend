@@ -10,6 +10,7 @@ interface StreakCardProps {
 
   // 복구하기 클릭 시 부모가 실행할 함수
   onRestore: () => void;
+  onShop: () => void;
 
   // 퀴즈 풀러가기 클릭 시 부모가 실행할 함수
   onStartQuiz: () => void;
@@ -26,6 +27,7 @@ interface StreakCardProps {
 const HEADER_MESSAGES = {
   learning: '연속 학습 중!',
   broken: '연속 학습 끊김',
+  recoveryUnavailable: '복구 신청 불가',
   restorePending: '복구 대기중',
   completed: '연속 학습 중!',
   restarted: '새로 시작했어요',
@@ -35,6 +37,7 @@ const HEADER_MESSAGES = {
 const StreakCard = ({
   data,
   onRestore,
+  onShop,
   onStartQuiz,
   isRestoring = false,
   deadlineLabel,
@@ -49,7 +52,8 @@ const StreakCard = ({
   const isPending = view === 'restorePending';
 
   // 끊김·만료 화면에서는 일수를 회색으로 표시해.
-  const isBroken = view === 'broken' || view === 'expired';
+  const isBroken =
+    view === 'broken' || view === 'recoveryUnavailable' || view === 'expired';
 
   const countClass = isPending
     ? 'text-purple-45'
@@ -58,7 +62,7 @@ const StreakCard = ({
       : 'text-yellow-45';
 
   return (
-    <Card className="min-h-[490px] mt-4 flex w-full flex-col bg-white p-5">
+    <Card className="min-h-[450px] mt-4 flex w-full flex-col bg-white p-5">
       {/* 상단: 일수 + 설명 + 버튼 또는 최고 기록 */}
       <div className="mb-5 flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
@@ -77,7 +81,15 @@ const StreakCard = ({
           </span>
         </div>
 
-        {canRestore ? (
+        {view === 'recoveryUnavailable' ? (
+          <button
+            type="button"
+            onClick={onShop}
+            className="shrink-0 cursor-pointer rounded-lg bg-blue-60 px-3 py-1 h-11 text-[16px] font-semibold text-white"
+          >
+            상점가기
+          </button>
+        ) : canRestore ? (
           // 복구 가능한 상태: 복구하기 버튼
           <button
             type="button"
@@ -97,8 +109,7 @@ const StreakCard = ({
             퀴즈 풀러가기
           </button>
         ) : bestDays !== null ? (
-          //최고기록 보여줌 TODO : 최고기록 받아서 보여주기
-          <span className="shrink-0 rounded-lg border border-yellow-45 px-2.5 py-2 text-[11px] font-semibold text-yellow-45">
+          <span className="shrink-0 rounded-lg border border-yellow-45 px-2.5 py-2 text-[16px] font-semibold text-yellow-45">
             최고기록 {bestDays}일
           </span>
         ) : null}

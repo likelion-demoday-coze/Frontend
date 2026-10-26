@@ -12,7 +12,7 @@ const MyRankSummaryCard = ({
 }: MyRankSummary) => {
   return (
     <Card className="flex gap-2 xl:gap-5 bg-white p-5 h-full justify-between">
-      <div className="flex min-w-0 max-w-full flex-col gap-8.5">
+      <div className="flex min-w-0 max-w-full flex-col gap-5">
         <h3 className="text-[14px] text-gray-60 font-semibold">{title}</h3>
         <div className="flex gap-4.5">
           <span className="flex items-center text-[24px] text-blue-60">

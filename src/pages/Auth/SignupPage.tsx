@@ -8,6 +8,7 @@ import textlogo from '../../assets/logos/coze_text_logo_black.svg';
 import CheckIcon from '../../assets/signup/check.svg?react';
 import CrossIcon from '../../assets/signup/cross.svg?react';
 import catImage from '../../assets/character/basic_pose_cat.svg';
+import standingCat from '../../assets/character/stand_pose.svg';
 
 import {
   NICKNAME_MAX,
@@ -81,6 +82,21 @@ const SignupPage = () => {
   const [hasServerError, setHasServerError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const [pageScale, setPageScale] = useState(1);
+  const [isCompact, setIsCompact] = useState(false);
+
+  // 입력창과 고양이를 각각 재배치하지 않고, 기준 화면 전체를 같은 비율로 축소
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const observer = new ResizeObserver(([entry]) => {
+      setIsCompact(entry.contentRect.width < 1024);
+      setPageScale(Math.min(entry.contentRect.width / 1440, entry.contentRect.height / 1024));
+    });
+    observer.observe(viewport);
+    return () => observer.disconnect();
+  }, []);
 
   //카카오 로그인 후 페이지 리로드 시 메모리 csrf토큰 사라짐 -> 다시 받음
   useEffect(() => {
@@ -212,22 +228,24 @@ const SignupPage = () => {
     status === 'error';
 
   return (
-    <div>
-      <header className="mx-auto max-w-300 px-15 pt-6">
-        <img src={textlogo} alt="COZ:E" className="h-8" />
+    <div ref={viewportRef} className="relative h-dvh overflow-hidden bg-white">
+      <div className="absolute bottom-0 origin-bottom"
+        style={isCompact ? { inset: 0 } : { left: '50%', width: 1440, height: `${100 / pageScale}%`, transform: `translateX(-50%) scale(${pageScale})` }}>
+      <header className="mx-auto w-full max-w-300 shrink-0 px-6 pt-6 lg:px-15">
+        <img src={textlogo} alt="COZ:E" className="h-6 lg:h-8" />
       </header>
-      <div className="flex clamp min-h-screen flex-col items-center overflow-hidden px-4 pt-15">
-        <div className="mb-7 w-full max-w-135.25">
-          <div className="mb-13 text-left">
-            <h1 className="text-[28px] font-semibold">닉네임을 정해주세요</h1>
-            <p className="mt-2 text-[18px] text-gray-60">
+      <div className="absolute inset-x-0 top-[clamp(80px,12dvh,140px)] bottom-0 lg:top-50 flex flex-col items-center overflow-hidden px-4">
+        <div className="z-10 w-full max-w-170 shrink-0">
+          <div className="mb-6 text-center lg:mb-13 lg:text-left">
+            <h1 className="text-[22px] font-semibold lg:text-[28px]">닉네임을 정해주세요</h1>
+            <p className="mx-auto mt-2 max-w-65 text-[14px] text-gray-60 lg:mx-0 lg:max-w-none lg:text-[18px]">
               랭킹에 공개되는 이름이에요. 마이페이지에서 언제든 바꿀 수 있어요.
             </p>
           </div>
 
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-2 lg:gap-5">
             <div
-              className={`flex h-14 flex-1 items-center rounded-xl border bg-white px-5 transition-colors ${style.border}`}
+              className={`flex h-14 min-w-0 flex-1 items-center rounded-xl border bg-white px-3 lg:px-5 transition-colors ${style.border}`}
             >
               <input
                 ref={inputRef}
@@ -305,19 +323,20 @@ const SignupPage = () => {
             onClick={handleSignup}
             type="button"
             disabled={!canSignup}
-            className="mt-8 h-16 w-full rounded-lg bg-blue-60 text-[18px] font-semibold text-white transition hover:brightness-95 disabled:opacity-50"
+            className="mx-auto mt-4 block h-14 w-44 rounded-lg lg:mt-8 lg:h-16 lg:w-full bg-blue-60 text-[18px] font-semibold text-white transition hover:brightness-95 disabled:opacity-50"
           >
             {isLoading ? '가입 중...' : '시작하기'}
           </button>
         </div>
 
-        <div className="relative -mt-10 h-[510px] w-218.75 shrink-0 overflow-hidden">
-          <div className="absolute top-74 left-7 z-10 rounded-full bg-blue-50 px-3 py-2 text-sm font-bold text-blue-05">
+        <div className="relative mt-[clamp(16px,5dvh,48px)] flex min-h-0 w-full max-w-105 flex-1 flex-col items-center overflow-hidden lg:absolute lg:bottom-0 lg:mt-0 lg:block lg:h-[510px] lg:w-218.75 lg:max-w-none lg:flex-none">
+          <div className="z-10 shrink-0 rounded-full lg:absolute lg:top-[58%] lg:left-[3.2%] bg-blue-50 px-3 py-2 text-sm font-bold text-blue-05">
             뭐라고 불러주면 될까 냥?
           </div>
 
-          <img src={catImage} alt="고양이" className="block h-auto w-full" />
+          <img src={isCompact ? standingCat : catImage} alt="고양이" className="block min-h-0 w-full flex-1 translate-y-[20%] object-contain object-bottom lg:h-auto lg:flex-none lg:translate-y-0" />
         </div>
+      </div>
       </div>
     </div>
   );

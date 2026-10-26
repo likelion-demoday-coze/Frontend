@@ -24,6 +24,7 @@ const LABELS = ['월', '화', '수', '목', '금', '토', '일'];
 const CURRENT_DAYS: Record<StreakView, number> = {
   learning: 7,
   broken: 0,
+  recoveryUnavailable: 0,
   restorePending: 7,
   completed: 8,
   restarted: 1,
@@ -47,6 +48,16 @@ const WEEK_STATUSES: Record<StreakView, StreakDayStatus[]> = {
   ],
 
   broken: [
+    'completed',
+    'completed',
+    'completed',
+    'pending',
+    'todayIncomplete',
+    'incomplete',
+    'incomplete',
+  ],
+
+  recoveryUnavailable: [
     'completed',
     'completed',
     'completed',
@@ -113,7 +124,7 @@ export const getMockStreak = (view: StreakView): StreakData => {
 
   // 디자인상 기존 이펙트가 일시정지되는 상황
   const paused =
-    view === 'broken' || view === 'restorePending' || view === 'restarted';
+    view === 'broken' || view === 'recoveryUnavailable' || view === 'restorePending' || view === 'restarted';
 
   // 일시정지 화면에서는 끊기기 전 기록을 7일로 가정해.
   // 실제 서비스에서 이 값을 7로 고정하면 안 돼.

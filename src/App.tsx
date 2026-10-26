@@ -54,7 +54,7 @@ function App() {
       <Routes>
         <Route element={<GuestOnlyRoute />}>
           <Route path={ROUTES.LANDING} element={<LandingPage />}></Route>
-          <Route path={ROUTES.SIGNUP} element={<SignupPage />}></Route>
+          <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
         </Route>
 
         {/*온보딩 -> 이거 곧 삭제할게요 튜토리얼도 닉네임페이지도 안씀!*/}

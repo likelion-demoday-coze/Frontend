@@ -45,7 +45,9 @@ const StreakEffectTree = ({ data }: StreakEffectTreeProps) => {
             <div key={effect.id} className="relative">
               {/* 마지막 카드 오른쪽에는 화살표가 없어. */}
               {index < effects.length - 1 && (
-                <span className={`absolute -right-2 top-1/2 w-2 -translate-y-1/2 justify-center ${index % 2 === 0 ? 'flex' : 'hidden @[300px]:flex'}`}>
+                <span
+                  className={`absolute -right-2 top-1/2 w-2 -translate-y-1/2 justify-center ${index % 2 === 0 ? 'flex' : 'hidden @[300px]:flex'}`}
+                >
                   <img src={right} alt="" className="h-[9px] w-[5px]" />
                 </span>
               )}
