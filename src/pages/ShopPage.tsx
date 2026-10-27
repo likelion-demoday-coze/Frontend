@@ -39,7 +39,10 @@ const ShopPage = () => {
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [isOrdering, setIsOrdering] = useState(false);
   const orderLock = useRef(false);
-  const createdOrder = useRef<CreatePaymentOrderResult | null>(null);
+  const createdOrder = useRef<{
+    receiverPhone: string;
+    order: CreatePaymentOrderResult;
+  } | null>(null);
   const [fishBalance, setFishBalance] = useState<number | null>(null);
   const [isLoadingFishBalance, setIsLoadingFishBalance] = useState(true);
   const [fishBalanceError, setFishBalanceError] = useState('');
@@ -184,6 +187,7 @@ const ShopPage = () => {
     orderLock.current = true;
     setIsOrdering(true);
     try {
+      if (createdOrder.current?.receiverPhone !== receiverPhone) createdOrder.current = null;
       if (!createdOrder.current) {
         if (Date.now() >= Date.parse(MOCK_PASS_SCHEDULE.saleEndsAt)) throw new Error('패스 판매가 종료되었어요.');
         const currentPass = await getCurrentPass();
@@ -192,9 +196,10 @@ const ShopPage = () => {
           throw new Error('현재 이용 중인 패스가 있습니다. 만료 후 다시 구매해 주세요.');
         }
         if (!hasCsrfToken()) await fetchCsrfToken();
-        createdOrder.current = await createPaymentOrder({ productCode: WEEK_PASS_PRODUCT.productCode, receiverPhone });
+        const order = await createPaymentOrder({ productCode: WEEK_PASS_PRODUCT.productCode, receiverPhone });
+        createdOrder.current = { receiverPhone, order };
       }
-      const order = createdOrder.current;
+      const order = createdOrder.current.order;
       let paymentUrl: URL;
       try { paymentUrl = new URL(order.paymentUrl); }
       catch (error) { throw new Error('결제창 정보를 확인하지 못했어요.', { cause: error }); }

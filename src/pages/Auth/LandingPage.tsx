@@ -62,11 +62,19 @@ const LandingPage = () => {
 
           {/* 모바일: 차트 위로 캐릭터와 질문 말풍선을 겹쳐 배치 */}
           <div aria-hidden className="relative mt-6 min-h-0 flex-1 lg:hidden">
-            <img src={chartCard} alt="" className="absolute top-3 left-0 w-[85%]" />
+            <img
+              src={chartCard}
+              alt=""
+              className="absolute top-3 left-0 w-[85%]"
+            />
             <p className="absolute bottom-12 left-6 w-52 rounded-xl bg-white px-3 py-3 text-[10px] leading-relaxed font-medium shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
               {BUBBLES[3].question}
             </p>
-            <img src={catImage} alt="" className="pointer-events-none fixed right-0 bottom-[30px] w-[138%] max-w-[716px] translate-x-[30%] translate-y-[15%]" />
+            <img
+              src={catImage}
+              alt=""
+              className="pointer-events-none fixed right-0 bottom-[30px] w-[138%] max-w-[716px] translate-x-[30%] translate-y-[15%]"
+            />
             <p className="absolute -top-4 -right-8 w-40 rounded-xl bg-white px-3 py-3 text-[9px] leading-relaxed font-medium shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
               {BUBBLES[2].question}
             </p>
