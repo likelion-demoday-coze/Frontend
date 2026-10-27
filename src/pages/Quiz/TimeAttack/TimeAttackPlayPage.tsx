@@ -7,15 +7,17 @@ import QuestionText from '../../../components/quiz/QuestionText';
 import QuizCatPanel from '../../../components/quiz/QuizCatPanel';
 import QuizHeader from '../../../components/quiz/QuizHeader';
 import QuizStockPanel from '../../../components/quiz/QuizStockPanel';
+import TimeAttackEndModal from '../../../components/quiz/TimeAttackEndModal';
 import { getStockGraph } from '../../../api/stock';
 import {
   completeTimeAttackSession,
   getNextTimeAttackQuestion,
   submitTimeAttackAnswer,
 } from '../../../api/timeAttack';
-import { toTimeAttackResult } from '../../../constants/routes';
+import { ROUTES, toTimeAttackResult } from '../../../constants/routes';
 import type {
   TimeAttackAnswerResult,
+  TimeAttackComplete,
   TimeAttackQuestion,
 } from '../../../types/timeAttack';
 
@@ -43,6 +45,11 @@ const TimeAttackPlayPage = () => {
   const [answer, setAnswer] = useState<TimeAttackAnswerResult | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
   const [combo, setCombo] = useState(0);
+  const [maxCombo, setMaxCombo] = useState(0);
+  const [wrongCount, setWrongCount] = useState(0);
+  const [isFinished, setIsFinished] = useState(false);
+  const [completeResult, setCompleteResult] =
+    useState<TimeAttackComplete | null>(null);
   const [stockPoints, setStockPoints] = useState<number[]>([]);
   const isFinishingRef = useRef(false);
   const isMountedRef = useRef(true);
@@ -66,6 +73,7 @@ const TimeAttackPlayPage = () => {
         setEndsAt(new Date(question.endsAt).getTime());
         setCorrectCount(question.correctCount);
         setCombo(question.consecutiveCorrectCount);
+        setMaxCombo(question.consecutiveCorrectCount);
         if (stock) {
           const recent = stock.points
             .slice(-STOCK_POINT_COUNT)
@@ -86,12 +94,13 @@ const TimeAttackPlayPage = () => {
     if (isFinishingRef.current) return;
     isFinishingRef.current = true;
     try {
-      await completeTimeAttackSession(sessionId);
+      const result = await completeTimeAttackSession(sessionId);
+      if (isMountedRef.current) setCompleteResult(result);
     } catch (error) {
       console.error('시간외거래 완료 처리 실패', error);
     }
-    if (isMountedRef.current) navigate(toTimeAttackResult(sessionId));
-  }, [sessionId, navigate]);
+    if (isMountedRef.current) setIsFinished(true);
+  }, [sessionId]);
 
   const remaining = endsAt === null ? TIME_LIMIT_MS : Math.max(endsAt - now, 0);
   const isTimeUp = endsAt !== null && remaining === 0;
@@ -99,17 +108,23 @@ const TimeAttackPlayPage = () => {
   //타이머는 팝업이 떠 있어도 계속 흐름
   useEffect(() => {
     if (endsAt === null) return;
-    const timer = setInterval(() => setNow(Date.now()), 200);
+    const timer = setInterval(() => {
+      const time = Date.now();
+      setNow(time);
+      if (time >= endsAt) finish();
+    }, 200);
     return () => clearInterval(timer);
-  }, [endsAt]);
-
-  useEffect(() => {
-    if (isTimeUp) finish();
-  }, [isTimeUp, finish]);
+  }, [endsAt, finish]);
 
   const handleSelect = useCallback(
     async (optionId: number) => {
-      if (!current || selectedOptionId !== null || isTimeUp) return;
+      if (
+        !current ||
+        selectedOptionId !== null ||
+        isTimeUp ||
+        isFinishingRef.current
+      )
+        return;
       setSelectedOptionId(optionId);
       try {
         const [result] = await Promise.all([
@@ -124,6 +139,8 @@ const TimeAttackPlayPage = () => {
         setAnswer(result);
         setCorrectCount(result.correctCount);
         setCombo(result.consecutiveCorrectCount);
+        setMaxCombo((prev) => Math.max(prev, result.consecutiveCorrectCount));
+        if (!result.correct) setWrongCount((prev) => prev + 1);
 
         const [next] = await Promise.all([
           getNextTimeAttackQuestion(sessionId),
@@ -239,6 +256,16 @@ const TimeAttackPlayPage = () => {
           />
         )}
       </aside>
+
+      {isFinished && (
+        <TimeAttackEndModal
+          maxCombo={completeResult?.maxConsecutiveCorrectCount ?? maxCombo}
+          correctCount={completeResult?.correctCount ?? correctCount}
+          incorrectCount={completeResult?.incorrectCount ?? wrongCount}
+          onRetry={() => navigate(`${ROUTES.QUIZ}?mode=timeAttack&start=1`)}
+          onNext={() => navigate(toTimeAttackResult(sessionId))}
+        />
+      )}
     </div>
   );
 };

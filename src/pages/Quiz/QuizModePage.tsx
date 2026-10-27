@@ -28,7 +28,10 @@ const QuizModePage = () => {
     const mode = params.get('mode');
     return mode === 'daily' || mode === 'timeAttack' ? mode : null;
   });
-  const [isTimeAttackConfirmOpen, setIsTimeAttackConfirmOpen] = useState(false);
+  //시간외거래 마감 팝업의 '다시 도전하기'로 오면 시작 팝업부터
+  const [isTimeAttackConfirmOpen, setIsTimeAttackConfirmOpen] = useState(
+    () => params.get('mode') === 'timeAttack' && params.get('start') === '1'
+  );
   const [isResumeOpen, setIsResumeOpen] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
   const { status, isError, applyAttendanceClaim } = useQuizEntryStatus();
@@ -144,18 +147,19 @@ const QuizModePage = () => {
         />
       )}
 
-      {isTimeAttackConfirmOpen && (
-        <StartConfirmModal
-          mode="timeAttack"
-          fishCost={TIME_ATTACK_FISH_COST}
-          fishBalance={fishBalance}
-          isPass={isPass}
-          attempt={timeAttackAttempt}
-          onClose={handleCloseConfirm}
-          onStart={handleStartTimeAttack}
-          fishShortAction={fishShort.action}
-        />
-      )}
+      {isTimeAttackConfirmOpen &&
+        timeAttackAttempt.used < timeAttackAttempt.limit && (
+          <StartConfirmModal
+            mode="timeAttack"
+            fishCost={TIME_ATTACK_FISH_COST}
+            fishBalance={fishBalance}
+            isPass={isPass}
+            attempt={timeAttackAttempt}
+            onClose={handleCloseConfirm}
+            onStart={handleStartTimeAttack}
+            fishShortAction={fishShort.action}
+          />
+        )}
 
       {fishShort.rewardAmount !== null && (
         <DailyRewardModal
