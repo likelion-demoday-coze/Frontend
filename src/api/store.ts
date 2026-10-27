@@ -25,5 +25,6 @@ export const purchaseItem = async (
     `/api/v1/store/items/${itemId}/purchase`,
     { quantity, requestId }
   );
+  if (!data.isSuccess) throw new Error(data.message);
   return data.result;
 };

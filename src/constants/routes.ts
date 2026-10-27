@@ -34,6 +34,7 @@ export const ROUTES = {
 
   //상점
   SHOP: '/shop',
+  PAYMENT_RESULT: '/shop/payment/result',
   PAYMENT_SUCCESS: '/shop/payment/success',
   PAYMENT_FAIL: '/shop/payment/fail',
 } as const;

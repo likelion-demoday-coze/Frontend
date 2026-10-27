@@ -19,7 +19,8 @@ import StreakRecoveryCompleteModal from './StreakRecoveryCompleteModal';
 const StreakRecoveryCompletion = () => {
   const { pathname } = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const isPreview = import.meta.env.DEV && searchParams.get('recoveryComplete') === '1';
+  const isPreview =
+    import.meta.env.DEV && searchParams.get('recoveryComplete') === '1';
   const memberId = useAuthstore((state) => state.member?.memberId);
   const [completion, setCompletion] = useState<{
     recovery: StreakRecovery;
@@ -76,21 +77,42 @@ const StreakRecoveryCompletion = () => {
   }, [pathname, memberId, isPreview]);
 
   if (isPreview) {
-    const statuses: StreakDayStatus[] = ['completed', 'restored', 'todayCompleted', 'incomplete', 'incomplete', 'incomplete', 'incomplete'];
-    return <StreakRecoveryCompleteModal
-      streakDays={8}
-      days={['월', '화', '수', '목', '금', '토', '일'].map((label, index) => ({ id: `example-${index}`, label, status: statuses[index] }))}
-      restoredDate="2026-10-27"
-      stockBefore={115}
-      stockAfter={142.15}
-      requestedBeforeLearning={false}
-      onShown={() => {}}
-      onClose={() => setSearchParams((previous) => {
-        const next = new URLSearchParams(previous);
-        next.delete('recoveryComplete');
-        return next;
-      }, { replace: true })}
-    />;
+    const statuses: StreakDayStatus[] = [
+      'completed',
+      'restored',
+      'todayCompleted',
+      'incomplete',
+      'incomplete',
+      'incomplete',
+      'incomplete',
+    ];
+    return (
+      <StreakRecoveryCompleteModal
+        streakDays={8}
+        days={['월', '화', '수', '목', '금', '토', '일'].map(
+          (label, index) => ({
+            id: `example-${index}`,
+            label,
+            status: statuses[index],
+          })
+        )}
+        restoredDate="2026-10-27"
+        stockBefore={115}
+        stockAfter={142.15}
+        requestedBeforeLearning={false}
+        onShown={() => {}}
+        onClose={() =>
+          setSearchParams(
+            (previous) => {
+              const next = new URLSearchParams(previous);
+              next.delete('recoveryComplete');
+              return next;
+            },
+            { replace: true }
+          )
+        }
+      />
+    );
   }
 
   if (!completion || memberId === undefined) return null;

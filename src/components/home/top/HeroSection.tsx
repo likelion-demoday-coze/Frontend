@@ -2,7 +2,7 @@ import PageTitleSection from '../../common/PageTitle';
 import DailyRewardCard from './DailyRewardCard';
 import StockChartCard from './StockChartCard';
 
-const HeroSection = () => {
+const HeroSection = ({ onBalanceChange }: { onBalanceChange: (balance: number) => void }) => {
   return (
     <section className="relative">
       {/* 하늘색 배경 반영 */}
@@ -20,12 +20,12 @@ const HeroSection = () => {
         />
 
         <div className="mt-9.5 flex flex-col gap-6 md:flex-row xl:gap-10">
-          <div className="min-w-0 md:flex-2 xl:flex-1">
+          <div className="min-w-0 flex-1">
             <StockChartCard />
           </div>
 
-          <div className="min-w-0 md:flex-1 xl:w-95 xl:flex-none xl:shrink-0">
-            <DailyRewardCard />
+          <div className="min-w-0 lg:w-95 lg:flex-none lg:shrink-0">
+            <DailyRewardCard onBalanceChange={onBalanceChange} />
           </div>
         </div>
       </div>

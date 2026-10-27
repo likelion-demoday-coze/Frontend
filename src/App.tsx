@@ -31,6 +31,7 @@ import DailyQuizResultPage from './pages/Quiz/Daily/DailyQuizResultPage';
 import TimeAttackEntryPage from './pages/Quiz/TimeAttack/TimeAttackEntryPage';
 import TimeAttackPlayPage from './pages/Quiz/TimeAttack/TimeAttackPlayPage';
 import TimeAttackResultPage from './pages/Quiz/TimeAttack/TimeAttackResultPage';
+import PaymentResultPage from './pages/payment/PaymentResultPage';
 
 function App() {
   //새로고침 시 로그인 상태인지 서버에 물어보고, 내정보 저장
@@ -92,6 +93,15 @@ function App() {
 
           {/*문제풀이 (로고만 있는 전체 화면)*/}
           <Route element={<FullScreenLayout />}>
+            <Route
+              path={ROUTES.PAYMENT_RESULT}
+              element={<PaymentResultPage />}
+            />
+            <Route
+              path={ROUTES.PAYMENT_SUCCESS}
+              element={<PaymentResultPage />}
+            />
+            <Route path={ROUTES.PAYMENT_FAIL} element={<PaymentResultPage />} />
             <Route path={ROUTES.DAILY_QUIZ} element={<DailyCategoryPage />} />
             <Route
               path={ROUTES.DAILY_QUIZ_REVIEW}

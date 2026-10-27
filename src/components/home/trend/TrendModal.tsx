@@ -94,7 +94,9 @@ const TrendModal = ({ items, initialIndex, onClose }: TrendModalProps) => {
         <span className="rounded-xl border w-14 h-8 border-blue-60 bg-blue-05 px-3 py-2 text-[16px] text-blue-60 flex items-center justify-center">
           {index + 1}/{items.length}
         </span>
-        <span className="font-semibold text-[16px]">{items[index].categoryName}</span>
+        <span className="font-semibold text-[16px]">
+          {items[index].categoryName}
+        </span>
 
         <button
           type="button"
