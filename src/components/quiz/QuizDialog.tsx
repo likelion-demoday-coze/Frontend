@@ -1,4 +1,4 @@
-import { useEffect, useId } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import type { ReactNode } from 'react';
 
 interface DialogAction {
@@ -12,7 +12,7 @@ interface QuizDialogProps {
   title: ReactNode;
   description: string;
   children?: ReactNode;
-  secondary: DialogAction;
+  secondary?: DialogAction;
   primary: DialogAction;
   onClose: () => void;
 }
@@ -28,10 +28,29 @@ const QuizDialog = ({
   onClose,
 }: QuizDialogProps) => {
   const titleId = useId();
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();
+      if (event.key !== 'Tab' || !dialogRef.current) return;
+
+      //Tab 포커스가 팝업 밖으로 나가지 않게 처음과 끝을 이어줌
+      const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), a[href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+      const isInside = dialogRef.current.contains(active);
+      if (event.shiftKey && (active === first || !isInside)) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (active === last || !isInside)) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
@@ -43,6 +62,7 @@ const QuizDialog = ({
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
@@ -59,7 +79,7 @@ const QuizDialog = ({
               >
                 {title}
               </h2>
-              <p className="text-sm font-medium break-keep text-gray-60 lg:text-base">
+              <p className="text-sm font-medium break-keep whitespace-pre-line text-gray-60 lg:text-base">
                 {description}
               </p>
             </div>
@@ -69,13 +89,15 @@ const QuizDialog = ({
 
         <div className="flex w-full gap-3 lg:w-auto">
           {/*TODO: 공통 Button 컴포넌트가 생기면 교체*/}
-          <button
-            type="button"
-            onClick={secondary.onClick}
-            className="h-14 flex-1 cursor-pointer rounded-xl border border-gray-10 bg-white text-lg font-semibold text-gray-40 lg:h-16 lg:w-42 lg:flex-none"
-          >
-            {secondary.label}
-          </button>
+          {secondary && (
+            <button
+              type="button"
+              onClick={secondary.onClick}
+              className="h-14 flex-1 cursor-pointer rounded-xl border border-gray-10 bg-white text-lg font-semibold text-gray-40 lg:h-16 lg:w-42 lg:flex-none"
+            >
+              {secondary.label}
+            </button>
+          )}
           <button
             type="button"
             onClick={primary.onClick}

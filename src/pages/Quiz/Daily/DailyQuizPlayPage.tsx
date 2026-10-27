@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import DailyQuizEndModal from '../../../components/quiz/DailyQuizEndModal';
 import FeedbackBar from '../../../components/quiz/FeedbackBar';
 import OptionButton from '../../../components/quiz/OptionButton';
 import type { OptionStatus } from '../../../components/quiz/OptionButton';
@@ -9,13 +10,19 @@ import QuizCatPanel from '../../../components/quiz/QuizCatPanel';
 import QuizHeader from '../../../components/quiz/QuizHeader';
 import QuizProgressBar from '../../../components/quiz/QuizProgressBar';
 import QuizStockPanel from '../../../components/quiz/QuizStockPanel';
-import { getSessionDetail, submitAnswer } from '../../../api/dailyQuiz';
+import {
+  completeSession,
+  getSessionDetail,
+  submitAnswer,
+  submitRetryAnswer,
+} from '../../../api/dailyQuiz';
 import { getStockGraph } from '../../../api/stock';
 import { QUIZ_CATEGORY_INFO } from '../../../constants/quizCategory';
 import { ROUTES, toDailyQuizReview } from '../../../constants/routes';
 import type {
   OriginalAnswerResult,
   QuizSessionDetail,
+  RetryAnswerResult,
 } from '../../../types/quiz';
 
 const DailyQuizPlayPage = () => {
@@ -27,10 +34,17 @@ const DailyQuizPlayPage = () => {
   const [isError, setIsError] = useState(false);
   const [index, setIndex] = useState(0);
   const [selectedOptionId, setSelectedOptionId] = useState<number | null>(null);
-  const [result, setResult] = useState<OriginalAnswerResult | null>(null);
+  const [result, setResult] = useState<
+    OriginalAnswerResult | RetryAnswerResult | null
+  >(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [stockPoints, setStockPoints] = useState<number[]>([]);
   const [startSlot, setStartSlot] = useState(0);
+  const [results, setResults] = useState<boolean[]>([]);
+  const [isEndOpen, setIsEndOpen] = useState(false);
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [retryQueue, setRetryQueue] = useState<number[] | null>(null);
+  const [retryPos, setRetryPos] = useState(0);
 
   //새로고침해도 아직 안 푼 문제부터 이어서 풀기
   useEffect(() => {
@@ -46,7 +60,7 @@ const DailyQuizPlayPage = () => {
           navigate(ROUTES.QUIZ, { replace: true });
           return;
         }
-        if (detail.status !== 'IN_PROGRESS') {
+        if (detail.status === 'COMPLETED') {
           navigate(toDailyQuizReview(sessionId), { replace: true });
           return;
         }
@@ -55,6 +69,15 @@ const DailyQuizPlayPage = () => {
         );
         const startIndex = Math.max(firstUnanswered, 0);
         setSession(detail);
+        setResults(
+          detail.questions.map((question) => question.originalCorrect)
+        );
+        //원본 5문제를 다 풀었으면 마감 팝업부터
+        if (firstUnanswered === -1) {
+          setIndex(detail.questions.length - 1);
+          setIsEndOpen(true);
+          return;
+        }
         setIndex(startIndex);
         setStartSlot(startIndex);
         if (stock) setStockPoints([stock.currentStock]);
@@ -79,9 +102,11 @@ const DailyQuizPlayPage = () => {
     return <p className="text-base text-gray-60">불러오는 중...</p>;
   }
 
-  const question = session.questions[index];
   const total = session.totalQuestionCount;
   const isLast = index === total - 1;
+  const isRetry = retryQueue !== null;
+  const currentIndex = isRetry ? retryQueue[retryPos] : index;
+  const question = session.questions[currentIndex];
 
   const getOptionStatus = (optionId: number): OptionStatus => {
     if (result) {
@@ -96,12 +121,24 @@ const DailyQuizPlayPage = () => {
     if (!selectedOptionId || isSubmitting) return;
     setIsSubmitting(true);
     try {
+      if (isRetry) {
+        const answer = await submitRetryAnswer(
+          sessionId,
+          question.sessionQuestionId,
+          selectedOptionId
+        );
+        setResult(answer);
+        return;
+      }
       const answer = await submitAnswer(
         sessionId,
         question.sessionQuestionId,
         selectedOptionId
       );
       setResult(answer);
+      setResults((prev) =>
+        prev.map((isCorrect, i) => (i === index ? answer.correct : isCorrect))
+      );
       setStockPoints((prev) =>
         prev.length > 0 ? [...prev, answer.currentStock] : prev
       );
@@ -113,18 +150,66 @@ const DailyQuizPlayPage = () => {
     }
   };
 
-  const handleNext = () => {
-    if (isLast) {
-      navigate(toDailyQuizReview(sessionId));
-      return;
-    }
-    setIndex((prev) => prev + 1);
+  const resetAnswer = () => {
     setSelectedOptionId(null);
     setResult(null);
   };
 
+  const handleNext = () => {
+    if (isRetry) {
+      if (retryPos === retryQueue.length - 1) {
+        handleFinish();
+        return;
+      }
+      setRetryPos((prev) => prev + 1);
+      resetAnswer();
+      return;
+    }
+    if (isLast) {
+      setIsEndOpen(true);
+      return;
+    }
+    setIndex((prev) => prev + 1);
+    resetAnswer();
+  };
+
+  const handleFinish = async () => {
+    if (isCompleting) return;
+    setIsCompleting(true);
+    try {
+      await completeSession(sessionId);
+      navigate(toDailyQuizReview(sessionId));
+    } catch (error) {
+      console.error('정규장 완료 처리 실패', error);
+      alert('정산하지 못했어요. 잠시 후 다시 시도해 주세요.');
+      setIsCompleting(false);
+    }
+  };
+
+  //틀린 문제 중 아직 다시 풀지 않은 문제만 순서대로
+  const handleRetry = () => {
+    const queue = results
+      .map((isCorrect, i) => (isCorrect ? -1 : i))
+      .filter((i) => i >= 0 && !session.questions[i].retryAnswered);
+    if (queue.length === 0) {
+      handleFinish();
+      return;
+    }
+    setRetryQueue(queue);
+    setRetryPos(0);
+    resetAnswer();
+    setIsEndOpen(false);
+  };
+
   const catMood = !result ? 'idle' : result.correct ? 'correct' : 'wrong';
-  const lastChange = result ? result.stockIncreasePercent : null;
+  const lastChange =
+    result && 'stockIncreasePercent' in result
+      ? result.stockIncreasePercent
+      : null;
+  const categoryLabel = QUIZ_CATEGORY_INFO[session.category].label;
+  const progress = isRetry
+    ? { current: retryPos + 1, total: retryQueue.length }
+    : { current: index + 1, total };
 
   return (
     <div className="flex flex-col gap-8">
@@ -133,10 +218,12 @@ const DailyQuizPlayPage = () => {
           <div className="flex flex-col gap-5 lg:gap-6">
             <QuizHeader
               mode="daily"
-              subtitle={QUIZ_CATEGORY_INFO[session.category].label}
-              right={<ProgressChip current={index + 1} total={total} />}
+              subtitle={
+                isRetry ? `${categoryLabel} · 오답 다시풀기` : categoryLabel
+              }
+              right={<ProgressChip {...progress} />}
             />
-            <QuizProgressBar current={index + 1} total={total} />
+            <QuizProgressBar {...progress} />
           </div>
 
           <div className="flex flex-col gap-8 lg:gap-15 lg:px-5">
@@ -169,8 +256,8 @@ const DailyQuizPlayPage = () => {
         </div>
 
         <aside className="flex flex-col gap-5 lg:mt-25">
-          <QuizCatPanel mood={catMood} seed={index} />
-          {stockPoints.length > 0 && (
+          <QuizCatPanel mood={catMood} seed={currentIndex} />
+          {!isRetry && stockPoints.length > 0 && (
             <QuizStockPanel
               points={stockPoints}
               slots={total - startSlot + 1}
@@ -179,6 +266,16 @@ const DailyQuizPlayPage = () => {
           )}
         </aside>
       </div>
+
+      {isEndOpen && (
+        <DailyQuizEndModal
+          results={results}
+          isLoading={isCompleting}
+          onRetry={handleRetry}
+          onNext={handleFinish}
+          onClose={() => {}}
+        />
+      )}
 
       {result && (
         <FeedbackBar
