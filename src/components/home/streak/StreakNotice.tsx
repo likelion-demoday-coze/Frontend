@@ -54,7 +54,7 @@ const StreakNotice = ({ view, deadlineLabel }: StreakNoticeProps) => {
       // TODO 수정 필요
       description = deadlineLabel
         ? `${deadlineLabel}까지 정규장을 완료해 주세요`
-        : '복구 신청 후 정해진 기한 안에 학습해 주세요';
+        : '복구 신청 후 오늘 정규장 학습을 완료해 주세요';
       break;
     //학습 완료
     case 'completed':

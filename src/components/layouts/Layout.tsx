@@ -1,11 +1,58 @@
-import { Outlet } from 'react-router-dom';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import LeftNavbar from './LeftNavbar';
 import TopBar from './Topbar/Topbar';
 import { useMyStreak } from '../../hooks/useMyStreak';
+import { getCurrentPass } from '../../api/pass';
+import { getFishBalance } from '../../api/fish';
+import type { PassOrCash } from '../../types/PassOrCash';
 
-//임시값 넣어둠
 const Layout = () => {
   const streakState = useMyStreak();
+  const { pathname } = useLocation();
+  const [passOrCash, setPassOrCash] = useState<PassOrCash>({ hasPass: false, status: 'loading' });
+  const [fishBalance, setFishBalance] = useState<number | null>(null);
+  const fishBalanceVersion = useRef(0);
+  const updateFishBalance = useCallback((balance: number) => {
+    fishBalanceVersion.current += 1;
+    setFishBalance(balance);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    const version = ++fishBalanceVersion.current;
+    getFishBalance().then((balance) => {
+      if (active && version === fishBalanceVersion.current) setFishBalance(balance);
+    }).catch(() => {
+      if (active && version === fishBalanceVersion.current) setFishBalance(null);
+    });
+    return () => { active = false; };
+  }, [pathname]);
+
+  useEffect(() => {
+    let active = true;
+    let timer: ReturnType<typeof setTimeout>;
+    const load = async () => {
+      try {
+        const result = await getCurrentPass();
+        if (!active) return;
+        const remainingMs = result.pass ? Date.parse(result.pass.expiresAt) - Date.now() : 0;
+        if (result.active && result.pass?.status === 'ACTIVE' && remainingMs > 0) {
+          // 남은 24시간 단위로 올림. 다음 일수 변경 시점에 다시 조회
+          const dayMs = 24 * 60 * 60 * 1000;
+          const remainingDays = Math.ceil(remainingMs / dayMs);
+          setPassOrCash({ hasPass: true, remainingDays });
+          timer = setTimeout(load, remainingMs - (remainingDays - 1) * dayMs + 100);
+        } else {
+          setPassOrCash({ hasPass: false, status: 'inactive' });
+        }
+      } catch {
+        if (active) setPassOrCash({ hasPass: false, status: 'error' });
+      }
+    };
+    void load();
+    return () => { active = false; clearTimeout(timer); };
+  }, [pathname]);
   return (
     <div className="flex min-h-screen">
       <LeftNavbar />
@@ -15,11 +62,12 @@ const Layout = () => {
           <div className="absolute top-16 right-33.25">
             <TopBar
               streakDays={streakState.streak?.currentStreak ?? null}
-              passOrCash={{ hasPass: true, remainingDays: 9 }}
+              fishBalance={fishBalance}
+              passOrCash={passOrCash}
             />
           </div>
           <main>
-            <Outlet context={streakState} />
+            <Outlet context={{ ...streakState, updateFishBalance }} />
           </main>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import useAuthstore from '../../stores/useAuthStore';
+import StreakRecoveryCompletion from '../home/streak/StreakRecoveryCompletion';
 
 //토큰 없는 상태에선 로그인 페이지로 리다이랙트
 
@@ -17,7 +18,7 @@ function ProtectedRoute() {
   }
 
   //로그인 상태면 그대로
-  return <Outlet />;
+  return <><Outlet /><StreakRecoveryCompletion /></>;
 }
 
 export default ProtectedRoute;

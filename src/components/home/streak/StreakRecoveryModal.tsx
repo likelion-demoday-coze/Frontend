@@ -170,7 +170,7 @@ const StreakRecoveryModal = ({
         event.preventDefault();
         if (!isSubmitting) onClose();
       }}
-      className="m-auto max-h-[calc(100dvh-32px)] w-[calc(100%-32px)] max-w-96 overflow-y-auto rounded-2xl border-0 bg-white p-5 backdrop:bg-black/30"
+      className="m-auto max-h-[calc(100dvh-32px)] w-[calc(100%-32px)] max-w-90 overflow-y-auto rounded-2xl border-0 bg-white p-6 backdrop:bg-black/30"
     >
       <div className="flex flex-col items-center text-center">
         <img
@@ -192,7 +192,7 @@ const StreakRecoveryModal = ({
           {mode === 'recovered' ? (
             '이전 하락 기록의 복구가 완료됐어요.'
           ) : mode === 'pending' ? (
-            '복구 신청이 완료됐어요. 기한 안에 정규장 학습을 완료해 주세요.'
+            '복구 신청이 완료됐어요. 오늘 정규장 학습을 완료해 주세요.'
           ) : mode === 'expired' ? (
             <>
               복구 기한이 지나 이번에는 복구할 수 없어요.
@@ -254,7 +254,7 @@ const StreakRecoveryModal = ({
         {mode === 'recovered' ? (
           '오늘도 학습을 이어가 보세요.'
         ) : mode === 'pending' ? (
-          '기한 안에 정규장을 끝까지 풀어야 복구가 완료돼요.'
+          '오늘 정규장을 끝까지 풀어야 복구가 완료돼요.'
         ) : mode === 'expired' || needsShop ? (
           '복구하지 않아도 오늘 정규장을 끝까지 풀면 1일부터 다시 시작해요.'
         ) : mode === 'pass' ? (

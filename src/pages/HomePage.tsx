@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import useAuthstore from '../stores/useAuthStore';
 import { completeTutorial } from '../api/auth';
 
@@ -9,13 +10,11 @@ import TrendSection from '../components/home/trend/TrendSection';
 import MyRankingSection from '../components/home/myrank/MyRankingSection';
 
 import StreakSection from '../components/home/streak/StreakSection';
-import StreakRecoveryModalPreview from '../components/home/streak/StreakRecoveryModalPreview';
 import StreakRecoveryNotification from '../components/home/streak/StreakRecoveryNotification';
-import { useSearchParams } from 'react-router-dom';
 
 const HomePage = () => {
   const [searchParams] = useSearchParams();
-  const isRecoveryPreview = import.meta.env.DEV && ['ticket', 'fish', 'insufficient', 'expired', 'pass'].includes(searchParams.get('recoveryModal') ?? '');
+  const isCompletionPreview = import.meta.env.DEV && searchParams.get('recoveryComplete') === '1';
   const member = useAuthstore((state) => state.member);
   const isInitialized = useAuthstore((state) => state.isInitialized);
   const [isTutorialDismissed, setIsTutorialDismissed] = useState(false);
@@ -54,8 +53,7 @@ const HomePage = () => {
   return (
     <div className="mx-auto w-full max-w-260">
       <HeroSection />
-      {import.meta.env.DEV && <StreakRecoveryModalPreview />}
-      {!isTutorialOpen && !isRecoveryPreview && <StreakRecoveryNotification />}
+      {!isTutorialOpen && !isCompletionPreview && <StreakRecoveryNotification />}
       <div className="mt-12 flex flex-col gap-6 md:flex-row">
         <div className="flex min-w-0 flex-col gap-10 md:flex-2 xl:flex-1">
           <TrendSection />
@@ -65,7 +63,7 @@ const HomePage = () => {
           <StreakSection />
         </div>
       </div>
-      {isTutorialOpen && (
+      {isTutorialOpen && !isCompletionPreview && (
         <TutorialModal
           onClose={closeTutorial}
           onComplete={handleTutorialComplete}

@@ -40,39 +40,39 @@ const LandingPage = () => {
   const navigate = useNavigate();
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-white">
-      <header className="max-w-300 px-15 pt-6">
+    <main className="relative flex h-dvh flex-col overflow-hidden bg-white lg:block lg:h-auto lg:min-h-screen">
+      <header className="flex max-w-300 shrink-0 justify-end px-15 pt-6 lg:block">
         <img src={textlogo} alt="COZ:E" className="h-8" />
       </header>
 
-      <div className="mx-auto flex w-full max-w-300 flex-col items-center gap-16 px-5 lg:px-6 lg:flex-row lg:justify-between">
-        <section className="flex min-h-[calc(100svh-56px)] w-full flex-col pt-4 pb-6 lg:block lg:min-h-0 lg:max-w-120 lg:pb-0 lg:pt-0">
-          <h1 className="text-[30px] leading-tight font-light lg:text-[56px]">
+      <div className="mx-auto flex min-h-0 w-full max-w-300 flex-1 flex-col items-center gap-16 px-5 lg:px-6 lg:flex-row lg:justify-between">
+        <section className="flex min-h-0 w-full flex-1 flex-col pt-4 pb-6 lg:block lg:flex-none lg:max-w-120 lg:pb-0 lg:pt-0">
+          <h1 className="shrink-0 text-[30px] leading-tight font-light lg:text-[56px]">
             하루 5분,
             <br />
             <strong className="font-medium">경제 지식</strong>이
             <br />
             <strong className="font-medium">내 주가</strong>가 되는 곳
           </h1>
-          <p className="mt-4 max-w-60 text-[13px] leading-relaxed text-gray-60 lg:mt-6 lg:max-w-none lg:text-[20px]">
+          <p className="relative z-10 mt-4 max-w-55 shrink-0 text-[13px] leading-relaxed text-gray-60 lg:mt-6 lg:max-w-none lg:text-[20px]">
             경제 퀴즈를 맞힐수록 내 주가가 올라가요.
             <br />
             매일 5문제로 지식 수익률을 쌓고, 랭킹에서 겨뤄보세요.
           </p>
 
           {/* 모바일: 차트 위로 캐릭터와 질문 말풍선을 겹쳐 배치 */}
-          <div aria-hidden className="relative mt-6 min-h-64 flex-1 lg:hidden">
+          <div aria-hidden className="relative mt-6 min-h-0 flex-1 lg:hidden">
             <img src={chartCard} alt="" className="absolute top-3 left-0 w-[85%]" />
             <p className="absolute bottom-12 left-6 w-52 rounded-xl bg-white px-3 py-3 text-[10px] leading-relaxed font-medium shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
               {BUBBLES[3].question}
             </p>
-            <img src={catImage} alt="" className="absolute -right-[30%] -bottom-32 w-[140%] max-w-none" />
-            <p className="absolute top-16 -right-8 w-40 rounded-xl bg-white px-3 py-3 text-[9px] leading-relaxed font-medium shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
+            <img src={catImage} alt="" className="pointer-events-none fixed right-0 bottom-[30px] w-[138%] max-w-[716px] translate-x-[30%] translate-y-[15%]" />
+            <p className="absolute -top-4 -right-8 w-40 rounded-xl bg-white px-3 py-3 text-[9px] leading-relaxed font-medium shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
               {BUBBLES[2].question}
             </p>
           </div>
 
-          <div className="relative z-10 flex w-full flex-col items-stretch gap-3 lg:mt-28 lg:flex-row lg:items-start lg:gap-4">
+          <div className="relative z-10 flex w-full shrink-0 flex-col items-stretch gap-3 lg:mt-28 lg:flex-row lg:items-start lg:gap-4">
             {/* 두 칸이 폭을 똑같이 나눔 */}
             <div className="flex min-w-0 flex-1 flex-col items-center gap-2">
               <button

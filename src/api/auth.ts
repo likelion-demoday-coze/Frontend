@@ -71,6 +71,11 @@ export const logout = async () => {
   await fetchCsrfToken();
 };
 
+// 회원탈퇴 (200 OK)
+export const withdraw = async () => {
+  await api.delete('/api/v1/members/me');
+};
+
 // 최초 튜토리얼 완료 처리
 export const completeTutorial = async () => {
   const { data } = await api.patch<ApiResponse<getMeResult>>(
