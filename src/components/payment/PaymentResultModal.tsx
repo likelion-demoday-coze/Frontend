@@ -5,6 +5,7 @@ import completeIcon from '../../assets/payment/pay_complete.svg';
 import cancelledIcon from '../../assets/payment/pay_cancle.svg';
 import failureIcon from '../../assets/payment/pay_incomplete.svg';
 import type { PaymentDetail } from '../../types/payment';
+import { PAYMENT_ENABLED, PAYMENT_DISABLED_MESSAGE } from '../../constants/payment';
 import { formatPaymentDateTime } from '../../utils/paymentFormat';
 import PaymentModalFrame, { PaymentModalActions } from './PaymentModalFrame';
 import type { PaymentModalAction } from './PaymentModalFrame';
@@ -137,7 +138,7 @@ const PaymentResultModal = (props: PaymentResultModalProps) => {
         primary: {
           label: isRetrying ? '결제 준비 중...' : '다시 결제하기',
           onClick: props.onRetry,
-          disabled: isRetrying,
+          disabled: isRetrying || !PAYMENT_ENABLED,
         },
       };
       break;
@@ -200,6 +201,9 @@ const PaymentResultModal = (props: PaymentResultModalProps) => {
           </button>
           로 알려 주세요.
         </p>
+      )}
+      {props.status === 'failed' && !PAYMENT_ENABLED && (
+        <p role="status" className="mt-3 text-center text-xs text-gray-60">{PAYMENT_DISABLED_MESSAGE}</p>
       )}
       {actions && <PaymentModalActions {...actions} />}
       {props.status === 'delayed' && (

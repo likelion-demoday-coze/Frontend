@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Check } from 'lucide-react';
 import passImage from '../../assets/store/Pass_Big.svg';
+import { PAYMENT_ENABLED, PAYMENT_DISABLED_MESSAGE } from '../../constants/payment';
 
 const BENEFITS = [
   '정규장 문제 풀이 FISH 차감 없이 무제한',
@@ -35,6 +36,7 @@ const PassProductCard = ({ passStatus, saleEndsAt, serviceEndsAt }: PassProductC
     : passStatus === 'active' ? '만료 후 다시 구매할 수 있어요'
     : passStatus === 'loading' ? '이용 상태 확인 중...'
     : passStatus === 'error' ? '이용 상태를 확인하지 못했어요'
+    : !PAYMENT_ENABLED ? PAYMENT_DISABLED_MESSAGE
     : saleEndsAt ? `${formatDate(saleEndsAt)}까지 구매 가능 · 구매 준비 중` : '구매 준비 중';
 
   return (

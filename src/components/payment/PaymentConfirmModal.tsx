@@ -1,6 +1,7 @@
 import { useId, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import type { PaymentProduct } from '../../types/payment';
+import { PAYMENT_ENABLED, PAYMENT_DISABLED_MESSAGE } from '../../constants/payment';
 import PaymentModalFrame from './PaymentModalFrame';
 import PaymentSummary from './PaymentSummary';
 
@@ -34,7 +35,7 @@ const PaymentConfirmModal = ({
   const lock = useRef(false);
   const validPhone = /^010\d{8}$/.test(phone);
   const busy = isSubmitting || submitting;
-  const canSubmit = validPhone && agreed && !busy;
+  const canSubmit = PAYMENT_ENABLED && validPhone && agreed && !busy;
   const amountLabel = `${product.price.toLocaleString('ko-KR')}원`;
   const durationLabel = `${product.passDurationHours}시간${product.passDurationHours % 24 === 0 ? `(${product.passDurationHours / 24}일)` : ''}`;
   const phoneError = phoneTouched && !validPhone;
@@ -146,6 +147,7 @@ const PaymentConfirmModal = ({
             </button>
           </div>
         </div>
+        {!PAYMENT_ENABLED && <p role="status" className="mt-3 text-xs text-gray-60">{PAYMENT_DISABLED_MESSAGE}</p>}
         {(submitError || errorMessage) && (
           <p role="alert" className="mt-3 text-xs leading-5 text-red-55">
             {submitError || errorMessage}

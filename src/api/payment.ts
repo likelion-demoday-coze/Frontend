@@ -1,5 +1,6 @@
 import api from './axiosInstance';
 import type { ApiResponse } from '../types/api';
+import { PAYMENT_ENABLED, PAYMENT_DISABLED_MESSAGE } from '../constants/payment';
 import type {
   PaymentDetail,
   PaymentHistories,
@@ -10,6 +11,7 @@ import type {
 
 // 결제 주문 생성 및 페이앱 결제 URL 발급
 export const createPaymentOrder = async (payload: CreatePaymentOrderRequest) => {
+  if (!PAYMENT_ENABLED) throw new Error(PAYMENT_DISABLED_MESSAGE);
   const { data } = await api.post<ApiResponse<CreatePaymentOrderResult>>(
     '/api/v1/payments/orders',
     payload
@@ -20,6 +22,7 @@ export const createPaymentOrder = async (payload: CreatePaymentOrderRequest) => 
 
 // 결제 전액 취소 (요청 본문 없음)
 export const cancelPayment = async (paymentId: number) => {
+  if (!PAYMENT_ENABLED) throw new Error(PAYMENT_DISABLED_MESSAGE);
   const { data } = await api.post<ApiResponse<CancelPaymentResult>>(
     `/api/v1/payments/${paymentId}/cancel`
   );
