@@ -1,6 +1,31 @@
 import api from './axiosInstance';
 import type { ApiResponse } from '../types/api';
-import type { PaymentDetail, PaymentHistories } from '../types/payment';
+import type {
+  PaymentDetail,
+  PaymentHistories,
+  CreatePaymentOrderRequest,
+  CreatePaymentOrderResult,
+  CancelPaymentResult,
+} from '../types/payment';
+
+// 결제 주문 생성 및 페이앱 결제 URL 발급
+export const createPaymentOrder = async (payload: CreatePaymentOrderRequest) => {
+  const { data } = await api.post<ApiResponse<CreatePaymentOrderResult>>(
+    '/api/v1/payments/orders',
+    payload
+  );
+  if (!data.isSuccess) throw new Error(data.message);
+  return data.result;
+};
+
+// 결제 전액 취소 (요청 본문 없음)
+export const cancelPayment = async (paymentId: number) => {
+  const { data } = await api.post<ApiResponse<CancelPaymentResult>>(
+    `/api/v1/payments/${paymentId}/cancel`
+  );
+  if (!data.isSuccess) throw new Error(data.message);
+  return data.result;
+};
 
 // 내 결제 내역 상세 조회
 export const getPaymentDetail = async (paymentId: number) => {

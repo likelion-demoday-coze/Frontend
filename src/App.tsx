@@ -31,7 +31,6 @@ import DailyQuizResultPage from './pages/Quiz/Daily/DailyQuizResultPage';
 import TimeAttackEntryPage from './pages/Quiz/TimeAttack/TimeAttackEntryPage';
 import TimeAttackPlayPage from './pages/Quiz/TimeAttack/TimeAttackPlayPage';
 import TimeAttackResultPage from './pages/Quiz/TimeAttack/TimeAttackResultPage';
-import PaymentPreviewPage from './pages/dev/PaymentPreviewPage';
 
 function App() {
   //새로고침 시 로그인 상태인지 서버에 물어보고, 내정보 저장
@@ -53,7 +52,6 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {import.meta.env.DEV && <Route path="/dev/payment" element={<PaymentPreviewPage />} />}
         <Route element={<GuestOnlyRoute />}>
           <Route path={ROUTES.LANDING} element={<LandingPage />}></Route>
           <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
