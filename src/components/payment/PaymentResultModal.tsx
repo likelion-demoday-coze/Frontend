@@ -5,7 +5,10 @@ import completeIcon from '../../assets/payment/pay_complete.svg';
 import cancelledIcon from '../../assets/payment/pay_cancle.svg';
 import failureIcon from '../../assets/payment/pay_incomplete.svg';
 import type { PaymentDetail } from '../../types/payment';
-import { PAYMENT_ENABLED, PAYMENT_DISABLED_MESSAGE } from '../../constants/payment';
+import {
+  PAYMENT_ENABLED,
+  PAYMENT_DISABLED_MESSAGE,
+} from '../../constants/payment';
 import { formatPaymentDateTime } from '../../utils/paymentFormat';
 import PaymentModalFrame, { PaymentModalActions } from './PaymentModalFrame';
 import type { PaymentModalAction } from './PaymentModalFrame';
@@ -18,8 +21,8 @@ export type PaymentResultModalProps =
   | { status: 'checking'; message?: string }
   | (Closeable & {
       status: 'delayed';
-      onContact: () => void;
-      onHistory: () => void;
+      onContact?: () => void;
+      onHistory?: () => void;
       onRetry: () => void;
       isRetrying?: boolean;
     })
@@ -27,11 +30,11 @@ export type PaymentResultModalProps =
       status: 'success';
       payment: Pick<PaymentDetail, 'productName' | 'amount' | 'orderNumber'>;
       passPeriod: { startedAt: string; expiresAt: string } | null;
-      onHistory: () => void;
+      onHistory?: () => void;
       onQuiz: () => void;
     })
   | (Closeable & {
-      status: 'cancelled';
+      status: 'cancelled' | 'refunded';
       onHome: () => void;
       onShop: () => void;
     })
@@ -41,7 +44,7 @@ export type PaymentResultModalProps =
       failureMessage: string | null;
       onShop: () => void;
       onRetry: () => void;
-      onContact: () => void;
+      onContact?: () => void;
       isRetrying?: boolean;
     });
 
@@ -50,6 +53,7 @@ const TITLES = {
   delayed: '확인이 늦어지고 있어요',
   success: '결제가 완료되었습니다',
   cancelled: '결제가 취소됐어요',
+  refunded: '환불이 완료됐어요',
   failed: '결제가 완료되지 않았습니다',
 };
 
@@ -81,14 +85,14 @@ const PaymentResultModal = (props: PaymentResultModalProps) => {
       );
       actions = {
         secondary: {
-          label: '고객문의',
-          onClick: props.onContact,
-          disabled: isRetrying,
+          label: props.onContact ? '고객문의' : '고객문의 준비 중',
+          onClick: props.onContact ?? (() => {}),
+          disabled: isRetrying || !props.onContact,
         },
         primary: {
-          label: '결제 내역 보기',
-          onClick: props.onHistory,
-          disabled: isRetrying,
+          label: props.onHistory ? '결제 내역 보기' : '결제 내역 준비 중',
+          onClick: props.onHistory ?? (() => {}),
+          disabled: isRetrying || !props.onHistory,
         },
       };
       break;
@@ -108,12 +112,20 @@ const PaymentResultModal = (props: PaymentResultModalProps) => {
         { label: '주문번호', value: props.payment.orderNumber },
       ];
       actions = {
-        secondary: { label: '결제 내역', onClick: props.onHistory },
+        secondary: {
+          label: props.onHistory ? '결제 내역' : '결제 내역 준비 중',
+          onClick: props.onHistory ?? (() => {}),
+          disabled: !props.onHistory,
+        },
         primary: { label: '퀴즈 풀러가기', onClick: props.onQuiz },
       };
       break;
     case 'cancelled':
-      description = '필요할 때 다시 구매할 수 있어요.';
+    case 'refunded':
+      description =
+        props.status === 'refunded'
+          ? '환불이 완료되어 패스 이용이 종료됐어요.'
+          : '필요할 때 다시 구매할 수 있어요.';
       actions = {
         secondary: { label: '홈으로', onClick: props.onHome },
         primary: { label: '상점으로', onClick: props.onShop },
@@ -165,7 +177,7 @@ const PaymentResultModal = (props: PaymentResultModalProps) => {
             src={
               props.status === 'success'
                 ? completeIcon
-                : props.status === 'cancelled'
+                : props.status === 'cancelled' || props.status === 'refunded'
                   ? cancelledIcon
                   : failureIcon
             }
@@ -194,16 +206,18 @@ const PaymentResultModal = (props: PaymentResultModalProps) => {
           <button
             type="button"
             onClick={props.onContact}
-            disabled={isRetrying}
+            disabled={isRetrying || !props.onContact}
             className="cursor-pointer font-semibold underline underline-offset-2"
           >
-            고객 문의
+            {props.onContact ? '고객 문의' : '고객 문의(준비 중)'}
           </button>
           로 알려 주세요.
         </p>
       )}
       {props.status === 'failed' && !PAYMENT_ENABLED && (
-        <p role="status" className="mt-3 text-center text-xs text-gray-60">{PAYMENT_DISABLED_MESSAGE}</p>
+        <p role="status" className="mt-3 text-center text-xs text-gray-60">
+          {PAYMENT_DISABLED_MESSAGE}
+        </p>
       )}
       {actions && <PaymentModalActions {...actions} />}
       {props.status === 'delayed' && (

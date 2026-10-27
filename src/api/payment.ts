@@ -40,9 +40,10 @@ export const getPaymentDetail = async (paymentId: number) => {
 };
 
 // 주문번호로 내 결제 상태 조회
-export const getPaymentStatus = async (orderNumber: string) => {
+export const getPaymentStatus = async (orderNumber: string, signal?: AbortSignal) => {
   const { data } = await api.get<ApiResponse<PaymentDetail>>(
-    `/api/v1/payments/orders/${encodeURIComponent(orderNumber)}`
+    `/api/v1/payments/orders/${encodeURIComponent(orderNumber)}`,
+    { signal }
   );
   if (!data.isSuccess) throw new Error(data.message);
   return data.result;

@@ -1,7 +1,11 @@
 import PageTitleSection from '../../common/PageTitle';
 import DailyRewardCard from './DailyRewardCard';
 
-const MobileHomeHero = ({ onBalanceChange }: { onBalanceChange: (balance: number) => void }) => (
+const MobileHomeHero = ({
+  onBalanceChange,
+}: {
+  onBalanceChange: (balance: number) => void;
+}) => (
   <section className="h-[402px] bg-blue-08 px-6 py-4 lg:hidden">
     <div className="mx-auto flex h-full w-full max-w-170 flex-col">
       <PageTitleSection
