@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { isAxiosError } from 'axios';
 import { getOwnedItems, getStoreItems, purchaseItem } from '../api/store';
 import type { Storeitems } from '../types/store';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import PageTitleSection from '../components/common/PageTitle';
 import PassProductCard from '../components/shop/PassProductCard';
 import RecoveryProductCard from '../components/shop/RecoveryProductCard';
@@ -16,6 +16,9 @@ const MOCK_PASS_SCHEDULE = {
 };
 
 const ShopPage = () => {
+  const { updateFishBalance } = useOutletContext<{
+    updateFishBalance: (balance: number) => void;
+  }>();
   const [recoveryItem, setRecoveryItem] = useState<Storeitems>();
   const [ownedCount, setOwnedCount] = useState<number>();
   const [isLoadingOwnedItems, setIsLoadingOwnedItems] = useState(true);
@@ -93,6 +96,7 @@ const ShopPage = () => {
       );
       // 서버가 반환한 구매 후 보유 수량으로 갱신
       setOwnedCount(result.quantityAfter);
+      updateFishBalance(result.balanceAfter);
       alert('복구권을 구매했습니다.');
     } catch (error) {
       alert(

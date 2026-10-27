@@ -4,6 +4,7 @@ import passImage from '../../../assets/store/Pass_Big.svg';
 
 export interface RecoveryActionData {
   method: 'ticket' | 'fish' | 'pass';
+  learnedToday: boolean;
   ownedBefore: number;
   ownedAfter: number | null;
   fishBefore: number;
@@ -64,12 +65,16 @@ const StreakRecoveryActionModal = ({
       : phase === 'error'
         ? '복구를 진행하지 못했어요'
         : isConfirm
-          ? '지금 바로 복구할까요?'
+          ? data?.learnedToday ? '지금 바로 복구할까요?' : '복구를 신청할까요?'
           : phase === 'completed'
             ? '연속 학습을 복구했어요'
             : '복구를 시작했어요';
   const description = isConfirm
-    ? isPass
+    ? !data?.learnedToday
+      ? data?.method === 'fish'
+        ? `FISH ${data.price.toLocaleString()}개로 복구권을 교환해 사용해요.`
+        : '복구권 1개를 사용해 복구를 신청해요.'
+      : isPass
       ? '오늘 정규장을 이미 마쳐서 패스로 무료 복구돼요.'
       : data?.method === 'fish'
         ? `오늘 정규장을 이미 마쳐서 FISH ${data.price.toLocaleString()}개로 바로 복구돼요.`
@@ -119,7 +124,7 @@ const StreakRecoveryActionModal = ({
         {description && (
           <p className="mt-2 text-xs leading-5 text-gray-60">{description}</p>
         )}
-        {phase === 'started' && (
+        {(phase === 'started' || (isConfirm && !data?.learnedToday)) && (
           <p className="text-xs leading-5 text-gray-60">
             오늘 정규장을 끝까지 풀면 복구가 완료돼요.
           </p>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import LeftNavbar from './LeftNavbar';
 import TopBar from './Topbar/Topbar';
@@ -12,13 +12,19 @@ const Layout = () => {
   const { pathname } = useLocation();
   const [passOrCash, setPassOrCash] = useState<PassOrCash>({ hasPass: false, status: 'loading' });
   const [fishBalance, setFishBalance] = useState<number | null>(null);
+  const fishBalanceVersion = useRef(0);
+  const updateFishBalance = useCallback((balance: number) => {
+    fishBalanceVersion.current += 1;
+    setFishBalance(balance);
+  }, []);
 
   useEffect(() => {
     let active = true;
+    const version = ++fishBalanceVersion.current;
     getFishBalance().then((balance) => {
-      if (active) setFishBalance(balance);
+      if (active && version === fishBalanceVersion.current) setFishBalance(balance);
     }).catch(() => {
-      if (active) setFishBalance(null);
+      if (active && version === fishBalanceVersion.current) setFishBalance(null);
     });
     return () => { active = false; };
   }, [pathname]);
@@ -61,7 +67,7 @@ const Layout = () => {
             />
           </div>
           <main>
-            <Outlet context={streakState} />
+            <Outlet context={{ ...streakState, updateFishBalance }} />
           </main>
         </div>
       </div>

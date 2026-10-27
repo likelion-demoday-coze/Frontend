@@ -170,6 +170,7 @@ export const useStreakRecoveryAction = (onDismiss?: () => void) => {
         requestId: crypto.randomUUID(),
         data: {
           method,
+          learnedToday: streak.learnedToday,
           ownedBefore: count,
           ownedAfter: null,
           fishBefore: fish,
@@ -180,7 +181,7 @@ export const useStreakRecoveryAction = (onDismiss?: () => void) => {
       };
       session.current = current;
       setData(current.data);
-      if (streak.learnedToday) setPhase('confirm');
+      if (streak.learnedToday || method === 'fish' || method === 'ticket') setPhase('confirm');
       else await apply(current);
     } catch (error) {
       fail(error);
