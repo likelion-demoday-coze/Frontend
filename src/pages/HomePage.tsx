@@ -1,10 +1,11 @@
 import { useState, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
 import useAuthstore from '../stores/useAuthStore';
 import { completeTutorial } from '../api/auth';
 
 import TutorialModal from '../components/tutorial/TutorialModal';
 import HeroSection from '../components/home/top/HeroSection';
+import StockChartCard from '../components/home/top/StockChartCard';
 import TrendSection from '../components/home/trend/TrendSection';
 
 import MyRankingSection from '../components/home/myrank/MyRankingSection';
@@ -13,6 +14,10 @@ import StreakSection from '../components/home/streak/StreakSection';
 import StreakRecoveryNotification from '../components/home/streak/StreakRecoveryNotification';
 
 const HomePage = () => {
+  const { isMobile, updateFishBalance } = useOutletContext<{
+    isMobile: boolean;
+    updateFishBalance: (balance: number) => void;
+  }>();
   const [searchParams] = useSearchParams();
   const isCompletionPreview = import.meta.env.DEV && searchParams.get('recoveryComplete') === '1';
   const member = useAuthstore((state) => state.member);
@@ -52,14 +57,14 @@ const HomePage = () => {
 
   return (
     <div className="mx-auto w-full max-w-260">
-      <HeroSection />
+      {isMobile ? <StockChartCard /> : <HeroSection onBalanceChange={updateFishBalance} />}
       {!isTutorialOpen && !isCompletionPreview && <StreakRecoveryNotification />}
-      <div className="mt-12 flex flex-col gap-6 md:flex-row">
-        <div className="flex min-w-0 flex-col gap-10 md:flex-2 xl:flex-1">
+      <div className="mt-12 flex flex-col gap-6 lg:flex-row">
+        <div className="order-2 flex min-w-0 flex-col gap-10 lg:order-1 lg:flex-2 xl:flex-1">
           <TrendSection />
           <MyRankingSection />
         </div>
-        <div className="min-w-0 md:flex-1 xl:w-90 xl:flex-none">
+        <div className="order-1 min-w-0 lg:order-2 lg:flex-1 xl:w-90 xl:flex-none">
           <StreakSection />
         </div>
       </div>
