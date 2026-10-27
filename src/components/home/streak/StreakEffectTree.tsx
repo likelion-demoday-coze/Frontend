@@ -43,7 +43,6 @@ const StreakEffectTree = ({ data }: StreakEffectTreeProps) => {
         >
           {effects.map((effect, index) => (
             <div key={effect.id} className="relative">
-              {/* 마지막 카드 오른쪽에는 화살표가 없어. */}
               {index < effects.length - 1 && (
                 <span
                   className={`absolute -right-2 top-1/2 w-2 -translate-y-1/2 justify-center ${index % 2 === 0 ? 'flex' : 'hidden @[300px]:flex'}`}
@@ -64,8 +63,6 @@ const StreakEffectTree = ({ data }: StreakEffectTreeProps) => {
       ) : (
         // 일시정지 상태가 아니면 진행 바와 남은 일수 표시
         <div className="mt-5">
-          {/* 공통 컴포넌트가 선과 현재 위치 마커를 표시해.
-      바깥 div는 접근성 이름과 진행률을 제공해. */}
           <div
             role="progressbar"
             aria-label="다음 이펙트까지 학습 진행률"

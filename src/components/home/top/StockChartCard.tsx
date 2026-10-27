@@ -47,7 +47,6 @@ const StockChartCard = () => {
   }, [period]);
 
   const handlePeriodChange = (nextPeriod: StockPeriod) => {
-    // 같은 탭은 요청이 다시 실행되지 않으므로 로딩으로 바꾸지 않아.
     if (nextPeriod === period) return;
 
     setStatus('loading');

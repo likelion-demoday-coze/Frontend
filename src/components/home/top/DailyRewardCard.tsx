@@ -22,7 +22,11 @@ import fishImage from '../../../assets/store/Fish_a.svg';
 
 type ViewStatus = AttendanceStatus | 'loading' | 'error';
 
-const DailyRewardCard = ({ onBalanceChange }: { onBalanceChange: (balance: number) => void }) => {
+const DailyRewardCard = ({
+  onBalanceChange,
+}: {
+  onBalanceChange: (balance: number) => void;
+}) => {
   const navigate = useNavigate();
   //오늘의 보상 수령 상태 (조회 전에는 로딩중)
   const [status, setStatus] = useState<ViewStatus>('loading');
@@ -35,24 +39,38 @@ const DailyRewardCard = ({ onBalanceChange }: { onBalanceChange: (balance: numbe
 
   useEffect(() => {
     let ignore = false;
-    getMyCharacter().then((result) => {
-      if (!ignore) setCharacter(result);
-    }).catch(() => {
-      if (!ignore) setCharacterError(true);
-    });
-    return () => { ignore = true; };
+    getMyCharacter()
+      .then((result) => {
+        if (!ignore) setCharacter(result);
+      })
+      .catch(() => {
+        if (!ignore) setCharacterError(true);
+      });
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   // 캐릭터 조회 응답의 현재 주가로 기본 / 큰손냥 / 귀족냥 결정
   const currentStock = character?.currentStock ?? 0;
-  const catImage = currentStock >= 10000 ? nobleCat
-    : currentStock >= 1000 ? bigHandCat : basicCat;
+  const catImage =
+    currentStock >= 10000
+      ? nobleCat
+      : currentStock >= 1000
+        ? bigHandCat
+        : basicCat;
   // 스트릭으로 달성한 가장 높은 단계의 배경 하나만 적용
   const streakDays = character?.currentStreak ?? 0;
-  const backgroundImage = streakDays >= 21 ? diamondBackground
-    : streakDays >= 14 ? goldBackground
-    : streakDays >= 7 ? silverBackground
-    : streakDays >= 3 ? bronzeBackground : undefined;
+  const backgroundImage =
+    streakDays >= 21
+      ? diamondBackground
+      : streakDays >= 14
+        ? goldBackground
+        : streakDays >= 7
+          ? silverBackground
+          : streakDays >= 3
+            ? bronzeBackground
+            : undefined;
 
   useEffect(() => {
     let ignore = false;
@@ -65,14 +83,12 @@ const DailyRewardCard = ({ onBalanceChange }: { onBalanceChange: (balance: numbe
         if (!ignore) setStatus('error');
       });
 
-    // 화면을 떠나거나 새로운 조회가 시작되면 이전 응답은 무시해.
     return () => {
       ignore = true;
     };
   }, [retryCount]);
 
   const handleRetry = () => {
-    // 클릭 이벤트 안에서 로딩 상태를 바꾸는 건 괜찮아.
     setStatus('loading');
     setRetryCount((previous) => previous + 1);
   };
@@ -121,7 +137,11 @@ const DailyRewardCard = ({ onBalanceChange }: { onBalanceChange: (balance: numbe
     <div className="flex h-full min-h-0 flex-col gap-3 lg:gap-6">
       <Card className="relative min-h-0 flex-1 overflow-hidden border-blue-15 bg-white lg:min-h-55.5">
         {backgroundImage && (
-          <img src={backgroundImage} alt="" className="absolute inset-0 size-full object-cover" />
+          <img
+            src={backgroundImage}
+            alt=""
+            className="absolute inset-0 size-full object-cover"
+          />
         )}
         {character ? (
           <img
@@ -131,7 +151,9 @@ const DailyRewardCard = ({ onBalanceChange }: { onBalanceChange: (balance: numbe
           />
         ) : (
           <p className="absolute bottom-6 w-full text-center text-sm text-gray-60">
-            {characterError ? '캐릭터를 불러오지 못했어요.' : '캐릭터 불러오는 중...'}
+            {characterError
+              ? '캐릭터를 불러오지 못했어요.'
+              : '캐릭터 불러오는 중...'}
           </p>
         )}
         <p className="absolute top-4 left-1/2 w-max max-w-[calc(100%-24px)] -translate-x-1/2 rounded-full bg-blue-50 px-3 py-2 text-center text-[14px] lg:top-10 xl:text-[16px] font-semibold break-keep text-white">
@@ -149,7 +171,13 @@ const DailyRewardCard = ({ onBalanceChange }: { onBalanceChange: (balance: numbe
             : 'bg-blue-60 text-white shadow-[0_0_4px_0_#276AD8]'
         }`}
       >
-        {canClaim && <img src={fishImage} alt="" className="mr-2 size-7 shrink-0 object-contain" />}
+        {canClaim && (
+          <img
+            src={fishImage}
+            alt=""
+            className="mr-2 size-7 shrink-0 object-contain"
+          />
+        )}
         {button.label}
       </button>
       {rewardAmount !== null && (
