@@ -4,6 +4,7 @@ import CountChip from '../../../components/quiz/CountChip';
 import OptionButton from '../../../components/quiz/OptionButton';
 import type { OptionStatus } from '../../../components/quiz/OptionButton';
 import QuestionText from '../../../components/quiz/QuestionText';
+import QuizLeaveModal from '../../../components/quiz/QuizLeaveModal';
 import QuizCatPanel from '../../../components/quiz/QuizCatPanel';
 import QuizHeader from '../../../components/quiz/QuizHeader';
 import QuizStockPanel from '../../../components/quiz/QuizStockPanel';
@@ -12,13 +13,16 @@ import { getStockGraph } from '../../../api/stock';
 import {
   completeTimeAttackSession,
   getNextTimeAttackQuestion,
+  getTimeAttackToday,
   submitTimeAttackAnswer,
 } from '../../../api/timeAttack';
 import { ROUTES, toTimeAttackResult } from '../../../constants/routes';
+import useLeaveGuard from '../../../hooks/useLeaveGuard';
 import type {
   TimeAttackAnswerResult,
   TimeAttackComplete,
   TimeAttackQuestion,
+  TimeAttackToday,
 } from '../../../types/timeAttack';
 
 const TIME_LIMIT_MS = 60_000;
@@ -28,6 +32,17 @@ const STOCK_POINT_COUNT = 6;
 const formatTime = (ms: number) => {
   const seconds = Math.ceil(ms / 1000);
   return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
+};
+
+//나간 판은 뒤로가기로 다시 들어와도 이어서 풀 수 없게 기록
+const leftKey = (sessionId: number) => `timeAttackLeft:${sessionId}`;
+
+const hasLeftSession = (sessionId: number) => {
+  try {
+    return sessionStorage.getItem(leftKey(sessionId)) !== null;
+  } catch {
+    return false;
+  }
 };
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -50,6 +65,7 @@ const TimeAttackPlayPage = () => {
   const [isFinished, setIsFinished] = useState(false);
   const [completeResult, setCompleteResult] =
     useState<TimeAttackComplete | null>(null);
+  const [today, setToday] = useState<TimeAttackToday | null>(null);
   const [stockPoints, setStockPoints] = useState<number[]>([]);
   const isFinishingRef = useRef(false);
   const isMountedRef = useRef(true);
@@ -63,12 +79,18 @@ const TimeAttackPlayPage = () => {
 
   useEffect(() => {
     let ignore = false;
+    if (hasLeftSession(sessionId)) {
+      navigate(ROUTES.QUIZ, { replace: true });
+      return;
+    }
     Promise.all([
       getNextTimeAttackQuestion(sessionId),
       getStockGraph('DAY').catch(() => null),
+      getTimeAttackToday().catch(() => null),
     ])
-      .then(([question, stock]) => {
+      .then(([question, stock, todayStatus]) => {
         if (ignore) return;
+        setToday(todayStatus);
         setCurrent(question);
         setEndsAt(new Date(question.endsAt).getTime());
         setCorrectCount(question.correctCount);
@@ -88,7 +110,7 @@ const TimeAttackPlayPage = () => {
     return () => {
       ignore = true;
     };
-  }, [sessionId]);
+  }, [sessionId, navigate]);
 
   const finish = useCallback(async () => {
     if (isFinishingRef.current) return;
@@ -169,6 +191,17 @@ const TimeAttackPlayPage = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [current, handleSelect]);
+
+  const leaveGuard = useLeaveGuard(!!current && !isFinished);
+
+  const handleLeave = () =>
+    leaveGuard.confirmLeave(() => {
+      try {
+        sessionStorage.setItem(leftKey(sessionId), '1');
+      } catch {
+        //저장소를 못 쓰면 표시 없이 나감
+      }
+    });
 
   if (isError) {
     return (
@@ -256,6 +289,31 @@ const TimeAttackPlayPage = () => {
           />
         )}
       </aside>
+
+      {leaveGuard.isLeaveOpen && (
+        <QuizLeaveModal
+          title="도전을 그만둘까요?"
+          description={
+            '지금 나가면 이번 도전은 기록되지 않아요.\n도전 횟수 1회는 이미 사용됐어요.'
+          }
+          rows={[
+            { label: '남은 시간', value: formatTime(remaining), tone: 'blue' },
+            { label: '지금까지', value: `${correctCount}문제 정답` },
+            ...(today
+              ? [
+                  {
+                    label: '도전 가능 횟수',
+                    value: `${today.usedAttemptCount}회 사용됨 · 남은 ${today.remainingAttemptCount}회`,
+                    tone: 'red' as const,
+                  },
+                ]
+              : []),
+          ]}
+          stayLabel="계속 도전"
+          onLeave={handleLeave}
+          onStay={leaveGuard.cancelLeave}
+        />
+      )}
 
       {isFinished && (
         <TimeAttackEndModal
