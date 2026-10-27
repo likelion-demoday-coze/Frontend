@@ -18,7 +18,12 @@ function ProtectedRoute() {
   }
 
   //로그인 상태면 그대로
-  return <><Outlet /><StreakRecoveryCompletion /></>;
+  return (
+    <>
+      <Outlet />
+      <StreakRecoveryCompletion />
+    </>
+  );
 }
 
 export default ProtectedRoute;

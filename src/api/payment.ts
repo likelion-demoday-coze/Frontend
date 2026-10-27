@@ -1,6 +1,9 @@
 import api from './axiosInstance';
 import type { ApiResponse } from '../types/api';
-import { PAYMENT_ENABLED, PAYMENT_DISABLED_MESSAGE } from '../constants/payment';
+import {
+  PAYMENT_ENABLED,
+  PAYMENT_DISABLED_MESSAGE,
+} from '../constants/payment';
 import type {
   PaymentDetail,
   PaymentHistories,
@@ -10,7 +13,9 @@ import type {
 } from '../types/payment';
 
 // 결제 주문 생성 및 페이앱 결제 URL 발급
-export const createPaymentOrder = async (payload: CreatePaymentOrderRequest) => {
+export const createPaymentOrder = async (
+  payload: CreatePaymentOrderRequest
+) => {
   if (!PAYMENT_ENABLED) throw new Error(PAYMENT_DISABLED_MESSAGE);
   const { data } = await api.post<ApiResponse<CreatePaymentOrderResult>>(
     '/api/v1/payments/orders',
@@ -40,7 +45,10 @@ export const getPaymentDetail = async (paymentId: number) => {
 };
 
 // 주문번호로 내 결제 상태 조회
-export const getPaymentStatus = async (orderNumber: string, signal?: AbortSignal) => {
+export const getPaymentStatus = async (
+  orderNumber: string,
+  signal?: AbortSignal
+) => {
   const { data } = await api.get<ApiResponse<PaymentDetail>>(
     `/api/v1/payments/orders/${encodeURIComponent(orderNumber)}`,
     { signal }

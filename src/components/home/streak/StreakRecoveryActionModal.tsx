@@ -65,7 +65,9 @@ const StreakRecoveryActionModal = ({
       : phase === 'error'
         ? '복구를 진행하지 못했어요'
         : isConfirm
-          ? data?.learnedToday ? '지금 바로 복구할까요?' : '복구를 신청할까요?'
+          ? data?.learnedToday
+            ? '지금 바로 복구할까요?'
+            : '복구를 신청할까요?'
           : phase === 'completed'
             ? '연속 학습을 복구했어요'
             : '복구를 시작했어요';
@@ -75,10 +77,10 @@ const StreakRecoveryActionModal = ({
         ? `FISH ${data.price.toLocaleString()}개로 복구권을 교환해 사용해요.`
         : '복구권 1개를 사용해 복구를 신청해요.'
       : isPass
-      ? '오늘 정규장을 이미 마쳐서 패스로 무료 복구돼요.'
-      : data?.method === 'fish'
-        ? `오늘 정규장을 이미 마쳐서 FISH ${data.price.toLocaleString()}개로 바로 복구돼요.`
-        : '오늘 정규장을 이미 마쳐서 복구권을 쓰면 바로 복구돼요.'
+        ? '오늘 정규장을 이미 마쳐서 패스로 무료 복구돼요.'
+        : data?.method === 'fish'
+          ? `오늘 정규장을 이미 마쳐서 FISH ${data.price.toLocaleString()}개로 바로 복구돼요.`
+          : '오늘 정규장을 이미 마쳐서 복구권을 쓰면 바로 복구돼요.'
     : phase === 'started'
       ? isPass
         ? '패스 혜택으로 무료 복구를 시작했어요.'

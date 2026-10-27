@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { isAxiosError } from 'axios';
 import { getOwnedItems, getStoreItems, purchaseItem } from '../api/store';
 import type { Storeitems } from '../types/store';
@@ -14,6 +14,8 @@ import type { CreatePaymentOrderResult } from '../types/payment';
 import { getCurrentPass } from '../api/pass';
 import { fetchCsrfToken, hasCsrfToken } from '../api/axiosInstance';
 import PaymentConfirmModal from '../components/payment/PaymentConfirmModal';
+import RecoveryPurchaseModal from '../components/shop/RecoveryPurchaseModal';
+import { getFishBalance } from '../api/fish';
 
 // 판매 일정 API 연결 전 사용할 목데이터 (한국 시간)
 const MOCK_PASS_SCHEDULE = {
@@ -38,9 +40,51 @@ const ShopPage = () => {
   const [isOrdering, setIsOrdering] = useState(false);
   const orderLock = useRef(false);
   const createdOrder = useRef<CreatePaymentOrderResult | null>(null);
+  const [fishBalance, setFishBalance] = useState<number | null>(null);
+  const [isLoadingFishBalance, setIsLoadingFishBalance] = useState(true);
+  const [fishBalanceError, setFishBalanceError] = useState('');
+  const [isRecoveryPurchaseOpen, setIsRecoveryPurchaseOpen] = useState(false);
+  const [purchaseError, setPurchaseError] = useState('');
+  const fishBalanceVersion = useRef(0);
+  const purchaseRequestId = useRef<string | null>(null);
+  const mounted = useRef(true);
+
+  const refreshFishBalance = useCallback(async () => {
+    if (!mounted.current) return;
+    const version = ++fishBalanceVersion.current;
+    setIsLoadingFishBalance(true);
+    setFishBalanceError('');
+    try {
+      const balance = await getFishBalance();
+      if (!mounted.current || version !== fishBalanceVersion.current) return;
+      setFishBalance(balance);
+      updateFishBalance(balance);
+    } catch {
+      if (!mounted.current || version !== fishBalanceVersion.current) return;
+      setFishBalance(null);
+      setFishBalanceError('FISH 잔액을 불러오지 못했어요.');
+    } finally {
+      if (mounted.current && version === fishBalanceVersion.current) setIsLoadingFishBalance(false);
+    }
+  }, [updateFishBalance]);
 
   useEffect(() => {
     let active = true;
+    mounted.current = true;
+    const balanceVersion = ++fishBalanceVersion.current;
+    getFishBalance().then((balance) => {
+      if (active && balanceVersion === fishBalanceVersion.current) {
+        setFishBalance(balance);
+        updateFishBalance(balance);
+      }
+    }).catch(() => {
+      if (active && balanceVersion === fishBalanceVersion.current) {
+        setFishBalance(null);
+        setFishBalanceError('FISH 잔액을 불러오지 못했어요.');
+      }
+    }).finally(() => {
+      if (active && balanceVersion === fishBalanceVersion.current) setIsLoadingFishBalance(false);
+    });
 
     getAttendanceToday()
       .then((result) => {
@@ -53,14 +97,14 @@ const ShopPage = () => {
         if (active) setPassStatus('error');
       });
 
-    // 상품명에서 공백을 제거해 복구권을 찾고, 서버의 itemId와 가격을 저장
+    // 공통 상품 코드로 복구권을 찾고 서버의 itemId와 가격을 저장
     getStoreItems()
       .then((items) => {
         console.log('상점 상품 조회 결과:', items);
         if (active) {
           setRecoveryItem(
             items.find(
-              (item) => item.name.replace(/\s/g, '') === '연속학습복구권'
+              (item) => item.itemCode === 'STREAK_RECOVERY'
             )
           );
         }
@@ -74,7 +118,7 @@ const ShopPage = () => {
       .then((items) => {
         if (active) {
           const item = items.find(
-            (item) => item.name.replace(/\s/g, '') === '연속학습복구권'
+            (item) => item.itemCode === 'STREAK_RECOVERY'
           );
           setOwnedCount(item?.quantity ?? 0);
         }
@@ -89,34 +133,47 @@ const ShopPage = () => {
     // 페이지를 벗어난 뒤 도착한 조회 응답은 반영하지 않음
     return () => {
       active = false;
+      mounted.current = false;
+      fishBalanceVersion.current += 1;
     };
-  }, []);
+  }, [updateFishBalance]);
 
   const handlePurchase = async () => {
-    if (!recoveryItem || isLoadingOwnedItems || purchaseLock.current) return;
+    if (!recoveryItem || !isRecoveryPurchaseOpen || isLoadingOwnedItems || isLoadingFishBalance || fishBalance === null || fishBalance < recoveryItem.fishPrice || purchaseLock.current) return;
 
     purchaseLock.current = true;
+    fishBalanceVersion.current += 1;
     setIsPurchasing(true);
+    setPurchaseError('');
     try {
+      if (!hasCsrfToken()) await fetchCsrfToken();
+      if (!mounted.current) return;
+      purchaseRequestId.current ??= crypto.randomUUID();
       // 조회한 itemId로 1개 구매 요청 (세 번째 인자는 요청 식별용 UUID)
       const result = await purchaseItem(
         recoveryItem.itemId,
         1,
-        crypto.randomUUID()
+        purchaseRequestId.current
       );
+      purchaseRequestId.current = null;
+      if (!mounted.current) return;
       // 서버가 반환한 구매 후 보유 수량으로 갱신
       setOwnedCount(result.quantityAfter);
+      setFishBalance(result.balanceAfter);
       updateFishBalance(result.balanceAfter);
+      setIsRecoveryPurchaseOpen(false);
       alert('복구권을 구매했습니다.');
     } catch (error) {
-      alert(
+      if (!mounted.current) return;
+      setPurchaseError(
         isAxiosError(error)
           ? (error.response?.data?.message ?? '구매에 실패했습니다.')
-          : '구매에 실패했습니다.'
+          : error instanceof Error ? error.message : '구매에 실패했습니다.'
       );
+      void refreshFishBalance();
     } finally {
       purchaseLock.current = false;
-      setIsPurchasing(false);
+      if (mounted.current) setIsPurchasing(false);
     }
   };
 
@@ -191,11 +248,29 @@ const ShopPage = () => {
         <RecoveryProductCard
           ownedCount={ownedCount}
           fishPrice={recoveryItem?.fishPrice}
-          disabled={!recoveryItem || isLoadingOwnedItems || isPurchasing}
+          fishBalance={fishBalance}
+          disabled={!recoveryItem || isLoadingOwnedItems || isLoadingFishBalance || fishBalance === null || isPurchasing}
           isPurchasing={isPurchasing}
-          onPurchase={handlePurchase}
+          statusMessage={fishBalanceError || (isLoadingFishBalance ? 'FISH 확인 중...' : !recoveryItem ? '교환 준비 중' : undefined)}
+          onRetry={fishBalanceError ? () => { void refreshFishBalance(); } : undefined}
+          onPurchase={() => {
+            if (!recoveryItem || fishBalance === null || fishBalance < recoveryItem.fishPrice || isLoadingFishBalance || isLoadingOwnedItems || purchaseLock.current) return;
+            setPurchaseError('');
+            setIsRecoveryPurchaseOpen(true);
+            void refreshFishBalance();
+          }}
         />
       </section>
+
+      {isRecoveryPurchaseOpen && recoveryItem && <RecoveryPurchaseModal
+        price={recoveryItem.fishPrice}
+        fishBalance={fishBalance}
+        isPurchasing={isPurchasing}
+        isRefreshing={isLoadingFishBalance}
+        errorMessage={purchaseError || fishBalanceError}
+        onClose={() => { if (!purchaseLock.current) setIsRecoveryPurchaseOpen(false); }}
+        onConfirm={() => { void handlePurchase(); }}
+      />}
 
       <footer className="mt-14 text-xs leading-6 text-gray-40">
         <ul className="rounded-xl bg-gray-05 px-5 py-3">
