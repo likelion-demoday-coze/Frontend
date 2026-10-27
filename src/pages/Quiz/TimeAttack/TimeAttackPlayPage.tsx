@@ -1,5 +1,246 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import CountChip from '../../../components/quiz/CountChip';
+import OptionButton from '../../../components/quiz/OptionButton';
+import type { OptionStatus } from '../../../components/quiz/OptionButton';
+import QuestionText from '../../../components/quiz/QuestionText';
+import QuizCatPanel from '../../../components/quiz/QuizCatPanel';
+import QuizHeader from '../../../components/quiz/QuizHeader';
+import QuizStockPanel from '../../../components/quiz/QuizStockPanel';
+import { getStockGraph } from '../../../api/stock';
+import {
+  completeTimeAttackSession,
+  getNextTimeAttackQuestion,
+  submitTimeAttackAnswer,
+} from '../../../api/timeAttack';
+import { toTimeAttackResult } from '../../../constants/routes';
+import type {
+  TimeAttackAnswerResult,
+  TimeAttackQuestion,
+} from '../../../types/timeAttack';
+
+const TIME_LIMIT_MS = 60_000;
+const FEEDBACK_DELAY_MS = 500;
+const STOCK_POINT_COUNT = 6;
+
+const formatTime = (ms: number) => {
+  const seconds = Math.ceil(ms / 1000);
+  return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
+};
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const TimeAttackPlayPage = () => {
-  return <div>시간외거래 - 문제 풀이</div>;
+  const { sessionId: sessionIdParam } = useParams();
+  const sessionId = Number(sessionIdParam);
+  const navigate = useNavigate();
+
+  const [current, setCurrent] = useState<TimeAttackQuestion | null>(null);
+  const [isError, setIsError] = useState(false);
+  const [endsAt, setEndsAt] = useState<number | null>(null);
+  const [now, setNow] = useState(() => Date.now());
+  const [selectedOptionId, setSelectedOptionId] = useState<number | null>(null);
+  const [answer, setAnswer] = useState<TimeAttackAnswerResult | null>(null);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [combo, setCombo] = useState(0);
+  const [stockPoints, setStockPoints] = useState<number[]>([]);
+  const isFinishingRef = useRef(false);
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let ignore = false;
+    Promise.all([
+      getNextTimeAttackQuestion(sessionId),
+      getStockGraph('DAY').catch(() => null),
+    ])
+      .then(([question, stock]) => {
+        if (ignore) return;
+        setCurrent(question);
+        setEndsAt(new Date(question.endsAt).getTime());
+        setCorrectCount(question.correctCount);
+        setCombo(question.consecutiveCorrectCount);
+        if (stock) {
+          const recent = stock.points
+            .slice(-STOCK_POINT_COUNT)
+            .map((point) => point.stockValue);
+          setStockPoints(recent.length > 0 ? recent : [stock.currentStock]);
+        }
+      })
+      .catch((error) => {
+        console.error('시간외거래 문제 조회 실패', error);
+        if (!ignore) setIsError(true);
+      });
+    return () => {
+      ignore = true;
+    };
+  }, [sessionId]);
+
+  const finish = useCallback(async () => {
+    if (isFinishingRef.current) return;
+    isFinishingRef.current = true;
+    try {
+      await completeTimeAttackSession(sessionId);
+    } catch (error) {
+      console.error('시간외거래 완료 처리 실패', error);
+    }
+    if (isMountedRef.current) navigate(toTimeAttackResult(sessionId));
+  }, [sessionId, navigate]);
+
+  const remaining = endsAt === null ? TIME_LIMIT_MS : Math.max(endsAt - now, 0);
+  const isTimeUp = endsAt !== null && remaining === 0;
+
+  //타이머는 팝업이 떠 있어도 계속 흐름
+  useEffect(() => {
+    if (endsAt === null) return;
+    const timer = setInterval(() => setNow(Date.now()), 200);
+    return () => clearInterval(timer);
+  }, [endsAt]);
+
+  useEffect(() => {
+    if (isTimeUp) finish();
+  }, [isTimeUp, finish]);
+
+  const handleSelect = useCallback(
+    async (optionId: number) => {
+      if (!current || selectedOptionId !== null || isTimeUp) return;
+      setSelectedOptionId(optionId);
+      try {
+        const [result] = await Promise.all([
+          submitTimeAttackAnswer(
+            sessionId,
+            current.question.questionId,
+            optionId
+          ),
+          wait(FEEDBACK_DELAY_MS),
+        ]);
+        if (!isMountedRef.current) return;
+        setAnswer(result);
+        setCorrectCount(result.correctCount);
+        setCombo(result.consecutiveCorrectCount);
+
+        const [next] = await Promise.all([
+          getNextTimeAttackQuestion(sessionId),
+          wait(FEEDBACK_DELAY_MS),
+        ]);
+        if (!isMountedRef.current) return;
+        setCurrent(next);
+        setSelectedOptionId(null);
+        setAnswer(null);
+      } catch (error) {
+        //제한 시간이 끝나 제출·출제가 막힌 경우 그대로 종료
+        console.error('시간외거래 답안 제출 실패', error);
+        finish();
+      }
+    },
+    [current, selectedOptionId, isTimeUp, sessionId, finish]
+  );
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const option = current?.question.options.find(
+        (item) => String(item.optionNumber) === event.key
+      );
+      if (option) handleSelect(option.optionId);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [current, handleSelect]);
+
+  if (isError) {
+    return (
+      <p className="text-base text-gray-60">
+        문제를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.
+      </p>
+    );
+  }
+  if (!current) {
+    return <p className="text-base text-gray-60">불러오는 중...</p>;
+  }
+
+  const getOptionStatus = (optionId: number): OptionStatus => {
+    if (answer) {
+      if (optionId === answer.correctOptionId) return 'correct';
+      if (optionId === answer.selectedOptionId) return 'wrong';
+      return 'default';
+    }
+    return optionId === selectedOptionId ? 'selected' : 'default';
+  };
+
+  const elapsedPercent = ((TIME_LIMIT_MS - remaining) / TIME_LIMIT_MS) * 100;
+  const catMood = !answer ? 'idle' : answer.correct ? 'correct' : 'wrong';
+
+  return (
+    <div className="flex flex-col gap-8 lg:flex-row lg:gap-8">
+      <div className="flex w-full flex-col gap-6 lg:w-153 lg:gap-12">
+        <div className="flex flex-col gap-5 lg:gap-6">
+          <QuizHeader
+            mode="timeAttack"
+            right={
+              <>
+                <CountChip type="combo" count={combo} />
+                <CountChip type="correct" count={correctCount} />
+              </>
+            }
+          />
+          <div
+            role="timer"
+            aria-label={`남은 시간 ${formatTime(remaining)}`}
+            className="relative h-8"
+          >
+            <span className="absolute top-1 left-0 h-px w-full bg-gray-20" />
+            <span
+              style={{ width: `${elapsedPercent}%` }}
+              className="absolute top-1 left-0 h-px bg-red-r"
+            />
+            <span
+              style={{ left: `${elapsedPercent}%` }}
+              className="absolute top-1 size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-r"
+            />
+            <span
+              style={{ left: `${elapsedPercent}%` }}
+              className="absolute top-3 -translate-x-1/2 text-base font-medium text-red-55"
+            >
+              {formatTime(remaining)}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-8 lg:gap-15 lg:px-5">
+          <QuestionText>{current.question.content}</QuestionText>
+          <div className="flex flex-col gap-3">
+            {current.question.options.map((option) => (
+              <OptionButton
+                key={option.optionId}
+                number={option.optionNumber}
+                label={option.content}
+                status={getOptionStatus(option.optionId)}
+                disabled={selectedOptionId !== null || isTimeUp}
+                onClick={() => handleSelect(option.optionId)}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <aside className="flex flex-col gap-5 lg:mt-25">
+        <QuizCatPanel mood={catMood} seed={correctCount} />
+        {stockPoints.length > 0 && (
+          <QuizStockPanel
+            points={stockPoints}
+            muted
+            notice="시간외거래는 주가에 반영되지 않아요"
+          />
+        )}
+      </aside>
+    </div>
+  );
 };
 
 export default TimeAttackPlayPage;

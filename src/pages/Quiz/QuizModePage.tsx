@@ -5,7 +5,12 @@ import DailyRewardModal from '../../components/home/top/DailyRewardModal';
 import ModeCard from '../../components/quiz/ModeCard';
 import ResumeQuizModal from '../../components/quiz/ResumeQuizModal';
 import StartConfirmModal from '../../components/quiz/StartConfirmModal';
-import { ROUTES, toDailyQuizPlay } from '../../constants/routes';
+import { createTimeAttackSession } from '../../api/timeAttack';
+import {
+  ROUTES,
+  toDailyQuizPlay,
+  toTimeAttackPlay,
+} from '../../constants/routes';
 import {
   DAILY_FISH_COST,
   TIME_ATTACK_FISH_COST,
@@ -25,6 +30,7 @@ const QuizModePage = () => {
   });
   const [isTimeAttackConfirmOpen, setIsTimeAttackConfirmOpen] = useState(false);
   const [isResumeOpen, setIsResumeOpen] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
   const { status, isError, applyAttendanceClaim } = useQuizEntryStatus();
   const { activeSession } = useActiveDailySession();
   const fishShort = useFishShortAction({
@@ -74,8 +80,17 @@ const QuizModePage = () => {
     if (selectedMode === 'timeAttack') setIsTimeAttackConfirmOpen(true);
   };
 
-  const handleStartTimeAttack = () => {
-    //TODO: 타임어택 세션 생성 API 연동 후 진행 화면으로 이동
+  const handleStartTimeAttack = async () => {
+    if (isStarting) return;
+    setIsStarting(true);
+    try {
+      const session = await createTimeAttackSession();
+      navigate(toTimeAttackPlay(session.sessionId));
+    } catch (error) {
+      console.error('시간외거래 세션 생성 실패', error);
+      alert('시간외거래를 시작하지 못했어요. 잠시 후 다시 시도해 주세요.');
+      setIsStarting(false);
+    }
   };
 
   return (
