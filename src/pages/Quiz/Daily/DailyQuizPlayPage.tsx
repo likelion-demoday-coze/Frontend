@@ -14,6 +14,7 @@ import {
   completeSession,
   getSessionDetail,
   submitAnswer,
+  submitRetryAnswer,
 } from '../../../api/dailyQuiz';
 import { getStockGraph } from '../../../api/stock';
 import { QUIZ_CATEGORY_INFO } from '../../../constants/quizCategory';
@@ -21,6 +22,7 @@ import { ROUTES, toDailyQuizReview } from '../../../constants/routes';
 import type {
   OriginalAnswerResult,
   QuizSessionDetail,
+  RetryAnswerResult,
 } from '../../../types/quiz';
 
 const DailyQuizPlayPage = () => {
@@ -32,13 +34,17 @@ const DailyQuizPlayPage = () => {
   const [isError, setIsError] = useState(false);
   const [index, setIndex] = useState(0);
   const [selectedOptionId, setSelectedOptionId] = useState<number | null>(null);
-  const [result, setResult] = useState<OriginalAnswerResult | null>(null);
+  const [result, setResult] = useState<
+    OriginalAnswerResult | RetryAnswerResult | null
+  >(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [stockPoints, setStockPoints] = useState<number[]>([]);
   const [startSlot, setStartSlot] = useState(0);
   const [results, setResults] = useState<boolean[]>([]);
   const [isEndOpen, setIsEndOpen] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
+  const [retryQueue, setRetryQueue] = useState<number[] | null>(null);
+  const [retryPos, setRetryPos] = useState(0);
 
   //새로고침해도 아직 안 푼 문제부터 이어서 풀기
   useEffect(() => {
@@ -96,9 +102,11 @@ const DailyQuizPlayPage = () => {
     return <p className="text-base text-gray-60">불러오는 중...</p>;
   }
 
-  const question = session.questions[index];
   const total = session.totalQuestionCount;
   const isLast = index === total - 1;
+  const isRetry = retryQueue !== null;
+  const currentIndex = isRetry ? retryQueue[retryPos] : index;
+  const question = session.questions[currentIndex];
 
   const getOptionStatus = (optionId: number): OptionStatus => {
     if (result) {
@@ -113,6 +121,15 @@ const DailyQuizPlayPage = () => {
     if (!selectedOptionId || isSubmitting) return;
     setIsSubmitting(true);
     try {
+      if (isRetry) {
+        const answer = await submitRetryAnswer(
+          sessionId,
+          question.sessionQuestionId,
+          selectedOptionId
+        );
+        setResult(answer);
+        return;
+      }
       const answer = await submitAnswer(
         sessionId,
         question.sessionQuestionId,
@@ -133,14 +150,27 @@ const DailyQuizPlayPage = () => {
     }
   };
 
+  const resetAnswer = () => {
+    setSelectedOptionId(null);
+    setResult(null);
+  };
+
   const handleNext = () => {
+    if (isRetry) {
+      if (retryPos === retryQueue.length - 1) {
+        handleFinish();
+        return;
+      }
+      setRetryPos((prev) => prev + 1);
+      resetAnswer();
+      return;
+    }
     if (isLast) {
       setIsEndOpen(true);
       return;
     }
     setIndex((prev) => prev + 1);
-    setSelectedOptionId(null);
-    setResult(null);
+    resetAnswer();
   };
 
   const handleFinish = async () => {
@@ -156,12 +186,30 @@ const DailyQuizPlayPage = () => {
     }
   };
 
+  //틀린 문제 중 아직 다시 풀지 않은 문제만 순서대로
   const handleRetry = () => {
-    //TODO: 오답 다시풀기 연결
+    const queue = results
+      .map((isCorrect, i) => (isCorrect ? -1 : i))
+      .filter((i) => i >= 0 && !session.questions[i].retryAnswered);
+    if (queue.length === 0) {
+      handleFinish();
+      return;
+    }
+    setRetryQueue(queue);
+    setRetryPos(0);
+    resetAnswer();
+    setIsEndOpen(false);
   };
 
   const catMood = !result ? 'idle' : result.correct ? 'correct' : 'wrong';
-  const lastChange = result ? result.stockIncreasePercent : null;
+  const lastChange =
+    result && 'stockIncreasePercent' in result
+      ? result.stockIncreasePercent
+      : null;
+  const categoryLabel = QUIZ_CATEGORY_INFO[session.category].label;
+  const progress = isRetry
+    ? { current: retryPos + 1, total: retryQueue.length }
+    : { current: index + 1, total };
 
   return (
     <div className="flex flex-col gap-8">
@@ -170,10 +218,12 @@ const DailyQuizPlayPage = () => {
           <div className="flex flex-col gap-5 lg:gap-6">
             <QuizHeader
               mode="daily"
-              subtitle={QUIZ_CATEGORY_INFO[session.category].label}
-              right={<ProgressChip current={index + 1} total={total} />}
+              subtitle={
+                isRetry ? `${categoryLabel} · 오답 다시풀기` : categoryLabel
+              }
+              right={<ProgressChip {...progress} />}
             />
-            <QuizProgressBar current={index + 1} total={total} />
+            <QuizProgressBar {...progress} />
           </div>
 
           <div className="flex flex-col gap-8 lg:gap-15 lg:px-5">
@@ -206,8 +256,8 @@ const DailyQuizPlayPage = () => {
         </div>
 
         <aside className="flex flex-col gap-5 lg:mt-25">
-          <QuizCatPanel mood={catMood} seed={index} />
-          {stockPoints.length > 0 && (
+          <QuizCatPanel mood={catMood} seed={currentIndex} />
+          {!isRetry && stockPoints.length > 0 && (
             <QuizStockPanel
               points={stockPoints}
               slots={total - startSlot + 1}
@@ -223,7 +273,7 @@ const DailyQuizPlayPage = () => {
           isLoading={isCompleting}
           onRetry={handleRetry}
           onNext={handleFinish}
-          onClose={() => setIsEndOpen(false)}
+          onClose={() => {}}
         />
       )}
 
