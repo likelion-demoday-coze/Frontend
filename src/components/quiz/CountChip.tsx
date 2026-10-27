@@ -7,6 +7,7 @@ export type CountChipType = 'correct' | 'wrong' | 'combo';
 interface CountChipProps {
   type: CountChipType;
   count: number;
+  padded?: boolean;
 }
 
 const chipStyles: Record<CountChipType, string> = {
@@ -22,7 +23,7 @@ const labels: Record<CountChipType, string> = {
 };
 
 //정답 / 오답 / 콤보(연속 정답) 개수 칩
-const CountChip = ({ type, count }: CountChipProps) => {
+const CountChip = ({ type, count, padded = true }: CountChipProps) => {
   return (
     <span
       className={`inline-flex h-9 min-w-15 items-center justify-center gap-1.5 rounded-lg border px-2.5 text-base font-medium lg:h-11 lg:min-w-19 lg:gap-2.5 lg:px-3 lg:text-xl ${chipStyles[type]}`}
@@ -36,7 +37,9 @@ const CountChip = ({ type, count }: CountChipProps) => {
       {type === 'combo' && (
         <ComboIcon aria-hidden="true" className="h-4 w-3.5 text-red-r" />
       )}
-      <span aria-hidden="true">{String(count).padStart(2, '0')}</span>
+      <span aria-hidden="true">
+        {padded ? String(count).padStart(2, '0') : count}
+      </span>
       <span className="sr-only">{`${labels[type]} ${count}개`}</span>
     </span>
   );

@@ -1,6 +1,5 @@
+import AnswerMark from './AnswerMark';
 import QuizDialog from './QuizDialog';
-import CorrectIcon from '../../assets/quiz/correct.svg?react';
-import WrongIcon from '../../assets/quiz/wrong.svg?react';
 import dailyIcon from '../../assets/quiz/mode_daily.png';
 
 interface DailyQuizEndModalProps {
@@ -53,16 +52,7 @@ const DailyQuizEndModal = ({
               <span className="text-xs leading-3.5 font-semibold text-blue-60">
                 {index + 1}
               </span>
-              <span
-                className={`flex size-6 items-center justify-center rounded-lg border ${isCorrect ? 'border-green-65 bg-white text-green-65' : 'border-red-r bg-red-02 text-red-r'}`}
-              >
-                {isCorrect ? (
-                  <CorrectIcon aria-hidden="true" className="size-4" />
-                ) : (
-                  <WrongIcon aria-hidden="true" className="size-5" />
-                )}
-                <span className="sr-only">{isCorrect ? '정답' : '오답'}</span>
-              </span>
+              <AnswerMark isCorrect={isCorrect} />
             </li>
           ))}
         </ol>
