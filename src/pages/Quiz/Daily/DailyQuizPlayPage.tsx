@@ -6,6 +6,7 @@ import OptionButton from '../../../components/quiz/OptionButton';
 import type { OptionStatus } from '../../../components/quiz/OptionButton';
 import ProgressChip from '../../../components/quiz/ProgressChip';
 import QuestionText from '../../../components/quiz/QuestionText';
+import QuizLeaveModal from '../../../components/quiz/QuizLeaveModal';
 import QuizCatPanel from '../../../components/quiz/QuizCatPanel';
 import QuizHeader from '../../../components/quiz/QuizHeader';
 import QuizProgressBar from '../../../components/quiz/QuizProgressBar';
@@ -17,13 +18,21 @@ import {
   submitRetryAnswer,
 } from '../../../api/dailyQuiz';
 import { getStockGraph } from '../../../api/stock';
+import { getMyStreak, getStreakRecovery } from '../../../api/streak';
 import { QUIZ_CATEGORY_INFO } from '../../../constants/quizCategory';
+import { DAILY_FISH_COST } from '../../../constants/quizCost';
 import { ROUTES, toDailyQuizReview } from '../../../constants/routes';
+import useLeaveGuard from '../../../hooks/useLeaveGuard';
 import type {
   OriginalAnswerResult,
   QuizSessionDetail,
   RetryAnswerResult,
 } from '../../../types/quiz';
+
+const formatTime = (dateTime: string) => {
+  const date = new Date(dateTime);
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+};
 
 const DailyQuizPlayPage = () => {
   const { sessionId: sessionIdParam } = useParams();
@@ -45,6 +54,8 @@ const DailyQuizPlayPage = () => {
   const [isCompleting, setIsCompleting] = useState(false);
   const [retryQueue, setRetryQueue] = useState<number[] | null>(null);
   const [retryPos, setRetryPos] = useState(0);
+  const [learnedToday, setLearnedToday] = useState(false);
+  const [isRecovering, setIsRecovering] = useState(false);
 
   //새로고침해도 아직 안 푼 문제부터 이어서 풀기
   useEffect(() => {
@@ -52,9 +63,13 @@ const DailyQuizPlayPage = () => {
     Promise.all([
       getSessionDetail(sessionId),
       getStockGraph('DAY').catch(() => null),
+      getMyStreak().catch(() => null),
+      getStreakRecovery().catch(() => null),
     ])
-      .then(([detail, stock]) => {
+      .then(([detail, stock, streak, recovery]) => {
         if (ignore) return;
+        setLearnedToday(!!streak?.learnedToday);
+        setIsRecovering(recovery?.status === 'PENDING');
         if (detail.status === 'EXPIRED') {
           alert('오늘 정규장이 마감되어 더 풀 수 없어요.');
           navigate(ROUTES.QUIZ, { replace: true });
@@ -90,6 +105,8 @@ const DailyQuizPlayPage = () => {
       ignore = true;
     };
   }, [sessionId, navigate]);
+
+  const leaveGuard = useLeaveGuard(!!session && !isEndOpen && !isCompleting);
 
   if (isError) {
     return (
@@ -201,6 +218,45 @@ const DailyQuizPlayPage = () => {
     setIsEndOpen(false);
   };
 
+  //나가도 세션은 유지되고 오늘 안에 이어서 풀 수 있음
+  const getLeaveCopy = () => {
+    const answered = isRetry ? total : index + (result ? 1 : 0);
+    const progressRow = {
+      label: '진행',
+      value: isRetry
+        ? `오답 다시풀기 ${retryPos + (result ? 1 : 0)}/${retryQueue.length}`
+        : `${answered}/${total}문제 · ${total - answered}문제 남았어요`,
+      tone: 'blue' as const,
+    };
+    const deadline = `오늘 ${formatTime(session.expiresAt)}까지`;
+    const fishRow = {
+      label: 'FISH',
+      value: session.passApplied
+        ? '패스 이용 중 · 차감 없음'
+        : `사용한 ${DAILY_FISH_COST}개는 반환 불가`,
+    };
+
+    if (isRecovering) {
+      return {
+        title: '복구가 아직 안 끝났어요',
+        description:
+          '나가도 진행 상황은 저장돼요.\n오늘 안에 끝까지 풀어야 연속 학습이 복구돼요.',
+        rows: [
+          progressRow,
+          { label: '복구 마감', value: deadline, tone: 'red' as const },
+          { label: '복구권', value: '반환 안 됨', tone: 'red' as const },
+        ],
+      };
+    }
+    return {
+      title: '잠깐 쉬었다 올까요?',
+      description: learnedToday
+        ? `나가도 지금까지 푼 내용은 저장돼요.\n${deadline} 이어서 풀 수 있어요.`
+        : '나가도 지금까지 푼 내용은 저장돼요.\n오늘 안에 이어서 끝내면 연속 학습이 인정돼요.',
+      rows: [progressRow, { label: '이어 풀기', value: deadline }, fishRow],
+    };
+  };
+
   const catMood = !result ? 'idle' : result.correct ? 'correct' : 'wrong';
   const lastChange =
     result && 'stockIncreasePercent' in result
@@ -266,6 +322,15 @@ const DailyQuizPlayPage = () => {
           )}
         </aside>
       </div>
+
+      {leaveGuard.isLeaveOpen && (
+        <QuizLeaveModal
+          {...getLeaveCopy()}
+          stayLabel="계속 풀기"
+          onLeave={() => leaveGuard.confirmLeave()}
+          onStay={leaveGuard.cancelLeave}
+        />
+      )}
 
       {isEndOpen && (
         <DailyQuizEndModal
