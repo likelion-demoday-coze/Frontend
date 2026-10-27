@@ -8,6 +8,12 @@ import PassProductCard from '../components/shop/PassProductCard';
 import RecoveryProductCard from '../components/shop/RecoveryProductCard';
 import { getAttendanceToday } from '../api/attendance';
 import { ROUTES } from '../constants/routes';
+import { PAYMENT_ENABLED, PAYMENT_DISABLED_MESSAGE, WEEK_PASS_PRODUCT } from '../constants/payment';
+import { createPaymentOrder } from '../api/payment';
+import type { CreatePaymentOrderResult } from '../types/payment';
+import { getCurrentPass } from '../api/pass';
+import { fetchCsrfToken, hasCsrfToken } from '../api/axiosInstance';
+import PaymentConfirmModal from '../components/payment/PaymentConfirmModal';
 
 // 판매 일정 API 연결 전 사용할 목데이터 (한국 시간)
 const MOCK_PASS_SCHEDULE = {
@@ -28,6 +34,10 @@ const ShopPage = () => {
   >('loading');
   // 상태가 화면에 반영되기 전에도 연속 클릭으로 인한 중복 요청을 막음
   const purchaseLock = useRef(false);
+  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+  const [isOrdering, setIsOrdering] = useState(false);
+  const orderLock = useRef(false);
+  const createdOrder = useRef<CreatePaymentOrderResult | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -110,6 +120,46 @@ const ShopPage = () => {
     }
   };
 
+  const handlePayment = async (receiverPhone: string) => {
+    if (!PAYMENT_ENABLED) throw new Error(PAYMENT_DISABLED_MESSAGE);
+    if (orderLock.current) return;
+    if (!/^010\d{8}$/.test(receiverPhone)) throw new Error('휴대전화 번호를 확인해 주세요.');
+    orderLock.current = true;
+    setIsOrdering(true);
+    try {
+      if (!createdOrder.current) {
+        if (Date.now() >= Date.parse(MOCK_PASS_SCHEDULE.saleEndsAt)) throw new Error('패스 판매가 종료되었어요.');
+        const currentPass = await getCurrentPass();
+        if (currentPass.active) {
+          setPassStatus('active');
+          throw new Error('현재 이용 중인 패스가 있습니다. 만료 후 다시 구매해 주세요.');
+        }
+        if (!hasCsrfToken()) await fetchCsrfToken();
+        createdOrder.current = await createPaymentOrder({ productCode: WEEK_PASS_PRODUCT.productCode, receiverPhone });
+      }
+      const order = createdOrder.current;
+      let paymentUrl: URL;
+      try { paymentUrl = new URL(order.paymentUrl); }
+      catch (error) { throw new Error('결제창 정보를 확인하지 못했어요.', { cause: error }); }
+      if (paymentUrl.protocol !== 'https:' || !order.orderNumber) throw new Error('결제창 정보를 확인하지 못했어요.');
+      // 결제창 이동 전에 주문번호를 보관해 복귀 후 최종 상태를 확인
+      try { sessionStorage.setItem('paymentOrderNumber', order.orderNumber); }
+      catch (error) { throw new Error('주문번호를 저장하지 못했어요. 브라우저 저장 공간 설정을 확인해 주세요.', { cause: error }); }
+      window.location.assign(paymentUrl.href);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const code = error.response?.data?.code;
+        if (code === 'PAYMENT_409_2') setPassStatus('active');
+        if (error.response?.status === 404 && code !== 'PAYMENT_404_1') throw new Error(PAYMENT_DISABLED_MESSAGE, { cause: error });
+        throw new Error(error.response?.data?.message ?? '결제 요청 결과를 확인하지 못했어요. 진행 중인 결제가 있는지 확인해 주세요.', { cause: error });
+      }
+      throw error;
+    } finally {
+      orderLock.current = false;
+      setIsOrdering(false);
+    }
+  };
+
   return (
     <div className="mx-auto w-full max-w-260">
       <PageTitleSection
@@ -121,8 +171,18 @@ const ShopPage = () => {
         <h2 id="cash-products" className="mb-4 text-xl font-semibold">
           현금 결제
         </h2>
-        <PassProductCard passStatus={passStatus} {...MOCK_PASS_SCHEDULE} />
+        <PassProductCard passStatus={passStatus} {...MOCK_PASS_SCHEDULE}
+          onPurchase={() => {
+            if (passStatus === 'inactive' && Date.now() < Date.parse(MOCK_PASS_SCHEDULE.saleEndsAt)) setIsPaymentOpen(true);
+          }} />
       </section>
+
+      {isPaymentOpen && <PaymentConfirmModal
+        product={WEEK_PASS_PRODUCT}
+        isSubmitting={isOrdering}
+        onClose={() => { if (!orderLock.current) setIsPaymentOpen(false); }}
+        onConfirm={handlePayment}
+      />}
 
       <section className="mt-9" aria-labelledby="fish-products">
         <h2 id="fish-products" className="mb-4 text-xl font-semibold">

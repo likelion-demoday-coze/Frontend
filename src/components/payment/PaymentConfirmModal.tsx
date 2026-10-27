@@ -1,16 +1,20 @@
 import { useId, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import type { PaymentProduct } from '../../types/payment';
-import { PAYMENT_ENABLED, PAYMENT_DISABLED_MESSAGE } from '../../constants/payment';
+import {
+  PAYMENT_ENABLED,
+  PAYMENT_DISABLED_MESSAGE,
+} from '../../constants/payment';
 import PaymentModalFrame from './PaymentModalFrame';
 import PaymentSummary from './PaymentSummary';
+import CrossIcon from '../../assets/signup/cross.svg?react';
 
 interface PaymentConfirmModalProps {
   product: Pick<PaymentProduct, 'name' | 'price' | 'passDurationHours'>;
   onClose: () => void;
   onConfirm: (receiverPhone: string) => void | Promise<void>;
-  onOpenTerms: () => void;
-  onOpenRefundPolicy: () => void;
+  onOpenTerms?: () => void;
+  onOpenRefundPolicy?: () => void;
   isSubmitting?: boolean;
   errorMessage?: string;
   paymentMethodLabel?: string;
@@ -78,7 +82,7 @@ const PaymentConfirmModal = ({
       />
       <form onSubmit={handleSubmit} className="mt-4">
         <label htmlFor={`${id}-phone`} className="text-sm font-semibold">
-          휴대전화 번호
+          휴대전화 번호(필수)
         </label>
         <input
           id={`${id}-phone`}
@@ -100,11 +104,12 @@ const PaymentConfirmModal = ({
         />
         <p
           id={`${id}-phone-help`}
-          className={`mt-2 text-xs leading-5 ${phoneError ? 'text-red-55' : 'text-gray-60'}`}
+          className={`mt-2 flex items-center gap-1 text-xs leading-5 ${phoneError ? 'text-red-55' : 'text-gray-60'}`}
         >
+          {phoneError && <CrossIcon aria-hidden="true" className="size-3 shrink-0 text-red-55" />}
           {phoneError
-            ? '010으로 시작하는 휴대전화 번호 11자리를 입력해 주세요.'
-            : '결제 안내를 받을 휴대전화 번호를 입력해 주세요. (숫자 11자리)'}
+            ? '휴대폰 번호를 정확히 입력해주세요.'
+            : '결제 안내를 위해 페이앱에 전달돼요.'}
         </p>
         <div className="mt-4 rounded-xl border border-gray-20 p-4">
           <label className="flex cursor-pointer items-start gap-2 text-sm font-semibold">
@@ -119,10 +124,10 @@ const PaymentConfirmModal = ({
             <span>[필수] 아래 내용을 확인했어요</span>
           </label>
           <ul className="mt-3 space-y-1 pl-6 text-[11px] leading-5 text-gray-60">
-            <li className="text-red-55">
-              패스 이용 중에는 출석 보상을 받을 수 없어요.
-            </li>
             <li>결제가 승인된 시각부터 {durationLabel} 동안 이용해요.</li>
+            <li className="text-blue-60 font-semibold">
+              자동으로 다시 결제되지 않아요.
+            </li>
             <li>결제 즉시 효력이 발생해요.</li>
             <li>이용 중에는 추가 구매할 수 없어요. 만료 후 재구매 가능해요.</li>
             <li>미사용 재화 환불은 환불 정책에 따라 처리돼요.</li>
@@ -132,22 +137,26 @@ const PaymentConfirmModal = ({
             <button
               type="button"
               onClick={onOpenTerms}
-              disabled={busy}
+              disabled={busy || !onOpenTerms}
               className="cursor-pointer underline underline-offset-2"
             >
-              이용약관 보기 ›
+              {onOpenTerms ? '이용약관 보기 ›' : '이용약관 준비 중'}
             </button>
             <button
               type="button"
               onClick={onOpenRefundPolicy}
-              disabled={busy}
+              disabled={busy || !onOpenRefundPolicy}
               className="cursor-pointer underline underline-offset-2"
             >
-              환불 정책 보기 ›
+              {onOpenRefundPolicy ? '환불 정책 보기 ›' : '환불 정책 준비 중'}
             </button>
           </div>
         </div>
-        {!PAYMENT_ENABLED && <p role="status" className="mt-3 text-xs text-gray-60">{PAYMENT_DISABLED_MESSAGE}</p>}
+        {!PAYMENT_ENABLED && (
+          <p role="status" className="mt-3 text-xs text-gray-60">
+            {PAYMENT_DISABLED_MESSAGE}
+          </p>
+        )}
         {(submitError || errorMessage) && (
           <p role="alert" className="mt-3 text-xs leading-5 text-red-55">
             {submitError || errorMessage}
@@ -165,7 +174,7 @@ const PaymentConfirmModal = ({
           <button
             type="submit"
             disabled={!canSubmit}
-            className="min-h-14 flex-1 cursor-pointer rounded-xl bg-blue-60 px-3 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50 sm:text-base"
+            className="min-h-14 flex-1 cursor-pointer rounded-xl bg-blue-60 px-3 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-10 disabled:text-gray-60 sm:text-base"
           >
             {busy ? '결제 요청 중...' : `${amountLabel} 결제하기`}
           </button>
