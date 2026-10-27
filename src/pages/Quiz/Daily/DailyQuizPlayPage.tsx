@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import DailyQuizEndModal from '../../../components/quiz/DailyQuizEndModal';
 import FeedbackBar from '../../../components/quiz/FeedbackBar';
 import OptionButton from '../../../components/quiz/OptionButton';
 import type { OptionStatus } from '../../../components/quiz/OptionButton';
@@ -9,7 +10,11 @@ import QuizCatPanel from '../../../components/quiz/QuizCatPanel';
 import QuizHeader from '../../../components/quiz/QuizHeader';
 import QuizProgressBar from '../../../components/quiz/QuizProgressBar';
 import QuizStockPanel from '../../../components/quiz/QuizStockPanel';
-import { getSessionDetail, submitAnswer } from '../../../api/dailyQuiz';
+import {
+  completeSession,
+  getSessionDetail,
+  submitAnswer,
+} from '../../../api/dailyQuiz';
 import { getStockGraph } from '../../../api/stock';
 import { QUIZ_CATEGORY_INFO } from '../../../constants/quizCategory';
 import { ROUTES, toDailyQuizReview } from '../../../constants/routes';
@@ -31,6 +36,9 @@ const DailyQuizPlayPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [stockPoints, setStockPoints] = useState<number[]>([]);
   const [startSlot, setStartSlot] = useState(0);
+  const [results, setResults] = useState<boolean[]>([]);
+  const [isEndOpen, setIsEndOpen] = useState(false);
+  const [isCompleting, setIsCompleting] = useState(false);
 
   //새로고침해도 아직 안 푼 문제부터 이어서 풀기
   useEffect(() => {
@@ -46,7 +54,7 @@ const DailyQuizPlayPage = () => {
           navigate(ROUTES.QUIZ, { replace: true });
           return;
         }
-        if (detail.status !== 'IN_PROGRESS') {
+        if (detail.status === 'COMPLETED') {
           navigate(toDailyQuizReview(sessionId), { replace: true });
           return;
         }
@@ -55,6 +63,15 @@ const DailyQuizPlayPage = () => {
         );
         const startIndex = Math.max(firstUnanswered, 0);
         setSession(detail);
+        setResults(
+          detail.questions.map((question) => question.originalCorrect)
+        );
+        //원본 5문제를 다 풀었으면 마감 팝업부터
+        if (firstUnanswered === -1) {
+          setIndex(detail.questions.length - 1);
+          setIsEndOpen(true);
+          return;
+        }
         setIndex(startIndex);
         setStartSlot(startIndex);
         if (stock) setStockPoints([stock.currentStock]);
@@ -102,6 +119,9 @@ const DailyQuizPlayPage = () => {
         selectedOptionId
       );
       setResult(answer);
+      setResults((prev) =>
+        prev.map((isCorrect, i) => (i === index ? answer.correct : isCorrect))
+      );
       setStockPoints((prev) =>
         prev.length > 0 ? [...prev, answer.currentStock] : prev
       );
@@ -115,12 +135,29 @@ const DailyQuizPlayPage = () => {
 
   const handleNext = () => {
     if (isLast) {
-      navigate(toDailyQuizReview(sessionId));
+      setIsEndOpen(true);
       return;
     }
     setIndex((prev) => prev + 1);
     setSelectedOptionId(null);
     setResult(null);
+  };
+
+  const handleFinish = async () => {
+    if (isCompleting) return;
+    setIsCompleting(true);
+    try {
+      await completeSession(sessionId);
+      navigate(toDailyQuizReview(sessionId));
+    } catch (error) {
+      console.error('정규장 완료 처리 실패', error);
+      alert('정산하지 못했어요. 잠시 후 다시 시도해 주세요.');
+      setIsCompleting(false);
+    }
+  };
+
+  const handleRetry = () => {
+    //TODO: 오답 다시풀기 연결
   };
 
   const catMood = !result ? 'idle' : result.correct ? 'correct' : 'wrong';
@@ -179,6 +216,16 @@ const DailyQuizPlayPage = () => {
           )}
         </aside>
       </div>
+
+      {isEndOpen && (
+        <DailyQuizEndModal
+          results={results}
+          isLoading={isCompleting}
+          onRetry={handleRetry}
+          onNext={handleFinish}
+          onClose={() => setIsEndOpen(false)}
+        />
+      )}
 
       {result && (
         <FeedbackBar

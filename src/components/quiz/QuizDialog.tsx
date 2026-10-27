@@ -12,7 +12,7 @@ interface QuizDialogProps {
   title: ReactNode;
   description: string;
   children?: ReactNode;
-  secondary: DialogAction;
+  secondary?: DialogAction;
   primary: DialogAction;
   onClose: () => void;
 }
@@ -59,7 +59,7 @@ const QuizDialog = ({
               >
                 {title}
               </h2>
-              <p className="text-sm font-medium break-keep text-gray-60 lg:text-base">
+              <p className="text-sm font-medium break-keep whitespace-pre-line text-gray-60 lg:text-base">
                 {description}
               </p>
             </div>
@@ -69,13 +69,15 @@ const QuizDialog = ({
 
         <div className="flex w-full gap-3 lg:w-auto">
           {/*TODO: 공통 Button 컴포넌트가 생기면 교체*/}
-          <button
-            type="button"
-            onClick={secondary.onClick}
-            className="h-14 flex-1 cursor-pointer rounded-xl border border-gray-10 bg-white text-lg font-semibold text-gray-40 lg:h-16 lg:w-42 lg:flex-none"
-          >
-            {secondary.label}
-          </button>
+          {secondary && (
+            <button
+              type="button"
+              onClick={secondary.onClick}
+              className="h-14 flex-1 cursor-pointer rounded-xl border border-gray-10 bg-white text-lg font-semibold text-gray-40 lg:h-16 lg:w-42 lg:flex-none"
+            >
+              {secondary.label}
+            </button>
+          )}
           <button
             type="button"
             onClick={primary.onClick}
