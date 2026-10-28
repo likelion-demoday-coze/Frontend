@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import MyAssets from '../components/mypage/MyAssets';
+import MyRecords from '../components/mypage/MyRecords';
 import PassCard from '../components/mypage/PassCard';
 import ProfileCard from '../components/mypage/ProfileCard';
 import { getMyPage } from '../api/member';
@@ -63,6 +65,8 @@ const MyPage = () => {
               expiresAt={activePass.expiresAt}
             />
           )}
+          <MyAssets assets={data.assets} isPass={profile.passActive} />
+          <MyRecords records={data.records} />
         </div>
       </div>
     </div>
