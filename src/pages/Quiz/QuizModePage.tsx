@@ -5,7 +5,12 @@ import DailyRewardModal from '../../components/home/top/DailyRewardModal';
 import ModeCard from '../../components/quiz/ModeCard';
 import ResumeQuizModal from '../../components/quiz/ResumeQuizModal';
 import StartConfirmModal from '../../components/quiz/StartConfirmModal';
-import { ROUTES, toDailyQuizPlay } from '../../constants/routes';
+import { createTimeAttackSession } from '../../api/timeAttack';
+import {
+  ROUTES,
+  toDailyQuizPlay,
+  toTimeAttackPlay,
+} from '../../constants/routes';
 import {
   DAILY_FISH_COST,
   TIME_ATTACK_FISH_COST,
@@ -23,8 +28,12 @@ const QuizModePage = () => {
     const mode = params.get('mode');
     return mode === 'daily' || mode === 'timeAttack' ? mode : null;
   });
-  const [isTimeAttackConfirmOpen, setIsTimeAttackConfirmOpen] = useState(false);
+  //시간외거래 마감 팝업의 '다시 도전하기'로 오면 시작 팝업부터
+  const [isTimeAttackConfirmOpen, setIsTimeAttackConfirmOpen] = useState(
+    () => params.get('mode') === 'timeAttack' && params.get('start') === '1'
+  );
   const [isResumeOpen, setIsResumeOpen] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
   const { status, isError, applyAttendanceClaim } = useQuizEntryStatus();
   const { activeSession } = useActiveDailySession();
   const fishShort = useFishShortAction({
@@ -65,6 +74,9 @@ const QuizModePage = () => {
     selectedMode === 'timeAttack' ? TIME_ATTACK_FISH_COST : DAILY_FISH_COST;
   const isFishShort =
     !!selectedMode && !isResumable && !isPass && fishBalance < fishCost;
+  const isTimeAttackExhausted =
+    selectedMode === 'timeAttack' &&
+    timeAttackAttempt.used >= timeAttackAttempt.limit;
 
   //정규장은 이어 풀기 또는 카테고리 선택으로, 시간외거래는 바로 시작 팝업
   const handleStart = () => {
@@ -74,8 +86,17 @@ const QuizModePage = () => {
     if (selectedMode === 'timeAttack') setIsTimeAttackConfirmOpen(true);
   };
 
-  const handleStartTimeAttack = () => {
-    //TODO: 타임어택 세션 생성 API 연동 후 진행 화면으로 이동
+  const handleStartTimeAttack = async () => {
+    if (isStarting) return;
+    setIsStarting(true);
+    try {
+      const session = await createTimeAttackSession();
+      navigate(toTimeAttackPlay(session.sessionId));
+    } catch (error) {
+      console.error('시간외거래 세션 생성 실패', error);
+      alert('시간외거래를 시작하지 못했어요. 잠시 후 다시 시도해 주세요.');
+      setIsStarting(false);
+    }
   };
 
   return (
@@ -114,7 +135,10 @@ const QuizModePage = () => {
         <button
           type="button"
           onClick={handleStart}
-          disabled={!selectedMode || (isFishShort && fishShort.action.disabled)}
+          disabled={
+            !selectedMode ||
+            (isFishShort ? fishShort.action.disabled : isTimeAttackExhausted)
+          }
           className="h-14 w-full cursor-pointer rounded-xl bg-blue-60 text-lg font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-10 disabled:text-gray-60 lg:h-16 lg:w-42"
         >
           {isFishShort ? fishShort.action.label : '투자 시작하기'}
@@ -129,18 +153,19 @@ const QuizModePage = () => {
         />
       )}
 
-      {isTimeAttackConfirmOpen && (
-        <StartConfirmModal
-          mode="timeAttack"
-          fishCost={TIME_ATTACK_FISH_COST}
-          fishBalance={fishBalance}
-          isPass={isPass}
-          attempt={timeAttackAttempt}
-          onClose={handleCloseConfirm}
-          onStart={handleStartTimeAttack}
-          fishShortAction={fishShort.action}
-        />
-      )}
+      {isTimeAttackConfirmOpen &&
+        timeAttackAttempt.used < timeAttackAttempt.limit && (
+          <StartConfirmModal
+            mode="timeAttack"
+            fishCost={TIME_ATTACK_FISH_COST}
+            fishBalance={fishBalance}
+            isPass={isPass}
+            attempt={timeAttackAttempt}
+            onClose={handleCloseConfirm}
+            onStart={handleStartTimeAttack}
+            fishShortAction={fishShort.action}
+          />
+        )}
 
       {fishShort.rewardAmount !== null && (
         <DailyRewardModal
