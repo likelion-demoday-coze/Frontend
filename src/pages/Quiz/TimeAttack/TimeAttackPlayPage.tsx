@@ -54,6 +54,7 @@ const TimeAttackPlayPage = () => {
 
   const [current, setCurrent] = useState<TimeAttackQuestion | null>(null);
   const [isError, setIsError] = useState(false);
+  const [loadCount, setLoadCount] = useState(0);
   const [endsAt, setEndsAt] = useState<number | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const [selectedOptionId, setSelectedOptionId] = useState<number | null>(null);
@@ -110,7 +111,7 @@ const TimeAttackPlayPage = () => {
     return () => {
       ignore = true;
     };
-  }, [sessionId, navigate]);
+  }, [sessionId, navigate, loadCount]);
 
   const finish = useCallback(async () => {
     if (isFinishingRef.current) return;
@@ -213,9 +214,21 @@ const TimeAttackPlayPage = () => {
 
   if (isError) {
     return (
-      <p className="text-base text-gray-60">
-        문제를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.
-      </p>
+      <div className="flex flex-col items-start gap-4">
+        <p className="text-base text-gray-60">
+          문제를 불러오지 못했어요. 남은 시간 안에 다시 시도해 주세요.
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            setIsError(false);
+            setLoadCount((prev) => prev + 1);
+          }}
+          className="h-12 cursor-pointer rounded-xl bg-blue-60 px-6 text-base font-semibold text-white"
+        >
+          다시 시도
+        </button>
+      </div>
     );
   }
   if (!current) {
