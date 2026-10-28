@@ -5,9 +5,9 @@ const GrowthRewardSection = () => {
   return (
     <section
       aria-labelledby="growth-reward-title"
-      className="flex h-dvh flex-col overflow-hidden bg-gray-05 px-[clamp(24px,11.11vw,160px)] pt-[clamp(24px,11.11dvh,100px)] pb-[clamp(24px,4dvh,40px)]"
+      className="flex min-h-dvh flex-col overflow-x-clip bg-gray-05 px-[clamp(24px,11.11vw,160px)] pt-[clamp(24px,11.11dvh,100px)] pb-[clamp(24px,4dvh,40px)]"
     >
-      <div className="mx-auto flex min-h-0 w-full max-w-300 flex-1 flex-col">
+      <div className="mx-auto flex min-h-min w-full max-w-300 flex-1 flex-col">
         <div className="shrink-0">
           <h2
             id="growth-reward-title"
@@ -22,7 +22,7 @@ const GrowthRewardSection = () => {
           </p>
         </div>
 
-        <div className="mt-[clamp(16px,6dvh,64px)] grid min-h-0 flex-1 items-center justify-items-center gap-4 md:grid-cols-2 md:gap-8">
+        <div className="mt-[clamp(16px,6dvh,64px)] grid min-h-min flex-1 items-center justify-items-center gap-4 md:grid-cols-2 md:gap-8">
           <img
             src={characterEvolution}
             alt="캐릭터 진화: 시작은 초보냥, 주가 1,000에는 큰손냥, 주가 100,000에는 왕족냥으로 진화해요."

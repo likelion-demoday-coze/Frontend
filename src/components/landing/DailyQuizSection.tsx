@@ -5,9 +5,9 @@ const DailyQuizSection = () => {
   return (
     <section
       aria-labelledby="daily-quiz-title"
-      className="flex h-dvh flex-col overflow-hidden bg-gray-05 px-[clamp(24px,11.11vw,160px)] pt-[clamp(24px,11.11dvh,100px)] pb-[clamp(24px,4dvh,40px)]"
+      className="flex min-h-dvh flex-col overflow-x-clip bg-gray-05 px-[clamp(24px,11.11vw,160px)] pt-[clamp(24px,11.11dvh,100px)] pb-[clamp(24px,4dvh,40px)]"
     >
-      <div className="mx-auto flex min-h-0 w-full max-w-300 flex-1 flex-col">
+      <div className="mx-auto flex min-h-min w-full max-w-300 flex-1 flex-col">
         <div className="grid shrink-0 gap-4 md:grid-cols-[28%_1fr] md:gap-8">
           <h2
             id="daily-quiz-title"
@@ -22,7 +22,7 @@ const DailyQuizSection = () => {
           </p>
         </div>
 
-        <div className="mt-[clamp(16px,4dvh,40px)] grid min-h-0 flex-1 items-center gap-4 md:grid-cols-[28%_1fr] md:gap-[11%]">
+        <div className="mt-[clamp(16px,4dvh,40px)] grid min-h-min flex-1 items-center gap-4 md:grid-cols-[28%_1fr] md:gap-[11%]">
           <img
             src={dailyQuizCard}
             alt="정규장: 하루 5문제, 정답과 해설 바로 확인. 8개 카테고리 중 하나를 골라 풀고, 정답마다 주가가 1~10% 상승합니다."

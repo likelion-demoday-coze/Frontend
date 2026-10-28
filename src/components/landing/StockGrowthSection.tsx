@@ -8,9 +8,9 @@ const StockGrowthSection = () => {
   return (
     <section
       aria-labelledby="stock-growth-title"
-      className="flex h-dvh flex-col overflow-hidden bg-white px-[clamp(24px,11.11vw,160px)] pt-[clamp(24px,11.11dvh,100px)] pb-[clamp(24px,4dvh,40px)]"
+      className="flex min-h-dvh flex-col overflow-x-clip bg-white px-[clamp(24px,11.11vw,160px)] pt-[clamp(24px,11.11dvh,100px)] pb-[clamp(24px,4dvh,40px)]"
     >
-      <div className="mx-auto flex min-h-0 w-full max-w-300 flex-1 flex-col">
+      <div className="mx-auto flex min-h-min w-full max-w-300 flex-1 flex-col">
         <div className="grid items-start gap-6 lg:grid-cols-[40%_1fr]">
           <div>
             <h2
@@ -40,8 +40,8 @@ const StockGrowthSection = () => {
             ))}
           </div>
         </div>
-        <div className="mt-[clamp(16px,4dvh,40px)] flex min-h-0 flex-1 items-center justify-center">
-          <div className="relative aspect-1270/640 w-full max-w-[min(100%,calc((100dvh-320px)*2))]">
+        <div className="mt-[clamp(16px,4dvh,40px)] flex min-h-min flex-1 items-center justify-center">
+          <div className="relative aspect-1270/640 w-full max-w-[min(100%,max(240px,calc((100dvh-320px)*2)))]">
             <div className="absolute top-[-10%] right-0 aspect-[699/561] w-[65%] overflow-hidden">
               <img
                 src={correctCat}

@@ -1,7 +1,7 @@
 import kakaoLogo from '../../assets/landing/kakao_login_logo.svg';
 
 const LandingSocialLinks = () => {
-  const kakaoUrl = 'http://pf.kakao.com/_ngMWX';
+  const kakaoUrl = 'https://pf.kakao.com/_ngMWX';
   const instagramUrl = 'https://www.instagram.com/cozeconomy/?hl=ko';
 
   return (

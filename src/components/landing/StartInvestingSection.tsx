@@ -13,29 +13,34 @@ const StartInvestingSection = () => {
   return (
     <section
       aria-labelledby="start-investing-title"
-      className="relative isolate flex min-h-0 flex-1 flex-col overflow-hidden bg-white px-6 py-[clamp(12px,3dvh,28px)]"
+      className="relative isolate flex min-h-[480px] flex-1 flex-col overflow-x-clip bg-white px-6 py-[clamp(12px,3dvh,28px)]"
     >
-      <img
-        src={basicCat}
-        alt=""
+      <div
         aria-hidden
-        loading="lazy"
-        className="pointer-events-none absolute top-0 right-0 -z-5 w-200 select-none"
-      />
-      <div className="pointer-events-none absolute bottom-0 left-0 w-150">
+        className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+      >
         <img
-          src={richCat}
+          src={basicCat}
           alt=""
           aria-hidden
           loading="lazy"
-          className="relative -z-10 w-full select-none"
+          className="pointer-events-none absolute top-0 right-0 -z-5 w-200 select-none"
         />
-        <p className="absolute top-[18%] left-[52%] z-20 rounded-2xl rounded-bl-none bg-blue-50 px-3 py-2 text-xs whitespace-nowrap text-white md:text-sm">
-          기다리고 있겠다 냥
-        </p>
+        <div className="pointer-events-none absolute bottom-0 left-0 w-150">
+          <img
+            src={richCat}
+            alt=""
+            aria-hidden
+            loading="lazy"
+            className="relative -z-10 w-full select-none"
+          />
+          <p className="absolute top-[18%] left-[52%] z-20 rounded-2xl rounded-bl-none bg-blue-50 px-3 py-2 text-xs whitespace-nowrap text-white md:text-sm">
+            기다리고 있겠다 냥
+          </p>
+        </div>
       </div>
 
-      <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-300 flex-1 flex-col items-center">
+      <div className="relative z-10 mx-auto flex min-h-min w-full max-w-300 flex-1 flex-col items-center">
         <h2
           id="start-investing-title"
           className="shrink-0 text-center text-[22px] leading-relaxed font-light lg:text-[clamp(22px,min(2vw,3.5dvh),28px)]"
@@ -49,7 +54,7 @@ const StartInvestingSection = () => {
           가입은 카카오로 10초면 끝나요.
         </p>
 
-        <div className="relative mt-3 flex min-h-0 w-180 max-w-150 flex-1 items-end justify-center">
+        <div className="relative mt-3 flex min-h-40 w-full max-w-150 flex-1 items-end justify-center">
           <img
             src={chartCard}
             alt="100.00에서 127.15까지 상승한 주가 그래프 예시"
@@ -58,7 +63,7 @@ const StartInvestingSection = () => {
           />
         </div>
 
-        <div className="relative z-10 -mt-4 flex w-full max-w-150 shrink-0 gap-3 md:-mt-6 md:-translate-x-50 md:gap-4">
+        <div className="relative z-10 -mt-4 flex w-full max-w-150 shrink-0 gap-3 md:-mt-6 md:-translate-x-[min(200px,max(0px,calc((100vw-680px)/2)))] md:gap-4">
           <button
             type="button"
             onClick={() => navigate(ROUTES.TRY)}

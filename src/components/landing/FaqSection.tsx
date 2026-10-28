@@ -23,9 +23,9 @@ const FaqSection = () => {
   return (
     <section
       aria-labelledby="faq-title"
-      className="flex h-dvh flex-col overflow-hidden bg-gray-05 px-[clamp(24px,11.11vw,160px)] pt-[clamp(24px,11.11dvh,100px)] pb-[clamp(24px,4dvh,40px)]"
+      className="flex min-h-dvh flex-col overflow-x-clip bg-gray-05 px-[clamp(24px,11.11vw,160px)] pt-[clamp(24px,11.11dvh,100px)] pb-[clamp(24px,4dvh,40px)]"
     >
-      <div className="mx-auto flex min-h-0 w-full max-w-300 flex-1 flex-col">
+      <div className="mx-auto flex min-h-min w-full max-w-300 flex-1 flex-col">
         <h2
           id="faq-title"
           className="shrink-0 text-center text-[26px] leading-relaxed font-light lg:text-[clamp(22px,min(2.2vw,4dvh),32px)]"

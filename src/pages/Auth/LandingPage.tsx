@@ -50,7 +50,7 @@ const LandingPage = () => {
 
   return (
     <div className="bg-white">
-      <main className="relative isolate flex h-dvh flex-col overflow-hidden bg-white">
+      <main className="relative isolate flex min-h-dvh flex-col overflow-hidden bg-white">
         <header className="relative z-20 mx-auto flex w-full max-w-300 shrink-0 items-center justify-between px-5 pt-6 lg:px-6">
           <div className="order-2 lg:order-1">
             <img src={textlogo} alt="COZ:E" className="h-8" />
@@ -60,8 +60,8 @@ const LandingPage = () => {
           </div>
         </header>
 
-        <div className="mx-auto flex min-h-0 w-full max-w-300 flex-1 flex-col items-center gap-6 px-5 lg:flex-row lg:justify-between lg:gap-8 lg:px-6">
-          <section className="flex min-h-0 w-full flex-1 flex-col pt-4 pb-6 lg:block lg:flex-1 lg:max-w-120 lg:pb-0 lg:pt-0">
+        <div className="mx-auto flex min-h-min w-full max-w-300 flex-1 flex-col items-center gap-6 px-5 lg:flex-row lg:justify-between lg:gap-8 lg:px-6">
+          <section className="flex min-h-min w-full flex-1 flex-col pt-4 pb-6 lg:block lg:flex-1 lg:max-w-120 lg:pb-0 lg:pt-0">
             <h1 className="shrink-0 text-[30px] leading-tight font-light lg:text-[clamp(40px,4vw,56px)]">
               하루 5분,
               <br />
@@ -76,7 +76,7 @@ const LandingPage = () => {
             </p>
 
             {/* 모바일: 차트 위로 캐릭터와 질문 말풍선을 겹쳐 배치 */}
-            <div aria-hidden className="relative mt-6 min-h-0 flex-1 lg:hidden">
+            <div aria-hidden className="relative mt-6 min-h-40 flex-1 lg:hidden">
               <img
                 src={chartCard}
                 alt=""
@@ -128,7 +128,7 @@ const LandingPage = () => {
 
           <section
             aria-hidden
-            className="relative hidden h-full max-h-170 min-h-0 min-w-0 lg:block lg:flex-1"
+            className="relative hidden h-[min(680px,calc(100dvh-56px))] min-h-90 min-w-0 lg:block lg:flex-1"
           >
             <img
               src={chartCard}
@@ -164,7 +164,7 @@ const LandingPage = () => {
       <GrowthRewardSection />
       <EconomicRoutineSection />
       <FaqSection />
-      <div className="flex h-dvh flex-col overflow-hidden">
+      <div className="flex min-h-dvh flex-col overflow-x-clip">
         <StartInvestingSection />
         <LandingFooter />
       </div>
