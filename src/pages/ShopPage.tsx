@@ -8,7 +8,11 @@ import PassProductCard from '../components/shop/PassProductCard';
 import RecoveryProductCard from '../components/shop/RecoveryProductCard';
 import { getAttendanceToday } from '../api/attendance';
 import { ROUTES } from '../constants/routes';
-import { PAYMENT_ENABLED, PAYMENT_DISABLED_MESSAGE, WEEK_PASS_PRODUCT } from '../constants/payment';
+import {
+  PAYMENT_ENABLED,
+  PAYMENT_DISABLED_MESSAGE,
+  WEEK_PASS_PRODUCT,
+} from '../constants/payment';
 import { createPaymentOrder } from '../api/payment';
 import type { CreatePaymentOrderResult } from '../types/payment';
 import { getCurrentPass } from '../api/pass';
@@ -67,7 +71,8 @@ const ShopPage = () => {
       setFishBalance(null);
       setFishBalanceError('FISH 잔액을 불러오지 못했어요.');
     } finally {
-      if (mounted.current && version === fishBalanceVersion.current) setIsLoadingFishBalance(false);
+      if (mounted.current && version === fishBalanceVersion.current)
+        setIsLoadingFishBalance(false);
     }
   }, [updateFishBalance]);
 
@@ -75,19 +80,23 @@ const ShopPage = () => {
     let active = true;
     mounted.current = true;
     const balanceVersion = ++fishBalanceVersion.current;
-    getFishBalance().then((balance) => {
-      if (active && balanceVersion === fishBalanceVersion.current) {
-        setFishBalance(balance);
-        updateFishBalance(balance);
-      }
-    }).catch(() => {
-      if (active && balanceVersion === fishBalanceVersion.current) {
-        setFishBalance(null);
-        setFishBalanceError('FISH 잔액을 불러오지 못했어요.');
-      }
-    }).finally(() => {
-      if (active && balanceVersion === fishBalanceVersion.current) setIsLoadingFishBalance(false);
-    });
+    getFishBalance()
+      .then((balance) => {
+        if (active && balanceVersion === fishBalanceVersion.current) {
+          setFishBalance(balance);
+          updateFishBalance(balance);
+        }
+      })
+      .catch(() => {
+        if (active && balanceVersion === fishBalanceVersion.current) {
+          setFishBalance(null);
+          setFishBalanceError('FISH 잔액을 불러오지 못했어요.');
+        }
+      })
+      .finally(() => {
+        if (active && balanceVersion === fishBalanceVersion.current)
+          setIsLoadingFishBalance(false);
+      });
 
     getAttendanceToday()
       .then((result) => {
@@ -106,9 +115,7 @@ const ShopPage = () => {
         console.log('상점 상품 조회 결과:', items);
         if (active) {
           setRecoveryItem(
-            items.find(
-              (item) => item.itemCode === 'STREAK_RECOVERY'
-            )
+            items.find((item) => item.itemCode === 'STREAK_RECOVERY')
           );
         }
       })
@@ -142,7 +149,16 @@ const ShopPage = () => {
   }, [updateFishBalance]);
 
   const handlePurchase = async () => {
-    if (!recoveryItem || !isRecoveryPurchaseOpen || isLoadingOwnedItems || isLoadingFishBalance || fishBalance === null || fishBalance < recoveryItem.fishPrice || purchaseLock.current) return;
+    if (
+      !recoveryItem ||
+      !isRecoveryPurchaseOpen ||
+      isLoadingOwnedItems ||
+      isLoadingFishBalance ||
+      fishBalance === null ||
+      fishBalance < recoveryItem.fishPrice ||
+      purchaseLock.current
+    )
+      return;
 
     purchaseLock.current = true;
     fishBalanceVersion.current += 1;
@@ -171,7 +187,9 @@ const ShopPage = () => {
       setPurchaseError(
         isAxiosError(error)
           ? (error.response?.data?.message ?? '구매에 실패했습니다.')
-          : error instanceof Error ? error.message : '구매에 실패했습니다.'
+          : error instanceof Error
+            ? error.message
+            : '구매에 실패했습니다.'
       );
       void refreshFishBalance();
     } finally {
@@ -183,37 +201,60 @@ const ShopPage = () => {
   const handlePayment = async (receiverPhone: string) => {
     if (!PAYMENT_ENABLED) throw new Error(PAYMENT_DISABLED_MESSAGE);
     if (orderLock.current) return;
-    if (!/^010\d{8}$/.test(receiverPhone)) throw new Error('휴대전화 번호를 확인해 주세요.');
+    if (!/^010\d{8}$/.test(receiverPhone))
+      throw new Error('휴대전화 번호를 확인해 주세요.');
     orderLock.current = true;
     setIsOrdering(true);
     try {
-      if (createdOrder.current?.receiverPhone !== receiverPhone) createdOrder.current = null;
+      if (createdOrder.current?.receiverPhone !== receiverPhone)
+        createdOrder.current = null;
       if (!createdOrder.current) {
-        if (Date.now() >= Date.parse(MOCK_PASS_SCHEDULE.saleEndsAt)) throw new Error('패스 판매가 종료되었어요.');
+        if (Date.now() >= Date.parse(MOCK_PASS_SCHEDULE.saleEndsAt))
+          throw new Error('패스 판매가 종료되었어요.');
         const currentPass = await getCurrentPass();
         if (currentPass.active) {
           setPassStatus('active');
-          throw new Error('현재 이용 중인 패스가 있습니다. 만료 후 다시 구매해 주세요.');
+          throw new Error(
+            '현재 이용 중인 패스가 있습니다. 만료 후 다시 구매해 주세요.'
+          );
         }
         if (!hasCsrfToken()) await fetchCsrfToken();
-        const order = await createPaymentOrder({ productCode: WEEK_PASS_PRODUCT.productCode, receiverPhone });
+        const order = await createPaymentOrder({
+          productCode: WEEK_PASS_PRODUCT.productCode,
+          receiverPhone,
+        });
         createdOrder.current = { receiverPhone, order };
       }
       const order = createdOrder.current.order;
       let paymentUrl: URL;
-      try { paymentUrl = new URL(order.paymentUrl); }
-      catch (error) { throw new Error('결제창 정보를 확인하지 못했어요.', { cause: error }); }
-      if (paymentUrl.protocol !== 'https:' || !order.orderNumber) throw new Error('결제창 정보를 확인하지 못했어요.');
+      try {
+        paymentUrl = new URL(order.paymentUrl);
+      } catch (error) {
+        throw new Error('결제창 정보를 확인하지 못했어요.', { cause: error });
+      }
+      if (paymentUrl.protocol !== 'https:' || !order.orderNumber)
+        throw new Error('결제창 정보를 확인하지 못했어요.');
       // 결제창 이동 전에 주문번호를 보관해 복귀 후 최종 상태를 확인
-      try { sessionStorage.setItem('paymentOrderNumber', order.orderNumber); }
-      catch (error) { throw new Error('주문번호를 저장하지 못했어요. 브라우저 저장 공간 설정을 확인해 주세요.', { cause: error }); }
+      try {
+        sessionStorage.setItem('paymentOrderNumber', order.orderNumber);
+      } catch (error) {
+        throw new Error(
+          '주문번호를 저장하지 못했어요. 브라우저 저장 공간 설정을 확인해 주세요.',
+          { cause: error }
+        );
+      }
       window.location.assign(paymentUrl.href);
     } catch (error) {
       if (isAxiosError(error)) {
         const code = error.response?.data?.code;
         if (code === 'PAYMENT_409_2') setPassStatus('active');
-        if (error.response?.status === 404 && code !== 'PAYMENT_404_1') throw new Error(PAYMENT_DISABLED_MESSAGE, { cause: error });
-        throw new Error(error.response?.data?.message ?? '결제 요청 결과를 확인하지 못했어요. 진행 중인 결제가 있는지 확인해 주세요.', { cause: error });
+        if (error.response?.status === 404 && code !== 'PAYMENT_404_1')
+          throw new Error(PAYMENT_DISABLED_MESSAGE, { cause: error });
+        throw new Error(
+          error.response?.data?.message ??
+            '결제 요청 결과를 확인하지 못했어요. 진행 중인 결제가 있는지 확인해 주세요.',
+          { cause: error }
+        );
       }
       throw error;
     } finally {
@@ -233,18 +274,29 @@ const ShopPage = () => {
         <h2 id="cash-products" className="mb-4 text-xl font-semibold">
           현금 결제
         </h2>
-        <PassProductCard passStatus={passStatus} {...MOCK_PASS_SCHEDULE}
+        <PassProductCard
+          passStatus={passStatus}
+          {...MOCK_PASS_SCHEDULE}
           onPurchase={() => {
-            if (passStatus === 'inactive' && Date.now() < Date.parse(MOCK_PASS_SCHEDULE.saleEndsAt)) setIsPaymentOpen(true);
-          }} />
+            if (
+              passStatus === 'inactive' &&
+              Date.now() < Date.parse(MOCK_PASS_SCHEDULE.saleEndsAt)
+            )
+              setIsPaymentOpen(true);
+          }}
+        />
       </section>
 
-      {isPaymentOpen && <PaymentConfirmModal
-        product={WEEK_PASS_PRODUCT}
-        isSubmitting={isOrdering}
-        onClose={() => { if (!orderLock.current) setIsPaymentOpen(false); }}
-        onConfirm={handlePayment}
-      />}
+      {isPaymentOpen && (
+        <PaymentConfirmModal
+          product={WEEK_PASS_PRODUCT}
+          isSubmitting={isOrdering}
+          onClose={() => {
+            if (!orderLock.current) setIsPaymentOpen(false);
+          }}
+          onConfirm={handlePayment}
+        />
+      )}
 
       <section className="mt-9" aria-labelledby="fish-products">
         <h2 id="fish-products" className="mb-4 text-xl font-semibold">
@@ -254,12 +306,39 @@ const ShopPage = () => {
           ownedCount={ownedCount}
           fishPrice={recoveryItem?.fishPrice}
           fishBalance={fishBalance}
-          disabled={!recoveryItem || isLoadingOwnedItems || isLoadingFishBalance || fishBalance === null || isPurchasing}
+          disabled={
+            !recoveryItem ||
+            isLoadingOwnedItems ||
+            isLoadingFishBalance ||
+            fishBalance === null ||
+            isPurchasing
+          }
           isPurchasing={isPurchasing}
-          statusMessage={fishBalanceError || (isLoadingFishBalance ? 'FISH 확인 중...' : !recoveryItem ? '교환 준비 중' : undefined)}
-          onRetry={fishBalanceError ? () => { void refreshFishBalance(); } : undefined}
+          statusMessage={
+            fishBalanceError ||
+            (isLoadingFishBalance
+              ? 'FISH 확인 중...'
+              : !recoveryItem
+                ? '교환 준비 중'
+                : undefined)
+          }
+          onRetry={
+            fishBalanceError
+              ? () => {
+                  void refreshFishBalance();
+                }
+              : undefined
+          }
           onPurchase={() => {
-            if (!recoveryItem || fishBalance === null || fishBalance < recoveryItem.fishPrice || isLoadingFishBalance || isLoadingOwnedItems || purchaseLock.current) return;
+            if (
+              !recoveryItem ||
+              fishBalance === null ||
+              fishBalance < recoveryItem.fishPrice ||
+              isLoadingFishBalance ||
+              isLoadingOwnedItems ||
+              purchaseLock.current
+            )
+              return;
             setPurchaseError('');
             setIsRecoveryPurchaseOpen(true);
             void refreshFishBalance();
@@ -267,15 +346,21 @@ const ShopPage = () => {
         />
       </section>
 
-      {isRecoveryPurchaseOpen && recoveryItem && <RecoveryPurchaseModal
-        price={recoveryItem.fishPrice}
-        fishBalance={fishBalance}
-        isPurchasing={isPurchasing}
-        isRefreshing={isLoadingFishBalance}
-        errorMessage={purchaseError || fishBalanceError}
-        onClose={() => { if (!purchaseLock.current) setIsRecoveryPurchaseOpen(false); }}
-        onConfirm={() => { void handlePurchase(); }}
-      />}
+      {isRecoveryPurchaseOpen && recoveryItem && (
+        <RecoveryPurchaseModal
+          price={recoveryItem.fishPrice}
+          fishBalance={fishBalance}
+          isPurchasing={isPurchasing}
+          isRefreshing={isLoadingFishBalance}
+          errorMessage={purchaseError || fishBalanceError}
+          onClose={() => {
+            if (!purchaseLock.current) setIsRecoveryPurchaseOpen(false);
+          }}
+          onConfirm={() => {
+            void handlePurchase();
+          }}
+        />
+      )}
 
       <footer className="mt-14 text-xs leading-6 text-gray-40">
         <ul className="rounded-xl bg-gray-05 px-5 py-3">
@@ -293,7 +378,7 @@ const ShopPage = () => {
           </li>
         </ul>
         <div className="mt-6 px-4">
-          <p>운영 COZ:E(팀 홍대프)</p>
+          <p>운영 COZ:E(팀 홍데프)</p>
           <Link
             to={ROUTES.MYPAGE_POLICY}
             className="mt-1 inline-block text-gray-60 underline underline-offset-2"

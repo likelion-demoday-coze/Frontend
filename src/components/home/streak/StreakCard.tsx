@@ -73,7 +73,7 @@ const StreakCard = ({
           </span>
 
           <span
-            className={`text-[12px] font-semibold ${
+            className={`text-[16px] font-semibold ${
               isPending ? 'text-purple-30' : 'text-gray-60'
             }`}
           >

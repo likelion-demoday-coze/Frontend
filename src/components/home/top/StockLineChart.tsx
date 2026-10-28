@@ -41,7 +41,7 @@ const StockLineChart = ({
     // ResponsiveContainer: 부모 폭에 맞춰 차트 크기를 자동으로 조절
     // (부모에 폭이 있어야 동작 -> 카드 내에 작성
     <ResponsiveContainer width="100%" height={260}>
-      <LineChart data={data} margin={{ top: 10, right: 0, bottom: 0, left: 0 }}>
+      <LineChart data={data} margin={{ top: 16, right: 12, bottom: 8, left: 24 }}>
         {/* 아래 x축: 모든 점의 라벨을 찍지 않고 맨 앞/맨 뒤 두 개만 보여줌 */}
         <XAxis
           dataKey="label" // x축 기준
@@ -57,6 +57,9 @@ const StockLineChart = ({
         {/* 오른쪽 y축: 시안처럼 가격 숫자를 오른쪽에 표시 */}
         <YAxis
           orientation="right" // 기본은 왼쪽이라 오른쪽으로 옮김
+          width="auto"
+          tickMargin={8}
+          padding={{ top: 8, bottom: 8 }}
           // 아래/위 여유를 위해 최솟값은 내림, 최댓값은 올림
           domain={[Math.floor(min), Math.ceil(max)]}
           // 숫자를 찍을 위치: 점선 가격들 + 가장 낮은 값 (Set으로 중복 제거)

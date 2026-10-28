@@ -19,7 +19,8 @@ const HomePage = () => {
     updateFishBalance: (balance: number) => void;
   }>();
   const [searchParams] = useSearchParams();
-  const isCompletionPreview = import.meta.env.DEV && searchParams.get('recoveryComplete') === '1';
+  const isCompletionPreview =
+    import.meta.env.DEV && searchParams.get('recoveryComplete') === '1';
   const member = useAuthstore((state) => state.member);
   const isInitialized = useAuthstore((state) => state.isInitialized);
   const [isTutorialDismissed, setIsTutorialDismissed] = useState(false);
@@ -57,8 +58,14 @@ const HomePage = () => {
 
   return (
     <div className="mx-auto w-full max-w-260">
-      {isMobile ? <StockChartCard /> : <HeroSection onBalanceChange={updateFishBalance} />}
-      {!isTutorialOpen && !isCompletionPreview && <StreakRecoveryNotification />}
+      {isMobile ? (
+        <StockChartCard />
+      ) : (
+        <HeroSection onBalanceChange={updateFishBalance} />
+      )}
+      {!isTutorialOpen && !isCompletionPreview && (
+        <StreakRecoveryNotification />
+      )}
       <div className="mt-12 flex flex-col gap-6 lg:flex-row">
         <div className="order-2 flex min-w-0 flex-col gap-10 lg:order-1 lg:flex-2 xl:flex-1">
           <TrendSection />
