@@ -181,8 +181,18 @@ const TimeAttackPlayPage = () => {
     [current, selectedOptionId, isTimeUp, sessionId, finish]
   );
 
+  const leaveGuard = useLeaveGuard(!!current && !isFinished);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        leaveGuard.isLeaveOpen ||
+        event.repeat ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.altKey
+      )
+        return;
       const option = current?.question.options.find(
         (item) => String(item.optionNumber) === event.key
       );
@@ -190,9 +200,7 @@ const TimeAttackPlayPage = () => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [current, handleSelect]);
-
-  const leaveGuard = useLeaveGuard(!!current && !isFinished);
+  }, [current, handleSelect, leaveGuard.isLeaveOpen]);
 
   const handleLeave = () =>
     leaveGuard.confirmLeave(() => {
