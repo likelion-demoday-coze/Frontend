@@ -25,14 +25,8 @@ const CATEGORY_BACKGROUNDS: Record<string, string> = {
   LIVING_ECONOMY: livingEconomy,
 };
 
-const MAX_TITLE_LENGTH = 35;
-
 const TrendCard = ({ category, categoryCode, title, onClick }: TrendCardProps) => {
   const background = CATEGORY_BACKGROUNDS[categoryCode];
-  const shortTitle =
-    title.length > MAX_TITLE_LENGTH
-      ? `${title.slice(0, MAX_TITLE_LENGTH)}…`
-      : title;
 
   return (
     <Card
@@ -47,7 +41,7 @@ const TrendCard = ({ category, categoryCode, title, onClick }: TrendCardProps) =
         />
       )}
       <div className="relative text-[16px] text-gray-60">{category}</div>
-      <div className="relative text-[16px] text-black font-semibold">{shortTitle}</div>
+      <div className="relative line-clamp-2 break-words text-[16px] text-black font-semibold">{title}</div>
     </Card>
   );
 };
