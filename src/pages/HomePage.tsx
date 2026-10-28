@@ -1,12 +1,7 @@
 import { useState, useRef } from 'react';
-import {
-  useNavigate,
-  useOutletContext,
-  useSearchParams,
-} from 'react-router-dom';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
 import useAuthstore from '../stores/useAuthStore';
-import { completeTutorial, logout } from '../api/auth';
-import { ROUTES } from '../constants/routes';
+import { completeTutorial } from '../api/auth';
 
 import TutorialModal from '../components/tutorial/TutorialModal';
 import HeroSection from '../components/home/top/HeroSection';
@@ -19,25 +14,6 @@ import StreakSection from '../components/home/streak/StreakSection';
 import StreakRecoveryNotification from '../components/home/streak/StreakRecoveryNotification';
 
 const HomePage = () => {
-  const navigate = useNavigate();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const loggingOutRef = useRef(false);
-
-  const handleLogout = async () => {
-    if (loggingOutRef.current) return;
-    loggingOutRef.current = true;
-    setIsLoggingOut(true);
-    try {
-      await logout();
-      useAuthstore.getState().clearAuth();
-      navigate(ROUTES.LANDING, { replace: true });
-    } catch {
-      alert('로그아웃하지 못했어요. 다시 시도해 주세요.');
-    } finally {
-      loggingOutRef.current = false;
-      setIsLoggingOut(false);
-    }
-  };
   const { isMobile, updateFishBalance } = useOutletContext<{
     isMobile: boolean;
     updateFishBalance: (balance: number) => void;
