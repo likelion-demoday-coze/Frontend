@@ -1,8 +1,8 @@
 import correctCat from '../../assets/character/stand_pose.svg';
-import quizResult from '../../assets/onboarding/page_1/퀴즈후_배경x 1.svg';
-import stockChange3 from '../../assets/onboarding/page_1/주가변화3 1.svg';
-import stockChange2 from '../../assets/onboarding/page_1/주가변화2 1.svg';
-import stockChange1 from '../../assets/onboarding/page_1/주가변화1 1.svg';
+import quizResult from '../../assets/onboarding/page_1/1_today_stock.svg';
+import stockChange3 from '../../assets/onboarding/page_1/1_stock_fluctations3.svg';
+import stockChange2 from '../../assets/onboarding/page_1/1_stock_fluctations2.svg';
+import stockChange1 from '../../assets/onboarding/page_1/1_stock_fluctations1.svg';
 
 const StockGrowthSection = () => {
   return (

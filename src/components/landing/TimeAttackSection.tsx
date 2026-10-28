@@ -1,5 +1,5 @@
-import quizPreview from '../../assets/onboarding/page_3/time_attack_on.svg';
-import timeAttackCard from '../../assets/onboarding/page_3/after_hours_trading.svg';
+import quizPreview from '../../assets/onboarding/page_3/3_time_attack_on.svg';
+import timeAttackCard from '../../assets/onboarding/page_3/3_after_hours_trading.svg';
 
 const TimeAttackSection = () => {
   return (

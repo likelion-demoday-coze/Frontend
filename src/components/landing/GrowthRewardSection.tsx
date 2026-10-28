@@ -1,5 +1,5 @@
-import characterEvolution from '../../assets/onboarding/page_4/character_evolution.svg';
-import learningReward from '../../assets/onboarding/page_4/learning_reward.svg';
+import characterEvolution from '../../assets/onboarding/page_4/4_character_evolution.svg';
+import learningReward from '../../assets/onboarding/page_4/4_learning_reward.svg';
 
 const GrowthRewardSection = () => {
   return (

@@ -1,4 +1,4 @@
-import dailyQuizCard from '../../assets/onboarding/page_2/정규장 2.svg';
+import dailyQuizCard from '../../assets/onboarding/page_2/2_today_quiz.svg';
 import categorySet from '../../assets/home/category_log_set.svg';
 
 const DailyQuizSection = () => {
