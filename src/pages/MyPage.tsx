@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import MyAssets from '../components/mypage/MyAssets';
 import MyRecords from '../components/mypage/MyRecords';
+import NicknameModal from '../components/mypage/NicknameModal';
 import PassCard from '../components/mypage/PassCard';
 import ProfileCard from '../components/mypage/ProfileCard';
 import SettingsCard from '../components/mypage/SettingsCard';
 import UsageHistory from '../components/mypage/UsageHistory';
 import { getMyPage } from '../api/member';
 import { getCurrentPass } from '../api/pass';
+import useAuthStore from '../stores/useAuthStore';
 import type { MyPage as MyPageData } from '../types/member';
 import type { mypass } from '../types/pass';
 
@@ -14,6 +16,8 @@ const MyPage = () => {
   const [data, setData] = useState<MyPageData | null>(null);
   const [pass, setPass] = useState<mypass | null>(null);
   const [isError, setIsError] = useState(false);
+  const [isNicknameOpen, setIsNicknameOpen] = useState(false);
+  const setMember = useAuthStore((state) => state.setMember);
 
   useEffect(() => {
     let ignore = false;
@@ -57,9 +61,7 @@ const MyPage = () => {
             joinedDays={profile.joinedDays}
             characterStage={profile.characterStage}
             isPass={profile.passActive}
-            onEditNickname={() => {
-              //TODO: 닉네임 변경 팝업 연결
-            }}
+            onEditNickname={() => setIsNicknameOpen(true)}
           />
           {activePass && (
             <PassCard
@@ -73,6 +75,20 @@ const MyPage = () => {
         </div>
         <SettingsCard memberId={profile.memberId} />
       </div>
+      {isNicknameOpen && (
+        <NicknameModal
+          currentNickname={profile.nickname}
+          onClose={() => setIsNicknameOpen(false)}
+          onChanged={(member) => {
+            setMember(member);
+            setData({
+              ...data,
+              profile: { ...profile, nickname: member.nickname },
+            });
+            setIsNicknameOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 };
