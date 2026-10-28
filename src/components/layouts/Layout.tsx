@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, matchPath, useLocation } from 'react-router-dom';
 import textLogo from '../../assets/logos/coze_text_logo_black.svg';
 import LeftNavbar from './LeftNavbar';
 import MobileTopNav from './MobileTopNav';
@@ -16,6 +16,10 @@ const Layout = () => {
   const { pathname } = useLocation();
   const [isMobile, setIsMobile] = useState(
     () => !window.matchMedia('(min-width: 1024px)').matches
+  );
+  const hideMobileNavigation = isMobile && Boolean(
+    matchPath(ROUTES.DAILY_QUIZ_PLAY, pathname) ||
+    matchPath(ROUTES.TIME_ATTACK_PLAY, pathname)
   );
   const [passOrCash, setPassOrCash] = useState<PassOrCash>({
     hasPass: false,
@@ -36,13 +40,13 @@ const Layout = () => {
 
   useEffect(() => {
     const element = mobileTopBarRef.current;
-    if (!isMobile || !element) return;
+    if (!isMobile || hideMobileNavigation || !element) return;
     const observer = new ResizeObserver(() => {
       setMobileTopBarHeight(Math.ceil(element.getBoundingClientRect().height));
     });
     observer.observe(element);
     return () => observer.disconnect();
-  }, [isMobile]);
+  }, [isMobile, hideMobileNavigation]);
 
   useEffect(() => {
     const query = window.matchMedia('(min-width: 1024px)');
@@ -108,7 +112,7 @@ const Layout = () => {
     <div className="flex min-h-screen">
       <LeftNavbar />
       <div className="min-w-0 flex-1 overflow-x-clip">
-        {isMobile && (
+        {isMobile && !hideMobileNavigation && (
           <div
             ref={mobileTopBarRef}
             className={`sticky top-0 z-50 flex flex-wrap items-center justify-between gap-3 px-6 py-4 ${pathname === ROUTES.HOME ? 'bg-blue-08' : 'bg-white'}`}
@@ -124,7 +128,9 @@ const Layout = () => {
           </div>
         )}
         {isMobile && pathname === ROUTES.HOME && <MobileHomeHero onBalanceChange={updateFishBalance} />}
-        <MobileTopNav key={pathname} topOffset={mobileTopBarHeight} />
+        {!hideMobileNavigation && (
+          <MobileTopNav key={pathname} topOffset={mobileTopBarHeight} />
+        )}
         {/* 본문 틀: 폭 제한 + 가운데 + 공통 패딩 */}
         <div className="relative mx-auto w-full max-w-360 px-6 pt-6 pb-10 lg:pt-16">
           <div className="hidden lg:absolute lg:top-16 lg:right-33.25 lg:block">
