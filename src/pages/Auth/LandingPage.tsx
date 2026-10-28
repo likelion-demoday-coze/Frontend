@@ -7,7 +7,6 @@ import GrowthRewardSection from '../../components/landing/GrowthRewardSection';
 import TimeAttackSection from '../../components/landing/TimeAttackSection';
 import DailyQuizSection from '../../components/landing/DailyQuizSection';
 import StockGrowthSection from '../../components/landing/StockGrowthSection';
-import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import textlogo from '../../assets/logos/coze_text_logo_black.svg';
 import catImage from '../../assets/character/stand_pose.svg';
@@ -48,103 +47,9 @@ const BUBBLES = [
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const container = scrollRef.current;
-    if (!container) return;
-    if (
-      document.activeElement === document.body ||
-      document.activeElement === document.documentElement
-    ) {
-      container.focus({ preventScroll: true });
-    }
-    let touchStartY = 0;
-    let transitionUntil = 0;
-    let lastWheelAt = -Infinity;
-    let touchHandled = false;
-    const revealSection = (direction: number) => {
-      const containerTop = container.getBoundingClientRect().top;
-      const sections = Array.from(container.children);
-      const targetSection =
-        direction > 0
-          ? sections.find(
-              (section) =>
-                section.getBoundingClientRect().top > containerTop + 2
-            )
-          : sections
-              .reverse()
-              .find(
-                (section) =>
-                  section.getBoundingClientRect().top < containerTop - 2
-              );
-      if (!targetSection) return false;
-      container.scrollTo({
-        top:
-          container.scrollTop +
-          targetSection.getBoundingClientRect().top -
-          containerTop,
-        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
-          ? 'instant'
-          : 'smooth',
-      });
-      transitionUntil = Date.now() + 800;
-      return true;
-    };
-    const onWheel = (event: WheelEvent) => {
-      if (
-        event.ctrlKey ||
-        event.deltaY === 0 ||
-        Math.abs(event.deltaX) > Math.abs(event.deltaY)
-      )
-        return;
-      const now = Date.now();
-      const isContinuingGesture = now - lastWheelAt < 250;
-      lastWheelAt = now;
-      if (
-        isContinuingGesture ||
-        now < transitionUntil ||
-        revealSection(event.deltaY)
-      ) {
-        event.preventDefault();
-      }
-    };
-    const onTouchStart = (event: TouchEvent) => {
-      touchStartY = event.touches[0].clientY;
-      touchHandled = false;
-    };
-    const onTouchMove = (event: TouchEvent) => {
-      const deltaY = touchStartY - event.touches[0].clientY;
-      if (Math.abs(deltaY) <= 12) return;
-      if (
-        touchHandled ||
-        Date.now() < transitionUntil ||
-        revealSection(deltaY)
-      ) {
-        event.preventDefault();
-        touchHandled = true;
-      }
-    };
-    window.addEventListener('wheel', onWheel, {
-      passive: false,
-      capture: true,
-    });
-    container.addEventListener('touchstart', onTouchStart, { passive: true });
-    container.addEventListener('touchmove', onTouchMove, { passive: false });
-    return () => {
-      window.removeEventListener('wheel', onWheel, { capture: true });
-      container.removeEventListener('touchstart', onTouchStart);
-      container.removeEventListener('touchmove', onTouchMove);
-    };
-  }, []);
 
   return (
-    <div
-      ref={scrollRef}
-      tabIndex={0}
-      aria-label="COZ:E 서비스 소개"
-      className="h-dvh overflow-y-auto overscroll-y-contain bg-white outline-none"
-    >
+    <div className="bg-white">
       <main className="relative isolate flex h-dvh flex-col overflow-hidden bg-white">
         <header className="relative z-20 mx-auto flex w-full max-w-300 shrink-0 items-center justify-between px-5 pt-6 lg:px-6">
           <div className="order-2 lg:order-1">

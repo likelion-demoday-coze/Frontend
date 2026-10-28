@@ -1,5 +1,9 @@
 import { useState, useRef } from 'react';
-import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
+import {
+  useNavigate,
+  useOutletContext,
+  useSearchParams,
+} from 'react-router-dom';
 import useAuthstore from '../stores/useAuthStore';
 import { completeTutorial, logout } from '../api/auth';
 import { ROUTES } from '../constants/routes';
@@ -39,7 +43,8 @@ const HomePage = () => {
     updateFishBalance: (balance: number) => void;
   }>();
   const [searchParams] = useSearchParams();
-  const isCompletionPreview = import.meta.env.DEV && searchParams.get('recoveryComplete') === '1';
+  const isCompletionPreview =
+    import.meta.env.DEV && searchParams.get('recoveryComplete') === '1';
   const member = useAuthstore((state) => state.member);
   const isInitialized = useAuthstore((state) => state.isInitialized);
   const [isTutorialDismissed, setIsTutorialDismissed] = useState(false);
@@ -87,8 +92,14 @@ const HomePage = () => {
           {isLoggingOut ? '로그아웃 중…' : '로그아웃'}
         </button>
       </div>
-      {isMobile ? <StockChartCard /> : <HeroSection onBalanceChange={updateFishBalance} />}
-      {!isTutorialOpen && !isCompletionPreview && <StreakRecoveryNotification />}
+      {isMobile ? (
+        <StockChartCard />
+      ) : (
+        <HeroSection onBalanceChange={updateFishBalance} />
+      )}
+      {!isTutorialOpen && !isCompletionPreview && (
+        <StreakRecoveryNotification />
+      )}
       <div className="mt-12 flex flex-col gap-6 lg:flex-row">
         <div className="order-2 flex min-w-0 flex-col gap-10 lg:order-1 lg:flex-2 xl:flex-1">
           <TrendSection />

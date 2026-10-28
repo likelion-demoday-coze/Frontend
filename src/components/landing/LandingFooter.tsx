@@ -11,7 +11,33 @@ const LandingFooter = () => {
           className="mb-2 h-5 w-auto"
         />
         <p className="font-medium text-gray-60">
-          이용약관 | 개인정보처리방침 | 환불정책 | 카카오 채널 문의
+          <a
+            href="https://oil-silkworm-ddb.notion.site/407c130b53ba80ec90e5ffd7a0ded302?source=copy_link"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline"
+          >
+            이용약관
+          </a>
+          {' | '}
+          <a
+            href="https://oil-silkworm-ddb.notion.site/407c130b53ba80bdbf28f9c444ca1e46?source=copy_link"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline"
+          >
+            개인정보처리방침
+          </a>
+          {' | '}
+          <a
+            href="https://oil-silkworm-ddb.notion.site/407c130b53ba8015989ef5852018676a?source=copy_link"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline"
+          >
+            환불정책
+          </a>
+          {' | 카카오 채널 문의'}
         </p>
         <p className="mt-1">
           상호 COZ:E(팀 홍데프) · 대표 박성찬 · 주소 경기도 과천시 별양로 · 전화
