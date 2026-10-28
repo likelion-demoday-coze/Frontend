@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import textLogo from '../../assets/logos/coze_text_logo_black.svg';
 import LeftNavbar from './LeftNavbar';
@@ -29,6 +29,10 @@ const Layout = () => {
     fishBalanceVersion.current += 1;
     setFishBalance(balance);
   }, []);
+
+  useLayoutEffect(() => {
+    if (isMobile) window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [pathname, isMobile]);
 
   useEffect(() => {
     const element = mobileTopBarRef.current;
@@ -120,7 +124,7 @@ const Layout = () => {
           </div>
         )}
         {isMobile && pathname === ROUTES.HOME && <MobileHomeHero onBalanceChange={updateFishBalance} />}
-        <MobileTopNav topOffset={mobileTopBarHeight} />
+        <MobileTopNav key={pathname} topOffset={mobileTopBarHeight} />
         {/* 본문 틀: 폭 제한 + 가운데 + 공통 패딩 */}
         <div className="relative mx-auto w-full max-w-360 px-6 pt-6 pb-10 lg:pt-16">
           <div className="hidden lg:absolute lg:top-16 lg:right-33.25 lg:block">
