@@ -25,7 +25,7 @@ interface RankRowProps extends MyRank {
   isMe?: boolean;
   isStock?: boolean;
 }
-//큰 타입에서, 필요한 속성만을 골라서 새로운 타입을 만듦 ->Pick
+//큰 타입에서, 필요한 속성만을 골라서 새로운 타입을 만듦 -> Pick
 const RankNumber = ({
   rank,
   isMe,
@@ -33,12 +33,18 @@ const RankNumber = ({
 }: Pick<RankRowProps, 'rank' | 'isMe' | 'change'>) => {
   if (isMe) {
     return (
-      <span className="flex items-center gap-4.5 text-blue-60">
+      <span className="flex items-center gap-1 text-blue-60 lg:gap-4.5">
         {RANK_IMAGES[rank] ? (
-          <img src={RANK_IMAGES[rank]} alt={`${rank}위`} className="h-9 w-9 object-contain" />
-        ) : rank}
+          <img
+            src={RANK_IMAGES[rank]}
+            alt={`${rank}위`}
+            className="h-9 w-9 object-contain"
+          />
+        ) : (
+          String(rank).padStart(3, '0')
+        )}
         {!!change && (
-          <span className="text-xs">
+          <span className="text-xs whitespace-nowrap">
             {change > 0 ? '▲' : '▼'} {Math.abs(change)}
           </span>
         )}
@@ -46,7 +52,11 @@ const RankNumber = ({
     );
   }
   return RANK_IMAGES[rank] ? (
-    <img src={RANK_IMAGES[rank]} alt={`${rank}위`} className="h-9 w-9 object-contain" />
+    <img
+      src={RANK_IMAGES[rank]}
+      alt={`${rank}위`}
+      className="h-9 w-9 object-contain"
+    />
   ) : (
     <span className="text-blue-60">{String(rank).padStart(3, '0')}</span>
   );
@@ -62,18 +72,25 @@ const RankRow = ({
 }: RankRowProps) => {
   return (
     <li
-      className={`flex h-14 items-center gap-4 rounded-2xl px-5 cursor-pointer ${
+      className={`flex h-14 items-center gap-2 rounded-2xl px-3 cursor-pointer lg:gap-4 lg:px-5 ${
         isMe ? 'border border-blue-60 bg-blue-08' : 'border-t border-gray-20'
       }`}
     >
-      <div className="flex w-20 items-center">
+      <div className="flex min-w-9 shrink-0 items-center lg:w-20">
         <RankNumber rank={rank} isMe={isMe} change={change} />
       </div>
-      <Avatar src={RANK_PROFILES[rank] ?? basic1} />
-      <span className="flex-1 text-[16px] font-semibold text-gray-60">
+      <div className="shrink-0">
+        <Avatar src={RANK_PROFILES[rank] ?? basic1} />
+      </div>
+      <span
+        title={nickname}
+        className="min-w-0 flex-1 truncate text-[16px] font-semibold text-gray-60 lg:overflow-visible lg:whitespace-normal"
+      >
         {nickname}
       </span>
-      <ScoreBadge value={score} isStock={isStock} />
+      <div className="shrink-0">
+        <ScoreBadge value={score} isStock={isStock} />
+      </div>
     </li>
   );
 };
