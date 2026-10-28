@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
+import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
 import useAuthstore from '../stores/useAuthStore';
-import { completeTutorial } from '../api/auth';
+import { completeTutorial, logout } from '../api/auth';
+import { ROUTES } from '../constants/routes';
 
 import TutorialModal from '../components/tutorial/TutorialModal';
 import HeroSection from '../components/home/top/HeroSection';
@@ -14,6 +15,25 @@ import StreakSection from '../components/home/streak/StreakSection';
 import StreakRecoveryNotification from '../components/home/streak/StreakRecoveryNotification';
 
 const HomePage = () => {
+  const navigate = useNavigate();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const loggingOutRef = useRef(false);
+
+  const handleLogout = async () => {
+    if (loggingOutRef.current) return;
+    loggingOutRef.current = true;
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      useAuthstore.getState().clearAuth();
+      navigate(ROUTES.LANDING, { replace: true });
+    } catch {
+      alert('로그아웃하지 못했어요. 다시 시도해 주세요.');
+    } finally {
+      loggingOutRef.current = false;
+      setIsLoggingOut(false);
+    }
+  };
   const { isMobile, updateFishBalance } = useOutletContext<{
     isMobile: boolean;
     updateFishBalance: (balance: number) => void;
@@ -57,6 +77,16 @@ const HomePage = () => {
 
   return (
     <div className="mx-auto w-full max-w-260">
+      <div className="mb-3 flex justify-end">
+        <button
+          type="button"
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+          className="cursor-pointer px-2 py-1 text-xs text-gray-50 hover:text-gray-80 disabled:cursor-wait disabled:opacity-50"
+        >
+          {isLoggingOut ? '로그아웃 중…' : '로그아웃'}
+        </button>
+      </div>
       {isMobile ? <StockChartCard /> : <HeroSection onBalanceChange={updateFishBalance} />}
       {!isTutorialOpen && !isCompletionPreview && <StreakRecoveryNotification />}
       <div className="mt-12 flex flex-col gap-6 lg:flex-row">

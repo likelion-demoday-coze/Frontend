@@ -1,0 +1,67 @@
+import correctCat from '../../assets/character/stand_pose.svg';
+import quizResult from '../../assets/onboarding/page_1/퀴즈후_배경x 1.svg';
+import stockChange3 from '../../assets/onboarding/page_1/주가변화3 1.svg';
+import stockChange2 from '../../assets/onboarding/page_1/주가변화2 1.svg';
+import stockChange1 from '../../assets/onboarding/page_1/주가변화1 1.svg';
+
+const StockGrowthSection = () => {
+  return (
+    <section
+      aria-labelledby="stock-growth-title"
+      className="flex h-dvh flex-col overflow-hidden bg-white px-[clamp(24px,11.11vw,160px)] pt-[clamp(24px,11.11dvh,100px)] pb-[clamp(24px,4dvh,40px)]"
+    >
+      <div className="mx-auto flex min-h-0 w-full max-w-300 flex-1 flex-col">
+        <div className="grid items-start gap-6 lg:grid-cols-[40%_1fr]">
+          <div>
+            <h2
+              id="stock-growth-title"
+              className="text-[26px] leading-noraml font-light lg:text-[clamp(22px,min(2.45vw,4dvh),36px)]"
+            >
+              퀴즈를 <strong className="font-semibold">맞히면</strong>
+              <br />내 주가가 <strong className="font-semibold">
+                1~10%
+              </strong>{' '}
+              올라요.
+            </h2>
+            <p className="mt-3 text-[15px] leading-relaxed text-gray-60 lg:text-[clamp(13px,min(1.36vw,2.3dvh),20px)]">
+              주가는 모두 100.00에서 시작해요.
+              <br />
+              문제를 틀려도 주가가 떨어지지 않아요.
+            </p>
+          </div>
+          <div className="flex items-start gap-[2.3%]">
+            {[stockChange1, stockChange2, stockChange3].map((src, index) => (
+              <img
+                key={src}
+                src={src}
+                alt={`퀴즈 정답에 따른 주가 상승 예시 ${index + 1}`}
+                className="h-auto w-60 shrink-0 object-contain object-top-left"
+              />
+            ))}
+          </div>
+        </div>
+        <div className="mt-[clamp(16px,4dvh,40px)] flex min-h-0 flex-1 items-center justify-center">
+          <div className="relative aspect-1270/640 w-full max-w-[min(100%,calc((100dvh-320px)*2))]">
+            <div className="absolute top-[-10%] right-0 aspect-[699/561] w-[65%] overflow-hidden">
+              <img
+                src={correctCat}
+                alt="손을 든 고양이"
+                className="absolute top-[14%] left-0 h-auto w-full"
+              />
+              <div className="absolute top-[6%] left-1/2 -translate-x-1/2 rounded-full bg-green-80 px-[clamp(10px,1.5vw,24px)] py-[clamp(6px,1vw,16px)] text-[clamp(10px,1.8vw,28px)] font-semibold whitespace-nowrap text-white">
+                정답이다 냥!
+              </div>
+            </div>
+            <img
+              src={quizResult}
+              alt="5문제 중 3문제 정답으로 오늘의 총 수익 +27.15, 최종 주가 142.15"
+              className="absolute top-[3.2%] left-0 h-auto w-[60%]"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default StockGrowthSection;
