@@ -74,6 +74,9 @@ const QuizModePage = () => {
     selectedMode === 'timeAttack' ? TIME_ATTACK_FISH_COST : DAILY_FISH_COST;
   const isFishShort =
     !!selectedMode && !isResumable && !isPass && fishBalance < fishCost;
+  const isTimeAttackExhausted =
+    selectedMode === 'timeAttack' &&
+    timeAttackAttempt.used >= timeAttackAttempt.limit;
 
   //정규장은 이어 풀기 또는 카테고리 선택으로, 시간외거래는 바로 시작 팝업
   const handleStart = () => {
@@ -132,7 +135,10 @@ const QuizModePage = () => {
         <button
           type="button"
           onClick={handleStart}
-          disabled={!selectedMode || (isFishShort && fishShort.action.disabled)}
+          disabled={
+            !selectedMode ||
+            (isFishShort ? fishShort.action.disabled : isTimeAttackExhausted)
+          }
           className="h-14 w-full cursor-pointer rounded-xl bg-blue-60 text-lg font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-10 disabled:text-gray-60 lg:h-16 lg:w-42"
         >
           {isFishShort ? fishShort.action.label : '투자 시작하기'}
