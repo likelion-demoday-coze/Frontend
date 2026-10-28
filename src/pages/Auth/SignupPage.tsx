@@ -74,6 +74,7 @@ const MESSAGE: Record<Status, string> = {
 
 const SignupPage = () => {
   const [nickname, setNickname] = useState('');
+  const [isAgeConfirmed, setIsAgeConfirmed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
   const [isChecked, setIsChecked] = useState(false); // 사용 가능 확인 완료
@@ -165,7 +166,7 @@ const SignupPage = () => {
   // 체크 가능 조건
   const canCheck = isValid && !isChecked && !isChecking;
   //회원가입 가능 조건
-  const canSignup = isValid && isChecked && !isLoading;
+  const canSignup = isValid && isChecked && isAgeConfirmed && !isLoading;
 
   const handleCheckNickname = async () => {
     if (!canCheck) return; // 규칙 위반, 확인 완료, 요청 중이면 종료
@@ -319,14 +320,52 @@ const SignupPage = () => {
             )}
           </div>
 
+          <div className="mt-4">
+            <label className="flex cursor-pointer items-center gap-2 text-[16px] font-semibold text-black lg:text-[18px]">
+              <input
+                type="checkbox"
+                checked={isAgeConfirmed}
+                onChange={(event) => setIsAgeConfirmed(event.target.checked)}
+                disabled={isLoading}
+                aria-describedby="signup-age-help"
+                className="size-5 shrink-0 cursor-pointer accent-blue-60 disabled:cursor-wait"
+              />
+              만 14세 이상입니다
+            </label>
+            <p id="signup-age-help" className="mt-1 text-[12px] text-gray-60">
+              만 14세 미만은 COZ:E에 가입할 수 없어요.
+            </p>
+          </div>
+
           <button
             onClick={handleSignup}
             type="button"
             disabled={!canSignup}
             className="mx-auto mt-4 block h-14 w-44 rounded-lg lg:mt-8 lg:h-16 lg:w-full bg-blue-60 text-[18px] font-semibold text-white transition hover:brightness-95 disabled:opacity-50"
           >
-            {isLoading ? '가입 중...' : '시작하기'}
+            {isLoading ? '가입 중...' : '투자 시작하기'}
           </button>
+          <p className="mt-2 text-center text-[11px] leading-relaxed text-gray-60 lg:text-[12px]">
+            시작하기를 누르면 COZ:E의{' '}
+            <a
+              href="https://oil-silkworm-ddb.notion.site/407c130b53ba80ec90e5ffd7a0ded302?source=copy_link"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold underline underline-offset-2"
+            >
+              이용약관
+            </a>
+            과{' '}
+            <a
+              href="https://oil-silkworm-ddb.notion.site/407c130b53ba80bdbf28f9c444ca1e46?source=copy_link"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold underline underline-offset-2"
+            >
+              개인정보 처리방침
+            </a>
+            에 동의하는 것으로 봅니다.
+          </p>
         </div>
 
         <div className="relative mt-[clamp(16px,5dvh,48px)] flex min-h-0 w-full max-w-105 flex-1 flex-col items-center overflow-hidden lg:absolute lg:bottom-0 lg:mt-0 lg:block lg:h-[510px] lg:w-218.75 lg:max-w-none lg:flex-none">
