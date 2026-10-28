@@ -3,6 +3,7 @@ import MyAssets from '../components/mypage/MyAssets';
 import MyRecords from '../components/mypage/MyRecords';
 import PassCard from '../components/mypage/PassCard';
 import ProfileCard from '../components/mypage/ProfileCard';
+import UsageHistory from '../components/mypage/UsageHistory';
 import { getMyPage } from '../api/member';
 import { getCurrentPass } from '../api/pass';
 import type { MyPage as MyPageData } from '../types/member';
@@ -67,6 +68,7 @@ const MyPage = () => {
           )}
           <MyAssets assets={data.assets} isPass={profile.passActive} />
           <MyRecords records={data.records} />
+          <UsageHistory />
         </div>
       </div>
     </div>

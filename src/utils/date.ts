@@ -1,5 +1,17 @@
 const pad = (value: number) => String(value).padStart(2, '0');
 
+//10.24.
+export const formatMonthDay = (dateTime: string) => {
+  const date = new Date(dateTime);
+  return `${pad(date.getMonth() + 1)}.${pad(date.getDate())}.`;
+};
+
+//14:23
+export const formatTime = (dateTime: string) => {
+  const date = new Date(dateTime);
+  return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+};
+
 //10.24 14:23
 export const formatMonthDayTime = (dateTime: string) => {
   const date = new Date(dateTime);
