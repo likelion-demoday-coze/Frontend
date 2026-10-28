@@ -2,12 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { isAxiosError } from 'axios';
 import { getOwnedItems, getStoreItems, purchaseItem } from '../api/store';
 import type { Storeitems } from '../types/store';
-import { Link, useOutletContext } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import PageTitleSection from '../components/common/PageTitle';
 import PassProductCard from '../components/shop/PassProductCard';
 import RecoveryProductCard from '../components/shop/RecoveryProductCard';
 import { getAttendanceToday } from '../api/attendance';
-import { ROUTES } from '../constants/routes';
 import {
   PAYMENT_ENABLED,
   PAYMENT_DISABLED_MESSAGE,
@@ -379,12 +378,34 @@ const ShopPage = () => {
         </ul>
         <div className="mt-6 px-4">
           <p>운영 COZ:E(팀 홍데프)</p>
-          <Link
-            to={ROUTES.MYPAGE_POLICY}
-            className="mt-1 inline-block text-gray-60 underline underline-offset-2"
-          >
-            이용약관 · 개인정보처리방침 · 환불 정책
-          </Link>
+          <div className="mt-1 flex flex-wrap items-center gap-x-2 text-gray-60">
+            <a
+              href="https://oil-silkworm-ddb.notion.site/407c130b53ba80ec90e5ffd7a0ded302?source=copy_link"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2"
+            >
+              이용약관
+            </a>
+            <span aria-hidden="true">·</span>
+            <a
+              href="https://oil-silkworm-ddb.notion.site/407c130b53ba80bdbf28f9c444ca1e46?source=copy_link"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2"
+            >
+              개인정보처리방침
+            </a>
+            <span aria-hidden="true">·</span>
+            <a
+              href="https://oil-silkworm-ddb.notion.site/407c130b53ba8015989ef5852018676a?source=copy_link"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2"
+            >
+              환불 정책
+            </a>
+          </div>
         </div>
       </footer>
     </div>
