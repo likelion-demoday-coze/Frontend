@@ -5,12 +5,16 @@ import fishImage from '../../assets/store/Fish_a.svg';
 const getRemainingTime = () => {
   const dayMs = 24 * 60 * 60 * 1000;
   const kstOffsetMs = 9 * 60 * 60 * 1000;
-  const seconds = Math.ceil((dayMs - ((Date.now() + kstOffsetMs) % dayMs)) / 1000);
+  const seconds = Math.ceil(
+    (dayMs - ((Date.now() + kstOffsetMs) % dayMs)) / 1000
+  );
   return [
     Math.floor(seconds / 3600),
     Math.floor((seconds % 3600) / 60),
     seconds % 60,
-  ].map((value) => String(value).padStart(2, '0')).join(':');
+  ]
+    .map((value) => String(value).padStart(2, '0'))
+    .join(':');
 };
 
 const RankingRewardBanner = () => {
@@ -33,7 +37,7 @@ const RankingRewardBanner = () => {
             <span className="text-blue-60">FISH 100개!</span>
           </p>
           <p className="mt-1 text-[11px] text-gray-60">
-            ※ 패스 이용 중에는 생선이 지급되지 않아요
+            ※ 주가 랭킹과 시간외거래 랭킹에서 각각 받을 수 있어요.
           </p>
         </div>
       </div>

@@ -8,10 +8,14 @@ interface ScoreBadgeProps {
 
 const ScoreBadge = ({ value, isStock = false }: ScoreBadgeProps) => {
   return (
-    <div className="flex items-center gap-2 border border-gray-20 bg-gray-05 px-3 py-2 rounded-lg">
-      {!isStock && <img src={greenCircle} alt="" className="size-3 object-contain" />}
+    <div className="flex items-center justify-center gap-2 border border-gray-20 bg-gray-05 px-3 py-2 rounded-lg w-30 ">
+      {!isStock && (
+        <img src={greenCircle} alt="" className="size-3 object-contain" />
+      )}
       {value}
-      {isStock && <img src={smallBell} alt="방울" className="size-4 object-contain" />}
+      {isStock && (
+        <img src={smallBell} alt="방울" className="size-6 object-contain" />
+      )}
     </div>
   );
 };

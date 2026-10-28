@@ -7,12 +7,11 @@ import thirdRank from '../../../assets/ranking/3rd_rank.svg';
 import basic1 from '../../../assets/character/basic_1.svg';
 import basic2 from '../../../assets/character/basic_2.svg';
 import basic3 from '../../../assets/character/basic_3.svg';
-import basic4 from '../../../assets/character/basic_4.svg';
 
 const RANK_PROFILES: Record<number, string> = {
-  1: basic4,
-  2: basic3,
-  3: basic2,
+  1: basic3,
+  2: basic2,
+  3: basic1,
 };
 
 const RANK_IMAGES: Record<number, string> = {

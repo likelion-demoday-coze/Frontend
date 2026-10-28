@@ -8,6 +8,7 @@ import {
 import type { MyStreak, StreakRecovery } from '../../../api/streak';
 import type { StreakDayStatus } from '../../../types/streak';
 import useAuthstore from '../../../stores/useAuthStore';
+import { useBlockRankingReward } from '../../../hooks/useRankingRewardGate';
 import {
   RECOVERY_STATUS_CHANGED,
   isRecoveryCompletionSeen,
@@ -28,6 +29,13 @@ const StreakRecoveryCompletion = () => {
   } | null>(null);
   const seen = useRef(new Set<string>());
   const acknowledged = useRef(new Set<string>());
+  const checkKey = `${memberId}:${pathname}:${isPreview}`;
+  const [checkedKey, setCheckedKey] = useState<string | null>(null);
+  useBlockRankingReward(
+    isPreview ||
+      completion !== null ||
+      (memberId !== undefined && checkedKey !== checkKey)
+  );
 
   useEffect(() => {
     if (memberId === undefined || isPreview) return;
@@ -58,6 +66,7 @@ const StreakRecoveryCompletion = () => {
         if (active) timer = setTimeout(check, 30000);
       } finally {
         running = false;
+        if (active) setCheckedKey(checkKey);
       }
     };
     const checkVisible = () => {
@@ -74,7 +83,7 @@ const StreakRecoveryCompletion = () => {
       window.removeEventListener('focus', checkVisible);
       document.removeEventListener('visibilitychange', checkVisible);
     };
-  }, [pathname, memberId, isPreview]);
+  }, [pathname, memberId, isPreview, checkKey]);
 
   if (isPreview) {
     const statuses: StreakDayStatus[] = [

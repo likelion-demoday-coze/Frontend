@@ -6,6 +6,7 @@ import MobileTopNav from './MobileTopNav';
 import MobileHomeHero from '../home/top/MobileHomeHero';
 import { ROUTES } from '../../constants/routes';
 import TopBar from './Topbar/Topbar';
+import RankingRewardNotification from '../ranking/RankingRewardNotification';
 import { useMyStreak } from '../../hooks/useMyStreak';
 import { getCurrentPass } from '../../api/pass';
 import { getFishBalance } from '../../api/fish';
@@ -144,6 +145,9 @@ const Layout = () => {
             <Outlet context={{ ...streakState, updateFishBalance, isMobile }} />
           </main>
         </div>
+        {(pathname === ROUTES.HOME || pathname === ROUTES.RANKING) && (
+          <RankingRewardNotification onBalanceChange={updateFishBalance} />
+        )}
       </div>
     </div>
   );

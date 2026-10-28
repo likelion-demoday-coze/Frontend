@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { useOutletContext, useSearchParams } from 'react-router-dom';
 import useAuthstore from '../stores/useAuthStore';
 import { completeTutorial } from '../api/auth';
+import { useBlockRankingReward } from '../hooks/useRankingRewardGate';
 
 import TutorialModal from '../components/tutorial/TutorialModal';
 import HeroSection from '../components/home/top/HeroSection';
@@ -34,6 +35,8 @@ const HomePage = () => {
     isInitialized &&
     member?.tutorialCompleted === false &&
     !isTutorialDismissed;
+
+  useBlockRankingReward(isTutorialOpen || isCompletionPreview);
 
   const closeTutorial = () => {
     setIsTutorialDismissed(true);

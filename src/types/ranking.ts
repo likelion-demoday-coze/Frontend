@@ -67,3 +67,16 @@ export interface StockRanking {
   myRanking: StockMyRanking | null;
   page: PageInfo;
 }
+
+// 서버에서 지급된 미확인 랭킹 보상
+export interface RankingReward {
+  rankingRewardId: number;
+  rankingType: 'STOCK' | 'TIME_ATTACK';
+  rankingDate: string;
+  rankingPosition: number;
+  rewardFishAmount: number;
+  fishBalanceBefore: number;
+  fishBalanceAfter: number;
+  stockClosingValue: number | null;
+  timeAttackCorrectCount: number | null;
+}

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import StockLineChart from './StockLineChart';
 import { getStockGraph } from '../../../api/stock';
 import type { StockHistory, StockPeriod } from '../../../types/stock';
+import bell from '../../../assets/icons/big_bell.svg';
 
 const PERIODS = [
   { key: 'DAY', label: '1일' },
@@ -71,13 +72,16 @@ const StockChartCard = () => {
     <div className="flex h-full flex-col rounded-2xl border border-blue-15 bg-white p-3">
       <div className="flex flex-col gap-4 px-5 py-5 xl:flex-row xl:items-center xl:justify-between xl:px-10.5 xl:py-6.5">
         <div className="flex flex-wrap items-center gap-3 xl:gap-4">
-          <span className="text-[16px] font-bold text-gray-60">현재 주가</span>
-          <span className="text-[28px] font-bold text-blue-60">
+          <span className="text-[16px] font-semibold text-gray-60">
+            현재 주가
+          </span>
+          <span className="text-[28px] font-bold text-blue-50">
             {history ? history.currentStock.toFixed(2) : '-'}
           </span>
+          <img src={bell} alt="" className="size-11" />
           {history && (
             <span
-              className={`text-[16px] font-bold ${isUp ? 'text-blue-60' : 'text-red-55'}`}
+              className={`text-[16px] font-bold ${isUp ? 'text-red-55' : 'text-blue-50'}`}
             >
               {isUp ? '▲' : '▼'} {Math.abs(rate).toFixed(2)}%
             </span>
