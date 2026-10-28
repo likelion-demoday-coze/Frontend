@@ -82,16 +82,6 @@ const HomePage = () => {
 
   return (
     <div className="mx-auto w-full max-w-260">
-      <div className="mb-3 flex justify-end">
-        <button
-          type="button"
-          onClick={handleLogout}
-          disabled={isLoggingOut}
-          className="cursor-pointer px-2 py-1 text-xs text-gray-50 hover:text-gray-80 disabled:cursor-wait disabled:opacity-50"
-        >
-          {isLoggingOut ? '로그아웃 중…' : '로그아웃'}
-        </button>
-      </div>
       {isMobile ? (
         <StockChartCard />
       ) : (
