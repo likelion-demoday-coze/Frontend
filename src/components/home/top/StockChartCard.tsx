@@ -70,30 +70,30 @@ const StockChartCard = () => {
 
   return (
     <div className="flex h-full flex-col rounded-2xl border border-blue-15 bg-white p-3">
-      <div className="flex flex-col gap-4 px-5 py-5 xl:flex-row xl:items-center xl:justify-between xl:px-10.5 xl:py-6.5">
-        <div className="flex flex-wrap items-center gap-3 xl:gap-4">
-          <span className="text-[16px] font-semibold text-gray-60">
+      <div className="flex flex-col gap-3 px-5 py-5 xl:flex-row xl:flex-wrap xl:items-center xl:justify-between xl:px-6 xl:py-6">
+        <div className="flex flex-wrap items-center gap-2.5 xl:flex-nowrap xl:gap-2.5">
+          <span className="text-[16px] font-semibold whitespace-nowrap text-gray-60">
             현재 주가
           </span>
-          <span className="text-[28px] font-bold text-blue-50">
+          <span className="text-[28px] font-bold whitespace-nowrap text-blue-50">
             {history ? history.currentStock.toFixed(2) : '-'}
           </span>
-          <img src={bell} alt="" className="size-11" />
+          <img src={bell} alt="" className="size-11 shrink-0" />
           {history && (
             <span
-              className={`text-[16px] font-bold ${isUp ? 'text-red-55' : 'text-blue-50'}`}
+              className={`text-[16px] font-bold whitespace-nowrap ${isUp ? 'text-red-55' : 'text-blue-50'}`}
             >
               {isUp ? '▲' : '▼'} {Math.abs(rate).toFixed(2)}%
             </span>
           )}
         </div>
 
-        <div className="flex shrink-0 gap-2">
+        <div className="flex shrink-0 gap-1.5">
           {PERIODS.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => handlePeriodChange(key)}
-              className={`flex items-center rounded-full border px-4 py-2 ${
+              className={`flex items-center rounded-full border px-3.5 py-2 ${
                 period === key
                   ? 'border-blue-60 font-bold text-blue-60'
                   : 'border-gray-20 text-gray-60'

@@ -7,7 +7,7 @@ const MyRankingSection = () => {
   return (
     <div>
       <SectionTitle title="내 랭킹" linkTo="/ranking" linkLabel="전체보기" />
-      <div className="mt-4 flex flex-col gap-6 xl:flex-row">
+      <div className="mt-4 flex flex-col gap-6 xl:flex-row xl:flex-wrap">
         {status === 'loading' && (
           <p className="text-sm text-gray-60">불러오는 중...</p>
         )}
@@ -18,7 +18,7 @@ const MyRankingSection = () => {
         {/* 불러온 카드 (정규장 / 시간외거래, 내 기록이 있는 것만) */}
         {status === 'done' &&
           data?.map((rank) => (
-            <div key={rank.title} className="min-w-0 flex-1">
+            <div key={rank.title} className="min-w-0 flex-1 lg:min-w-74">
               <MyRankSummaryCard {...rank} />
             </div>
           ))}

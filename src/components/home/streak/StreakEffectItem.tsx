@@ -42,7 +42,7 @@ const StreakEffectItem = ({ effect }: StreakEffectItemProps) => {
         <img
           src={image}
           alt=""
-          className="absolute top-0 left-1/2 size-13 -translate-x-1/2 object-contain"
+          className={`absolute top-0 left-1/2 -translate-x-1/2 object-contain ${effect.requiredDays === 21 ? 'size-13' : 'size-11.5'}`}
         />
       ) : (
         <span
