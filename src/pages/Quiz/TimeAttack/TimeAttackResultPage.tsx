@@ -53,7 +53,7 @@ const TimeAttackResultPage = () => {
 
   const items = result.questions
     .map((question, index) => ({
-      id: question.questionId,
+      id: index,
       number: index + 1,
       content: question.content,
       correct: question.correct,
