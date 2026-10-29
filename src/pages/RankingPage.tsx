@@ -48,7 +48,7 @@ const CONFIG: Record<
 // 탭마다 CTA 버튼이 가는 곳 (컴포넌트 밖: 값이 고정이라 매번 만들 필요 없음)
 const ACTION_PATH: Record<RankingType, string> = {
   regular: ROUTES.QUIZ, // 정규장 → 문제 풀이
-  afterhours: ROUTES.TIME_ATTACK, // 시간외거래 → 타임어택
+  afterhours: ROUTES.QUIZ, // 시간외거래 → 타임어택
 };
 
 const RankingPage = () => {
