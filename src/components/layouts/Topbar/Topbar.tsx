@@ -12,7 +12,7 @@ interface TopBarProps {
 
 const TopBar = ({ streakDays, fishBalance, passOrCash }: TopBarProps) => {
   return (
-    <header className="flex min-w-0 shrink flex-nowrap items-center gap-1.5 text-sm sm:gap-3 sm:text-[15px] lg:shrink-0 lg:gap-4 lg:text-base">
+    <header className="flex min-w-0 shrink flex-nowrap items-center gap-2.5 text-sm sm:gap-4 sm:text-[15px] lg:shrink-0 lg:gap-4 lg:text-base">
       <StatItem
         icon={<img src={streak_icon} alt="연속학습" className="size-7 min-w-4 shrink object-contain sm:size-8 sm:shrink-0 lg:size-9" />}
         label={streakDays === null ? '-' : `${streakDays}일`}

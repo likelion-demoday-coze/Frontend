@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { getFishBalance } from '../../api/fish';
 import type { RankingType } from '../../types/ranking';
+import { formatRankingRewardDate } from '../../utils/date';
 import firstRank from '../../assets/ranking/1st_rank.svg';
 import secondRank from '../../assets/ranking/2nd_rank.svg';
 import thirdRank from '../../assets/ranking/3rd_rank.svg';
@@ -39,7 +40,7 @@ const RankingRewardModal = ({
   const [balance, setBalance] = useState<number | null>(null);
   const isRegular = type === 'regular';
   const rankingName = isRegular ? '정규장' : '시간외거래';
-  const dateLabel = rankingDate ? rankingDate.replaceAll('-', '.') : '어제';
+  const dateLabel = formatRankingRewardDate(rankingDate);
 
   useEffect(() => {
     const dialog = dialogRef.current;

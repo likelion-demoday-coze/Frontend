@@ -19,7 +19,9 @@ export const ProgressBar = ({
         style={{ width: `${value}%` }}
       />
       {/* 끝점 동그라미 */}
-      <span className="absolute top-1/2 right-0 h-2 w-2 -translate-y-1/2 rounded-full bg-gray-20" />
+      {value < 100 && (
+        <span className="absolute top-1/2 right-0 h-2 w-2 translate-x-1/2 -translate-y-1/2 rounded-full bg-gray-20" />
+      )}
 
       {/* 내 위치 마커 */}
       <div
