@@ -6,11 +6,6 @@ export const ROUTES = {
   COMINGSOON: '/', // 삭제예정
   SIGNUP: '/signup', //백엔드가 신규 회원을 보내는 경로
 
-  //온보딩
-  ONBOARDING_TERMS: '/onboarding/terms',
-  ONBOARDING_NICKNAME: '/onboarding/nickname',
-  ONBOARDING_TUTORIAL: '/onboarding/tutorial',
-
   //맛보기 퀴즈 (비로그인)
   TRY: '/try',
 
