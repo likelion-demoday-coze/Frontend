@@ -63,10 +63,12 @@ const SettingsCard = ({ memberId }: SettingsCardProps) => {
     setIsPending(true);
     try {
       await logout();
+      leave();
     } catch (error) {
       console.error('로그아웃 실패', error);
+      setIsPending(false);
+      alert('로그아웃에 실패했어요. 잠시 후 다시 시도해 주세요.');
     }
-    leave();
   };
 
   const handleWithdraw = async () => {
