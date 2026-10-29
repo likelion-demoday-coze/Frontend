@@ -49,7 +49,7 @@ const PassCard = ({ startedAt, expiresAt }: PassCardProps) => {
       </div>
       <p className="rounded-[20px] border border-gray-20 px-4 py-2 text-center text-sm leading-5.5 font-medium break-keep text-gray-80">
         주가 상승 기회 <b className="font-semibold text-blue-60">하루 15문제</b>{' '}
-        · 입장시 <b className="font-semibold text-blue-60">생선 차감 없음</b> ·
+        · 입장시 <b className="font-semibold text-blue-60">FISH 차감 없음</b> ·
         연속 학습 중단시 <b className="font-semibold text-blue-60">무료 복구</b>
       </p>
     </section>
