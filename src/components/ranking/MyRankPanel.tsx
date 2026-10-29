@@ -63,7 +63,7 @@ const MyRankPanel = ({
           </div>
           </>}
         </div>
-        <div className="mt-3 flex justify-between text-sm text-gray-60">
+        <div className="relative -top-9 -mx-4 mt-3 flex justify-between text-sm text-gray-60">
           <span>{lastRank > 0 ? `${lastRank}위` : '-'}</span>
           <span>1위</span>
         </div>
