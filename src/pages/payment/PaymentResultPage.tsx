@@ -1,6 +1,7 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import PaymentResultModal from '../../components/payment/PaymentResultModal';
+import PassStartedModal from '../../components/payment/PassStartedModal';
 import { usePaymentResult } from '../../hooks/usePaymentResult';
 import { ROUTES } from '../../constants/routes';
 
@@ -17,7 +18,11 @@ const PaymentResultPage = () => {
       return null;
     }
   }, [params]);
-  const { state, passPeriod, retry } = usePaymentResult(orderNumber);
+  const { state, passPeriod, isLoadingPassPeriod, retry, retryPassPeriod } =
+    usePaymentResult(orderNumber);
+  const [confirmedPaymentId, setConfirmedPaymentId] = useState<number | null>(
+    null
+  );
   const payment = 'payment' in state ? state.payment : null;
 
   useEffect(() => {
@@ -95,15 +100,26 @@ const PaymentResultPage = () => {
       <PaymentResultModal status="delayed" onClose={toShop} onRetry={retry} />
     );
   } else if (state.payment.status === 'COMPLETED') {
-    modal = (
-      <PaymentResultModal
-        status="success"
-        payment={state.payment}
-        passPeriod={passPeriod}
-        onClose={toShop}
-        onQuiz={() => leave(ROUTES.QUIZ)}
-      />
-    );
+    const showPassStarted = () =>
+      setConfirmedPaymentId(state.payment.paymentId);
+    modal =
+      confirmedPaymentId === state.payment.paymentId ? (
+        <PassStartedModal
+          passPeriod={passPeriod}
+          isLoadingPeriod={isLoadingPassPeriod}
+          onRetry={retryPassPeriod}
+          onClose={toShop}
+          onQuiz={() => leave(ROUTES.QUIZ)}
+        />
+      ) : (
+        <PaymentResultModal
+          status="success"
+          payment={state.payment}
+          passPeriod={passPeriod}
+          onClose={showPassStarted}
+          onConfirm={showPassStarted}
+        />
+      );
   } else if (
     state.payment.status === 'CANCELLED' ||
     state.payment.status === 'REFUNDED'

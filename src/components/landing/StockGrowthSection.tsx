@@ -1,5 +1,6 @@
 import correctCat from '../../assets/character/stand_pose.svg';
 import quizResult from '../../assets/onboarding/page_1/1_today_stock.svg';
+import quizResultBottom from '../../assets/onboarding/page_1/1_today_stock_bottom.svg';
 import stockChange3 from '../../assets/onboarding/page_1/1_stock_fluctations3.svg';
 import stockChange2 from '../../assets/onboarding/page_1/1_stock_fluctations2.svg';
 import stockChange1 from '../../assets/onboarding/page_1/1_stock_fluctations1.svg';
@@ -41,8 +42,8 @@ const StockGrowthSection = () => {
           </div>
         </div>
         <div className="mt-[clamp(16px,4dvh,40px)] flex min-h-min flex-1 items-center justify-center">
-          <div className="relative aspect-1270/640 w-full max-w-[min(100%,max(240px,calc((100dvh-320px)*2)))]">
-            <div className="absolute top-[-10%] right-0 aspect-[699/561] w-[65%] overflow-hidden">
+          <div className="relative isolate aspect-1270/640 w-full max-w-[min(100%,max(240px,calc((100dvh-320px)*2)))]">
+            <div className="absolute top-[-10%] right-0 z-10 aspect-[699/561] w-[65%] overflow-hidden">
               <img
                 src={correctCat}
                 alt="손을 든 고양이"
@@ -52,11 +53,18 @@ const StockGrowthSection = () => {
                 정답이다 냥!
               </div>
             </div>
-            <img
-              src={quizResult}
-              alt="5문제 중 3문제 정답으로 오늘의 총 수익 +27.15, 최종 주가 142.15"
-              className="absolute top-[3.2%] left-0 h-auto w-[60%]"
-            />
+            <div className="absolute top-[3.2%] left-0 w-[60%]">
+              <img
+                src={quizResult}
+                alt="5문제 중 3문제 정답으로 오늘의 총 수익 +27.15, 최종 주가 142.15"
+                className="relative z-0 block h-auto w-full"
+              />
+              <img
+                src={quizResultBottom}
+                alt="시작 주가와 Q1부터 Q5까지 문제별 정답 여부 및 주가"
+                className="absolute bottom-[7.8%] left-[5.2%] z-20 h-auto w-[89.45%]"
+              />
+            </div>
           </div>
         </div>
       </div>

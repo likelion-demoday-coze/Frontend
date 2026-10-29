@@ -6,7 +6,6 @@ import { useOutletContext } from 'react-router-dom';
 import PageTitleSection from '../components/common/PageTitle';
 import PassProductCard from '../components/shop/PassProductCard';
 import RecoveryProductCard from '../components/shop/RecoveryProductCard';
-import { getAttendanceToday } from '../api/attendance';
 import {
   PAYMENT_ENABLED,
   PAYMENT_DISABLED_MESSAGE,
@@ -18,6 +17,7 @@ import { getCurrentPass } from '../api/pass';
 import { fetchCsrfToken, hasCsrfToken } from '../api/axiosInstance';
 import PaymentConfirmModal from '../components/payment/PaymentConfirmModal';
 import RecoveryPurchaseModal from '../components/shop/RecoveryPurchaseModal';
+import RecoveryPurchaseCompleteModal from '../components/shop/RecoveryPurchaseCompleteModal';
 import { getFishBalance } from '../api/fish';
 
 // 판매 일정 API 연결 전 사용할 목데이터 (한국 시간)
@@ -50,10 +50,30 @@ const ShopPage = () => {
   const [isLoadingFishBalance, setIsLoadingFishBalance] = useState(true);
   const [fishBalanceError, setFishBalanceError] = useState('');
   const [isRecoveryPurchaseOpen, setIsRecoveryPurchaseOpen] = useState(false);
+  const [completedRecoveryCount, setCompletedRecoveryCount] = useState<
+    number | null
+  >(null);
   const [purchaseError, setPurchaseError] = useState('');
   const fishBalanceVersion = useRef(0);
   const purchaseRequestId = useRef<string | null>(null);
   const mounted = useRef(true);
+  const shopRef = useRef<HTMLDivElement>(null);
+  const purchaseTrigger = useRef<HTMLButtonElement | null>(null);
+  const shouldRestorePurchaseFocus = useRef(false);
+
+  useEffect(() => {
+    if (completedRecoveryCount !== null || !shouldRestorePurchaseFocus.current)
+      return;
+    shouldRestorePurchaseFocus.current = false;
+    const trigger = purchaseTrigger.current;
+    if (trigger?.isConnected && !trigger.disabled) {
+      trigger.focus();
+      return;
+    }
+    const heading = shopRef.current?.querySelector('h1');
+    heading?.setAttribute('tabindex', '-1');
+    heading?.focus();
+  }, [completedRecoveryCount]);
 
   const refreshFishBalance = useCallback(async () => {
     if (!mounted.current) return;
@@ -97,12 +117,9 @@ const ShopPage = () => {
           setIsLoadingFishBalance(false);
       });
 
-    getAttendanceToday()
+    getCurrentPass()
       .then((result) => {
-        if (active)
-          setPassStatus(
-            result.status === 'PASS_ACTIVE' ? 'active' : 'inactive'
-          );
+        if (active) setPassStatus(result.active ? 'active' : 'inactive');
       })
       .catch(() => {
         if (active) setPassStatus('error');
@@ -180,7 +197,7 @@ const ShopPage = () => {
       setFishBalance(result.balanceAfter);
       updateFishBalance(result.balanceAfter);
       setIsRecoveryPurchaseOpen(false);
-      alert('복구권을 구매했습니다.');
+      setCompletedRecoveryCount(result.quantityAfter);
     } catch (error) {
       if (!mounted.current) return;
       setPurchaseError(
@@ -263,7 +280,7 @@ const ShopPage = () => {
   };
 
   return (
-    <div className="mx-auto w-full max-w-260">
+    <div ref={shopRef} className="mx-auto w-full max-w-260">
       <PageTitleSection
         title="상점"
         description="1주일 패스로 더 자유롭게 풀어보세요. 결제하면 바로 시작돼요."
@@ -328,7 +345,7 @@ const ShopPage = () => {
                 }
               : undefined
           }
-          onPurchase={() => {
+          onPurchase={(event) => {
             if (
               !recoveryItem ||
               fishBalance === null ||
@@ -338,6 +355,7 @@ const ShopPage = () => {
               purchaseLock.current
             )
               return;
+            purchaseTrigger.current = event.currentTarget;
             setPurchaseError('');
             setIsRecoveryPurchaseOpen(true);
             void refreshFishBalance();
@@ -357,6 +375,15 @@ const ShopPage = () => {
           }}
           onConfirm={() => {
             void handlePurchase();
+          }}
+        />
+      )}
+      {completedRecoveryCount !== null && (
+        <RecoveryPurchaseCompleteModal
+          ownedCount={completedRecoveryCount}
+          onClose={() => {
+            shouldRestorePurchaseFocus.current = true;
+            setCompletedRecoveryCount(null);
           }}
         />
       )}

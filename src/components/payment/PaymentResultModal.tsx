@@ -31,7 +31,7 @@ export type PaymentResultModalProps =
       payment: Pick<PaymentDetail, 'productName' | 'amount' | 'orderNumber'>;
       passPeriod: { startedAt: string; expiresAt: string } | null;
       onHistory?: () => void;
-      onQuiz: () => void;
+      onConfirm: () => void;
     })
   | (Closeable & {
       status: 'cancelled' | 'refunded';
@@ -85,7 +85,9 @@ const PaymentResultModal = (props: PaymentResultModalProps) => {
       );
       actions = {
         secondary: {
-          label: props.onContact ? '고객문의' : '고객문의 준비 중',
+          label: props.onContact
+            ? '고객문의 = 카카오채널(@COZE)'
+            : '고객문의 준비 중',
           onClick: props.onContact ?? (() => {}),
           disabled: isRetrying || !props.onContact,
         },
@@ -111,14 +113,6 @@ const PaymentResultModal = (props: PaymentResultModalProps) => {
         },
         { label: '주문번호', value: props.payment.orderNumber },
       ];
-      actions = {
-        secondary: {
-          label: props.onHistory ? '결제 내역' : '결제 내역 준비 중',
-          onClick: props.onHistory ?? (() => {}),
-          disabled: !props.onHistory,
-        },
-        primary: { label: '퀴즈 풀러가기', onClick: props.onQuiz },
-      };
       break;
     case 'cancelled':
     case 'refunded':
@@ -220,6 +214,15 @@ const PaymentResultModal = (props: PaymentResultModalProps) => {
         </p>
       )}
       {actions && <PaymentModalActions {...actions} />}
+      {props.status === 'success' && (
+        <button
+          type="button"
+          onClick={props.onConfirm}
+          className="mt-7 min-h-14 w-full cursor-pointer rounded-xl bg-blue-60 px-4 py-3 text-base font-semibold text-white"
+        >
+          확인
+        </button>
+      )}
       {props.status === 'delayed' && (
         <button
           type="button"
