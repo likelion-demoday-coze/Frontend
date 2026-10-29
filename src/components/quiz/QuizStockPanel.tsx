@@ -6,6 +6,7 @@ interface QuizStockPanelProps {
   lastChange?: number | null;
   muted?: boolean;
   notice?: string;
+  label?: string;
 }
 
 const BASE_RATIO = 0.15;
@@ -18,6 +19,7 @@ const QuizStockPanel = ({
   lastChange = null,
   muted = false,
   notice,
+  label = '현재 주가',
 }: QuizStockPanelProps) => {
   const base = points[0];
   const current = points[points.length - 1];
@@ -39,7 +41,7 @@ const QuizStockPanel = ({
     <div className="flex w-full flex-col items-center gap-3 rounded-[20px] border border-blue-15 bg-white px-6 pt-3 pb-2 lg:w-86.5">
       <div className="flex flex-col items-center gap-1">
         <div className="flex items-center gap-7">
-          <span className="text-base font-bold text-gray-50">현재 주가</span>
+          <span className="text-base font-bold text-gray-50">{label}</span>
           <span className="flex items-end gap-1">
             <strong
               className={`text-[32px] leading-none font-bold ${muted ? 'text-gray-40' : 'text-blue-60'}`}
