@@ -303,11 +303,13 @@ const TimeAttackPlayPage = () => {
       <aside className="flex flex-col gap-5 lg:mt-25">
         <QuizCatPanel mood={catMood} seed={correctCount} hideStockMessages />
         {stockPoints.length > 0 && (
-          <QuizStockPanel
-            points={stockPoints}
-            muted
-            notice="시간외거래는 주가에 반영되지 않아요"
-          />
+          <div className="hidden lg:block">
+            <QuizStockPanel
+              points={stockPoints}
+              muted
+              notice="시간외거래는 주가에 반영되지 않아요"
+            />
+          </div>
         )}
       </aside>
 
