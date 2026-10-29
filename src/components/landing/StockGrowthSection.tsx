@@ -18,7 +18,7 @@ const StockGrowthSection = ({
     >
       <div className="mx-auto flex min-h-min w-full max-w-300 flex-1 flex-col">
         <div
-          className={`grid items-start gap-6 ${comingSoonMobile ? 'sm:grid-cols-[40%_1fr]' : 'lg:grid-cols-[40%_1fr]'}`}
+          className={`grid items-start gap-6 ${comingSoonMobile ? 'sm:grid-cols-[40%_minmax(0,1fr)]' : 'lg:grid-cols-[40%_1fr]'}`}
         >
           <div>
             <h2
@@ -38,14 +38,18 @@ const StockGrowthSection = ({
             </p>
           </div>
           <div
-            className={`${comingSoonMobile ? 'hidden sm:flex' : 'flex'} items-start gap-[2.3%]`}
+            className={`${comingSoonMobile ? 'hidden min-w-0 sm:flex' : 'flex'} items-start gap-[2.3%]`}
           >
             {[stockChange1, stockChange2, stockChange3].map((src, index) => (
               <img
                 key={src}
                 src={src}
                 alt={`퀴즈 정답에 따른 주가 상승 예시 ${index + 1}`}
-                className="h-auto w-60 shrink-0 object-contain object-top-left"
+                className={
+                  comingSoonMobile
+                    ? 'h-auto w-0 min-w-0 max-w-60 flex-1 object-contain object-top-left'
+                    : 'h-auto w-60 shrink-0 object-contain object-top-left'
+                }
               />
             ))}
           </div>
