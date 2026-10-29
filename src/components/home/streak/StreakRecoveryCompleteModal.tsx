@@ -58,12 +58,14 @@ const StreakRecoveryCompleteModal = ({
         복구 완료
       </span>
       <div className="-mt-6 flex flex-col items-center text-center">
-        <img
-          src={catImage}
-          alt="다시 돌아온 고양이"
-          className="size-24 object-contain"
-        />
-        <p className="rounded-full bg-blue-50 px-3 py-2 text-xs font-semibold text-white">
+        <div className="size-32 shrink-0 overflow-hidden rounded-full">
+          <img
+            src={catImage}
+            alt="다시 돌아온 고양이"
+            className="size-full object-cover"
+          />
+        </div>
+        <p className="relative -mt-0.5 rounded-full bg-blue-50 px-3 py-2 text-xs font-semibold text-white">
           다시 이어졌다 냥!
         </p>
         <p className="mt-4 text-4xl font-bold text-yellow-45">{streakDays}일</p>
@@ -74,7 +76,7 @@ const StreakRecoveryCompleteModal = ({
           {dateLabel} 기록을 이어 붙였어요.
         </p>
       </div>
-      <div className="mt-4">
+      <div className="mx-auto mt-4 w-full max-w-56 [&_ul]:gap-1">
         <StreakWeek days={days} />
       </div>
       <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl border border-blue-15 px-3 py-4">

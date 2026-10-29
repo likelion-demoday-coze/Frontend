@@ -85,7 +85,9 @@ const PaymentResultModal = (props: PaymentResultModalProps) => {
       );
       actions = {
         secondary: {
-          label: props.onContact ? '고객문의' : '고객문의 준비 중',
+          label: props.onContact
+            ? '고객문의 = 카카오채널(@COZE)'
+            : '고객문의 준비 중',
           onClick: props.onContact ?? (() => {}),
           disabled: isRetrying || !props.onContact,
         },

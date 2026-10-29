@@ -5,7 +5,7 @@ const EconomicRoutineSection = () => {
   return (
     <section
       aria-labelledby="economic-routine-title"
-      className="flex min-h-dvh flex-col overflow-x-clip bg-white px-[clamp(24px,11.11vw,160px)] pt-[clamp(24px,11.11dvh,100px)] pb-[clamp(24px,4dvh,40px)]"
+      className="flex min-h-dvh flex-col overflow-clip bg-white px-[clamp(24px,11.11vw,160px)] pt-[clamp(24px,11.11dvh,100px)] pb-[clamp(24px,4dvh,40px)]"
     >
       <div className="mx-auto grid min-h-min w-full max-w-300 flex-1 grid-cols-[minmax(0,2fr)_minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)] gap-x-[clamp(16px,5vw,80px)] gap-y-[clamp(20px,5dvh,64px)]">
         <div className="col-span-2 md:col-span-1">
@@ -28,7 +28,7 @@ const EconomicRoutineSection = () => {
           src={trendPreview}
           alt="오늘의 경제 트렌드 미리보기: 경제 뉴스 3개와 핵심 요약, 필수 경제 용어를 함께 확인해요."
           loading="lazy"
-          className="col-start-1 row-start-2 h-full min-h-min w-full object-contain object-left-top"
+          className="col-start-1 row-start-2 h-full min-h-min w-full translate-y-[calc(clamp(24px,4dvh,40px)+20px)] object-contain object-left-bottom"
         />
 
         <figure className="col-start-2 row-start-2 flex min-h-min flex-col items-center gap-4 md:row-span-2 md:row-start-1">

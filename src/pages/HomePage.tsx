@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
+import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
 import useAuthstore from '../stores/useAuthStore';
-import { completeTutorial } from '../api/auth';
+import { completeTutorial, logout } from '../api/auth';
+import { fetchCsrfToken, hasCsrfToken } from '../api/axiosInstance';
 import { useBlockRankingReward } from '../hooks/useRankingRewardGate';
 
 import TutorialModal from '../components/tutorial/TutorialModal';
@@ -15,6 +16,9 @@ import StreakSection from '../components/home/streak/StreakSection';
 import StreakRecoveryNotification from '../components/home/streak/StreakRecoveryNotification';
 
 const HomePage = () => {
+  const navigate = useNavigate();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const loggingOutRef = useRef(false);
   const { isMobile, updateFishBalance } = useOutletContext<{
     isMobile: boolean;
     updateFishBalance: (balance: number) => void;
@@ -42,6 +46,24 @@ const HomePage = () => {
     setIsTutorialDismissed(true);
   };
 
+  const handleLogout = async () => {
+    if (loggingOutRef.current) return;
+    loggingOutRef.current = true;
+    setIsLoggingOut(true);
+    try {
+      if (!hasCsrfToken()) await fetchCsrfToken();
+      await logout();
+      useAuthstore.getState().clearAuth();
+      navigate('/', { replace: true });
+    } catch (error) {
+      console.error('로그아웃 실패', error);
+      alert('로그아웃에 실패했어요. 다시 시도해주세요.');
+    } finally {
+      loggingOutRef.current = false;
+      setIsLoggingOut(false);
+    }
+  };
+
   // 마지막 '시작하기' 버튼을 눌렀을 때 실행
   const handleTutorialComplete = async () => {
     if (completingRef.current) return;
@@ -61,6 +83,16 @@ const HomePage = () => {
 
   return (
     <div className="mx-auto w-full max-w-260">
+      <div className="mb-3 flex justify-end">
+        <button
+          type="button"
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+          className="text-sm text-gray-60 underline underline-offset-4 disabled:opacity-50"
+        >
+          {isLoggingOut ? '로그아웃 중...' : '로그아웃'}
+        </button>
+      </div>
       {isMobile ? (
         <StockChartCard />
       ) : (

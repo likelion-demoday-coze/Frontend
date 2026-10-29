@@ -9,6 +9,7 @@ import GuestOnlyRoute from './components/guards/GuestOnlyRoute';
 
 import LandingPage from './pages/Auth/LandingPage';
 import SignupPage from './pages/Auth/SignupPage';
+import ComingSoonPage from './pages/ComingSoonPage';
 
 import HomePage from './pages/HomePage';
 import MyPage from './pages/MyPage';
@@ -56,6 +57,7 @@ function App() {
         <Route element={<GuestOnlyRoute />}>
           <Route path={ROUTES.LANDING} element={<LandingPage />}></Route>
           <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
+          <Route path={ROUTES.COMINGSOON} element={<ComingSoonPage />} />
         </Route>
 
         {/*온보딩 -> 이거 곧 삭제할게요 튜토리얼도 닉네임페이지도 안씀!*/}

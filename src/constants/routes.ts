@@ -3,6 +3,7 @@ import type { RankingType } from '../types/ranking';
 export const ROUTES = {
   LANDING: '/',
   HOME: '/home',
+  COMINGSOON: '/comingsoon',
   SIGNUP: '/signup', //백엔드가 신규 회원을 보내는 경로
 
   //온보딩
