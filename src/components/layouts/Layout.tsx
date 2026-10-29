@@ -120,8 +120,8 @@ const Layout = () => {
             ref={mobileTopBarRef}
             className={`sticky top-0 z-50 flex flex-nowrap items-center justify-between gap-2 px-3 py-4 sm:gap-3 sm:px-6 ${pathname === ROUTES.HOME ? 'bg-blue-08' : 'bg-white'}`}
           >
-            <Link to={ROUTES.HOME} aria-label="COZ:E 홈" className="shrink-0">
-              <img src={textLogo} alt="COZ:E" className="h-auto w-15 sm:h-6 sm:w-21" />
+            <Link to={ROUTES.HOME} aria-label="COZ:E 홈" className="min-w-12 shrink sm:shrink-0">
+              <img src={textLogo} alt="COZ:E" className="h-auto w-[78px] max-w-full sm:w-[102px]" />
             </Link>
             <TopBar
               streakDays={streakState.streak?.currentStreak ?? null}

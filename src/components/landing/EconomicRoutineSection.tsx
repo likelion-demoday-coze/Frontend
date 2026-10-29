@@ -29,7 +29,7 @@ const EconomicRoutineSection = ({
             경제는 계속돼요
           </h2>
           <p className="mt-5 text-[15px] leading-relaxed text-gray-60 lg:text-[clamp(13px,min(1.3vw,2.3dvh),18px)]">
-            매일 아침, 오늘의 경제 뉴스 3개를 쉽게 요약하고
+            매일 아침, 오늘의 경제 뉴스 3개를 쉽게 요약하고<span> </span>
             <br
               className={`hidden ${comingSoonMobile ? 'sm:block' : 'md:block'}`}
             />

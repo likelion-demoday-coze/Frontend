@@ -7,9 +7,9 @@ interface StatItemProps {
 
 const StatItem = ({ icon, label }: StatItemProps) => {
   return (
-    <div className="flex shrink-0 items-center gap-0.5 whitespace-nowrap sm:gap-1 lg:gap-2">
+    <div className="flex min-w-0 shrink items-center gap-0.5 whitespace-nowrap sm:gap-1 lg:shrink-0 lg:gap-2">
       {icon}
-      <span>{label}</span>
+      <span className="shrink-0">{label}</span>
     </div>
   );
 };
