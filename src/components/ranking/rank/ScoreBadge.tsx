@@ -8,7 +8,7 @@ interface ScoreBadgeProps {
 
 const ScoreBadge = ({ value, isStock = false }: ScoreBadgeProps) => {
   return (
-    <div className="flex w-auto items-center justify-center gap-1 whitespace-nowrap rounded-lg border border-gray-20 bg-gray-05 px-2 py-2 text-sm lg:w-30 lg:gap-2 lg:px-3 lg:text-base">
+    <div className="flex h-9 w-26 shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-lg border border-gray-20 bg-gray-05 px-2 text-sm tabular-nums lg:h-10 lg:w-30 lg:text-base">
       {!isStock && (
         <img
           src={greenCircle}
@@ -16,7 +16,7 @@ const ScoreBadge = ({ value, isStock = false }: ScoreBadgeProps) => {
           className="size-3 shrink-0 object-contain"
         />
       )}
-      {value}
+      <span className="shrink-0">{value}</span>
       {isStock && (
         <img
           src={smallBell}
