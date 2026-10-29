@@ -56,6 +56,9 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {!isOpen && (
+          <Route path={ROUTES.COMINGSOON} element={<ComingSoonPage />} />
+        )}
         <Route element={<GuestOnlyRoute />}>
           <Route path={ROUTES.LANDING} element={<LandingPage />}></Route>
           {/* 오픈 전에는 가입 화면 대신 커밍순으로 이동 */}
@@ -69,10 +72,9 @@ function App() {
               )
             }
           />
-          <Route
-            path={ROUTES.COMINGSOON}
-            element={isOpen ? <LandingPage /> : <ComingSoonPage />}
-          />
+          {isOpen && (
+            <Route path={ROUTES.COMINGSOON} element={<LandingPage />} />
+          )}
         </Route>
 
         {/*온보딩 -> 이거 곧 삭제할게요 튜토리얼도 닉네임페이지도 안씀!*/}

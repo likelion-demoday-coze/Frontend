@@ -57,8 +57,8 @@ const ComingSoonClosingSection = ({
             id="coming-soon-closing-title"
             className="text-[clamp(24px,2.6vw,36px)] leading-relaxed font-light text-black"
           >
-            <strong className="font-semibold">10월 31일,</strong> 첫 상장에
-            함께해요
+            <strong className="font-semibold text-blue-60">10월 31일,</strong>{' '}
+            첫 상장에 함께해요
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-gray-80">
             오픈하는 순간 카카오톡으로 알려드릴게요.

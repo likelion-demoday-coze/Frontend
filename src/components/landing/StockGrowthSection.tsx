@@ -1,18 +1,25 @@
 import correctCat from '../../assets/character/stand_pose.svg';
 import quizResult from '../../assets/onboarding/page_1/1_today_stock.svg';
 import quizResultBottom from '../../assets/onboarding/page_1/1_today_stock_bottom.svg';
+import quizResultMobile from '../../assets/onboarding/page_1/1_today_stock_mobile.svg';
 import stockChange3 from '../../assets/onboarding/page_1/1_stock_fluctations3.svg';
 import stockChange2 from '../../assets/onboarding/page_1/1_stock_fluctations2.svg';
 import stockChange1 from '../../assets/onboarding/page_1/1_stock_fluctations1.svg';
 
-const StockGrowthSection = () => {
+const StockGrowthSection = ({
+  comingSoonMobile = false,
+}: {
+  comingSoonMobile?: boolean;
+}) => {
   return (
     <section
       aria-labelledby="stock-growth-title"
       className="flex min-h-dvh flex-col overflow-x-clip bg-white px-[clamp(24px,11.11vw,160px)] pt-[clamp(24px,11.11dvh,100px)] pb-[clamp(24px,4dvh,40px)]"
     >
       <div className="mx-auto flex min-h-min w-full max-w-300 flex-1 flex-col">
-        <div className="grid items-start gap-6 lg:grid-cols-[40%_1fr]">
+        <div
+          className={`grid items-start gap-6 ${comingSoonMobile ? 'sm:grid-cols-[40%_1fr]' : 'lg:grid-cols-[40%_1fr]'}`}
+        >
           <div>
             <h2
               id="stock-growth-title"
@@ -30,7 +37,9 @@ const StockGrowthSection = () => {
               문제를 틀려도 주가가 떨어지지 않아요.
             </p>
           </div>
-          <div className="flex items-start gap-[2.3%]">
+          <div
+            className={`${comingSoonMobile ? 'hidden sm:flex' : 'flex'} items-start gap-[2.3%]`}
+          >
             {[stockChange1, stockChange2, stockChange3].map((src, index) => (
               <img
                 key={src}
@@ -42,7 +51,17 @@ const StockGrowthSection = () => {
           </div>
         </div>
         <div className="mt-[clamp(16px,4dvh,40px)] flex min-h-min flex-1 items-center justify-center">
-          <div className="relative isolate aspect-1270/640 w-full max-w-[min(100%,max(240px,calc((100dvh-320px)*2)))]">
+          {comingSoonMobile && (
+            <img
+              src={quizResultMobile}
+              alt="퀴즈 정답에 따른 주가 상승과 문제별 결과 미리보기"
+              loading="lazy"
+              className="mx-auto h-auto max-h-[calc(100dvh-260px)] w-full max-w-[362px] object-contain sm:hidden"
+            />
+          )}
+          <div
+            className={`${comingSoonMobile ? 'hidden sm:block' : ''} relative isolate aspect-1270/640 w-full max-w-[min(100%,max(240px,calc((100dvh-320px)*2)))]`}
+          >
             <div className="absolute top-[-10%] right-0 z-10 aspect-[699/561] w-[65%] overflow-hidden">
               <img
                 src={correctCat}
