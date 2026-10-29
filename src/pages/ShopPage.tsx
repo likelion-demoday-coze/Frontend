@@ -18,6 +18,7 @@ import { getCurrentPass } from '../api/pass';
 import { fetchCsrfToken, hasCsrfToken } from '../api/axiosInstance';
 import PaymentConfirmModal from '../components/payment/PaymentConfirmModal';
 import RecoveryPurchaseModal from '../components/shop/RecoveryPurchaseModal';
+import RecoveryPurchaseCompleteModal from '../components/shop/RecoveryPurchaseCompleteModal';
 import { getFishBalance } from '../api/fish';
 
 // 판매 일정 API 연결 전 사용할 목데이터 (한국 시간)
@@ -50,6 +51,9 @@ const ShopPage = () => {
   const [isLoadingFishBalance, setIsLoadingFishBalance] = useState(true);
   const [fishBalanceError, setFishBalanceError] = useState('');
   const [isRecoveryPurchaseOpen, setIsRecoveryPurchaseOpen] = useState(false);
+  const [completedRecoveryCount, setCompletedRecoveryCount] = useState<
+    number | null
+  >(null);
   const [purchaseError, setPurchaseError] = useState('');
   const fishBalanceVersion = useRef(0);
   const purchaseRequestId = useRef<string | null>(null);
@@ -180,7 +184,7 @@ const ShopPage = () => {
       setFishBalance(result.balanceAfter);
       updateFishBalance(result.balanceAfter);
       setIsRecoveryPurchaseOpen(false);
-      alert('복구권을 구매했습니다.');
+      setCompletedRecoveryCount(result.quantityAfter);
     } catch (error) {
       if (!mounted.current) return;
       setPurchaseError(
@@ -358,6 +362,12 @@ const ShopPage = () => {
           onConfirm={() => {
             void handlePurchase();
           }}
+        />
+      )}
+      {completedRecoveryCount !== null && (
+        <RecoveryPurchaseCompleteModal
+          ownedCount={completedRecoveryCount}
+          onClose={() => setCompletedRecoveryCount(null)}
         />
       )}
     </div>
