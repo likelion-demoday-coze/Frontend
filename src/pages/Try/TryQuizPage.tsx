@@ -193,6 +193,7 @@ const TryQuizPage = () => {
     setIndex((prev) => prev + 1);
     setSelectedOptionId(null);
     setResult(null);
+    setLastChange(null);
   };
 
   return (
