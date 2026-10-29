@@ -44,6 +44,21 @@ const tabs: { value: HistoryTab; label: string }[] = [
   { value: 'payment', label: '결제 내역' },
 ];
 
+const RetryMessage = ({ onRetry }: { onRetry: () => void }) => (
+  <div className="flex flex-col items-center gap-3 py-4 text-center">
+    <p className="text-sm text-gray-60">
+      내역을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.
+    </p>
+    <button
+      type="button"
+      onClick={onRetry}
+      className="cursor-pointer rounded-full border border-blue-60 px-4 py-1.5 text-sm font-semibold text-blue-60"
+    >
+      다시 시도
+    </button>
+  </div>
+);
+
 const EmptyHistory = ({
   icon,
   title,
@@ -72,8 +87,11 @@ const UsageHistory = () => {
   const [fishItems, setFishItems] = useState<FishTransaction[] | null>(null);
   const [fishPage, setFishPage] = useState(0);
   const [hasNextFish, setHasNextFish] = useState(false);
+  const [isFishLoading, setIsFishLoading] = useState(true);
+  const [isFishError, setIsFishError] = useState(false);
+  const [fishReloadKey, setFishReloadKey] = useState(0);
   const [payments, setPayments] = useState<PaymentHistory[] | null>(null);
-  const [isError, setIsError] = useState(false);
+  const [isPaymentError, setIsPaymentError] = useState(false);
 
   useEffect(() => {
     let ignore = false;
@@ -84,18 +102,21 @@ const UsageHistory = () => {
           fishPage === 0 ? data.content : [...(prev ?? []), ...data.content]
         );
         setHasNextFish(data.hasNext);
+        setIsFishLoading(false);
       })
       .catch((error) => {
         console.error('FISH 내역 조회 실패', error);
-        if (!ignore) setIsError(true);
+        if (ignore) return;
+        setIsFishError(true);
+        setIsFishLoading(false);
       });
     return () => {
       ignore = true;
     };
-  }, [fishPage]);
+  }, [fishPage, fishReloadKey]);
 
   useEffect(() => {
-    if (tab !== 'payment' || payments) return;
+    if (tab !== 'payment' || payments || isPaymentError) return;
     let ignore = false;
     //운영 기간이 3주라 결제 내역은 한 번에 조회
     getPaymentHistories(0, 20)
@@ -104,14 +125,27 @@ const UsageHistory = () => {
       })
       .catch((error) => {
         console.error('결제 내역 조회 실패', error);
-        if (!ignore) setIsError(true);
+        if (!ignore) setIsPaymentError(true);
       });
     return () => {
       ignore = true;
     };
-  }, [tab, payments]);
+  }, [tab, payments, isPaymentError]);
+
+  const loadMoreFish = () => {
+    if (isFishLoading) return;
+    setIsFishLoading(true);
+    setFishPage((prev) => prev + 1);
+  };
+
+  const retryFish = () => {
+    setIsFishError(false);
+    setIsFishLoading(true);
+    setFishReloadKey((prev) => prev + 1);
+  };
 
   const renderFish = () => {
+    if (!fishItems && isFishError) return <RetryMessage onRetry={retryFish} />;
     if (!fishItems)
       return <p className="text-sm text-gray-60">불러오는 중...</p>;
     if (fishItems.length === 0)
@@ -151,11 +185,14 @@ const UsageHistory = () => {
             </li>
           ))}
         </ul>
-        {hasNextFish ? (
+        {isFishError ? (
+          <RetryMessage onRetry={retryFish} />
+        ) : hasNextFish ? (
           <button
             type="button"
-            onClick={() => setFishPage((prev) => prev + 1)}
-            className="mt-4 flex cursor-pointer items-center gap-2 rounded-full border border-blue-60 px-4 py-1.5 text-sm font-semibold text-blue-60"
+            onClick={loadMoreFish}
+            disabled={isFishLoading}
+            className="mt-4 flex cursor-pointer disabled:cursor-wait disabled:opacity-50 items-center gap-2 rounded-full border border-blue-60 px-4 py-1.5 text-sm font-semibold text-blue-60"
           >
             더보기
             <ArrowIcon aria-hidden="true" className="h-4 w-2 rotate-90" />
@@ -172,6 +209,8 @@ const UsageHistory = () => {
   };
 
   const renderPayments = () => {
+    if (isPaymentError)
+      return <RetryMessage onRetry={() => setIsPaymentError(false)} />;
     if (!payments)
       return <p className="text-sm text-gray-60">불러오는 중...</p>;
     if (payments.length === 0)
@@ -262,15 +301,7 @@ const UsageHistory = () => {
         </div>
       </div>
       <div className="flex flex-col items-center rounded-2xl border border-gray-20 bg-white px-4 py-4 lg:px-6">
-        {isError ? (
-          <p className="text-sm text-gray-60">
-            내역을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.
-          </p>
-        ) : tab === 'fish' ? (
-          renderFish()
-        ) : (
-          renderPayments()
-        )}
+        {tab === 'fish' ? renderFish() : renderPayments()}
       </div>
       {tab === 'payment' && (
         <p className="text-sm text-gray-40">
