@@ -7,7 +7,7 @@ interface StatItemProps {
 
 const StatItem = ({ icon, label }: StatItemProps) => {
   return (
-    <div className="flex gap-2 items-center">
+    <div className="flex shrink-0 items-center gap-0.5 whitespace-nowrap sm:gap-1 lg:gap-2">
       {icon}
       <span>{label}</span>
     </div>

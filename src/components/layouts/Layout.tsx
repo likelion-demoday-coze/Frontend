@@ -118,10 +118,10 @@ const Layout = () => {
         {isMobile && !hideMobileNavigation && (
           <div
             ref={mobileTopBarRef}
-            className={`sticky top-0 z-50 flex flex-wrap items-center justify-between gap-3 px-6 py-4 ${pathname === ROUTES.HOME ? 'bg-blue-08' : 'bg-white'}`}
+            className={`sticky top-0 z-50 flex flex-nowrap items-center justify-between gap-2 px-3 py-4 sm:gap-3 sm:px-6 ${pathname === ROUTES.HOME ? 'bg-blue-08' : 'bg-white'}`}
           >
             <Link to={ROUTES.HOME} aria-label="COZ:E 홈" className="shrink-0">
-              <img src={textLogo} alt="COZ:E" className="w-21 h-6" />
+              <img src={textLogo} alt="COZ:E" className="h-auto w-15 sm:h-6 sm:w-21" />
             </Link>
             <TopBar
               streakDays={streakState.streak?.currentStreak ?? null}
