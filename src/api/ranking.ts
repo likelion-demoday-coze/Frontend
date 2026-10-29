@@ -1,4 +1,5 @@
 import api from './axiosInstance';
+import type { AxiosRequestConfig } from 'axios';
 import type { ApiResponse } from '../types/api';
 import type {
   TimeAttackRanking,
@@ -7,19 +8,27 @@ import type {
 } from '../types/ranking';
 
 //시간외거래
-export const getTimeAttackRanking = async (page: number, size = 20) => {
+export const getTimeAttackRanking = async (
+  page: number,
+  size = 20,
+  options: Pick<AxiosRequestConfig, 'suppressNetworkAlert'> = {}
+) => {
   const { data } = await api.get<ApiResponse<TimeAttackRanking>>(
     '/api/v1/rankings/time-attacks',
-    { params: { page, size } }
+    { ...options, params: { page, size } }
   );
   return data.result;
 };
 
 //정규장
-export const getStockRanking = async (page: number, size = 20) => {
+export const getStockRanking = async (
+  page: number,
+  size = 20,
+  options: Pick<AxiosRequestConfig, 'suppressNetworkAlert'> = {}
+) => {
   const { data } = await api.get<ApiResponse<StockRanking>>(
     '/api/v1/rankings/stocks',
-    { params: { page, size } }
+    { ...options, params: { page, size } }
   );
   return data.result;
 };

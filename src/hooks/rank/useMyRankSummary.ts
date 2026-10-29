@@ -23,7 +23,10 @@ export const useMyRankSummary = () => {
         requestedAt + dayMs - ((requestedAt + 9 * 60 * 60 * 1000) % dayMs);
       let retryDelay: number | null = null;
 
-      return Promise.all([getStockRanking(0, 1), getTimeAttackRanking(0, 1)])
+      return Promise.all([
+        getStockRanking(0, 1, { suppressNetworkAlert: true }),
+        getTimeAttackRanking(0, 1, { suppressNetworkAlert: true }),
+      ])
         .then(([stock, timeAttack]) => {
           if (ignore) return;
           const stockMy = stock.myRanking;

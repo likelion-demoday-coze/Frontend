@@ -1,6 +1,12 @@
 //공통 통신 설정
 import axios from 'axios';
 
+declare module 'axios' {
+  interface AxiosRequestConfig {
+    suppressNetworkAlert?: boolean;
+  }
+}
+
 const baseURL = import.meta.env.VITE_API_URL;
 
 const api = axios.create({ baseURL, withCredentials: true });
@@ -93,7 +99,7 @@ api.interceptors.response.use(
         default:
           console.error(`서버 오류 발생 (${status})`, error.response.data);
       }
-    } else {
+    } else if (!error.config?.suppressNetworkAlert) {
       alert('네트워크 연결이 불안정합니다. 인터넷 연결을 확인해 주세요.');
     }
     return Promise.reject(error);
