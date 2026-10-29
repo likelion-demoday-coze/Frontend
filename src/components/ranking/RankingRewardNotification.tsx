@@ -39,12 +39,21 @@ const RankingRewardNotification = ({
       .then(async (unread) => {
         if (!active) return;
         setRewards(
-          unread.filter(
-            (reward) =>
-              (reward.rankingType === 'STOCK' ||
-                reward.rankingType === 'TIME_ATTACK') &&
-              [1, 2, 3].includes(reward.rankingPosition)
-          )
+          unread
+            .filter(
+              (reward) =>
+                (reward.rankingType === 'STOCK' ||
+                  reward.rankingType === 'TIME_ATTACK') &&
+                [1, 2, 3].includes(reward.rankingPosition)
+            )
+            .sort((a, b) => {
+              const dateOrder = a.rankingDate.localeCompare(b.rankingDate);
+              if (dateOrder !== 0) return dateOrder;
+              return (
+                Number(a.rankingType === 'TIME_ATTACK') -
+                Number(b.rankingType === 'TIME_ATTACK')
+              );
+            })
         );
         setLoadStatus('done');
         if (unread.length === 0) return;

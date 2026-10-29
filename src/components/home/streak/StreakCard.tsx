@@ -62,7 +62,7 @@ const StreakCard = ({
       : 'text-yellow-45';
 
   return (
-    <Card className="min-h-[450px] mt-4 flex w-full flex-col bg-white p-5">
+    <Card className="lg:min-h-[450px] mt-4 flex w-full flex-col bg-white p-5">
       {/* 상단: 일수 + 설명 + 버튼 또는 최고 기록 */}
       <div className="mb-5 flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
@@ -124,7 +124,7 @@ const StreakCard = ({
       </div>
 
       {/* 이펙트 단계와 진행 상태 */}
-      <div className="mt-auto pt-10">
+      <div className="hidden lg:block mt-auto pt-10">
         <StreakEffectTree data={data} />
       </div>
     </Card>
