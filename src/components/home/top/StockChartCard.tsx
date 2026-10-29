@@ -92,6 +92,8 @@ const StockChartCard = () => {
           {PERIODS.map(({ key, label }) => (
             <button
               key={key}
+              type="button"
+              aria-pressed={period === key}
               onClick={() => handlePeriodChange(key)}
               className={`flex items-center rounded-full border px-3.5 py-2 ${
                 period === key

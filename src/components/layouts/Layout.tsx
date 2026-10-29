@@ -6,6 +6,7 @@ import MobileTopNav from './MobileTopNav';
 import MobileHomeHero from '../home/top/MobileHomeHero';
 import { ROUTES } from '../../constants/routes';
 import TopBar from './Topbar/Topbar';
+import LandingFooter from '../landing/LandingFooter';
 import RankingRewardNotification from '../ranking/RankingRewardNotification';
 import { useMyStreak } from '../../hooks/useMyStreak';
 import { getCurrentPass } from '../../api/pass';
@@ -15,6 +16,7 @@ import type { PassOrCash } from '../../types/PassOrCash';
 const Layout = () => {
   const streakState = useMyStreak();
   const { pathname } = useLocation();
+  const isShopPage = pathname === ROUTES.SHOP;
   const [isMobile, setIsMobile] = useState(
     () => !window.matchMedia('(min-width: 1024px)').matches
   );
@@ -110,9 +112,9 @@ const Layout = () => {
     };
   }, [pathname]);
   return (
-    <div className="flex min-h-screen">
+    <div className={`flex ${isShopPage ? 'min-h-dvh' : 'min-h-screen'}`}>
       <LeftNavbar />
-      <div className="min-w-0 flex-1 overflow-x-clip">
+      <div className={`min-w-0 flex-1 overflow-x-clip ${isShopPage ? 'flex flex-col' : ''}`}>
         {isMobile && !hideMobileNavigation && (
           <div
             ref={mobileTopBarRef}
@@ -133,7 +135,7 @@ const Layout = () => {
           <MobileTopNav key={pathname} topOffset={mobileTopBarHeight} />
         )}
         {/* 본문 틀: 폭 제한 + 가운데 + 공통 패딩 */}
-        <div className="relative mx-auto w-full max-w-360 px-6 pt-6 pb-10 lg:pt-16">
+        <div className={`relative mx-auto w-full max-w-360 px-6 pt-6 pb-10 lg:pt-16 ${isShopPage ? 'flex-1' : ''}`}>
           <div className="hidden lg:absolute lg:top-16 lg:right-33.25 lg:block">
             <TopBar
               streakDays={streakState.streak?.currentStreak ?? null}
@@ -148,6 +150,7 @@ const Layout = () => {
         {(pathname === ROUTES.HOME || pathname === ROUTES.RANKING) && (
           <RankingRewardNotification onBalanceChange={updateFishBalance} />
         )}
+        {isShopPage && <LandingFooter />}
       </div>
     </div>
   );

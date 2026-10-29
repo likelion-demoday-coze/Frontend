@@ -37,7 +37,15 @@ const LandingFooter = () => {
           >
             환불정책
           </a>
-          {' | 카카오 채널 문의'}
+          {' | '}
+          <a
+            href="https://pf.kakao.com/_ngMWX"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline"
+          >
+            카카오 채널 문의
+          </a>
         </p>
         <p className="mt-1">
           상호 COZ:E(팀 홍데프) · 대표 박성찬 · 주소 경기도 과천시 별양로 · 전화

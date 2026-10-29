@@ -360,54 +360,6 @@ const ShopPage = () => {
           }}
         />
       )}
-
-      <footer className="mt-14 text-xs leading-6 text-gray-40">
-        <ul className="rounded-xl bg-gray-05 px-5 py-3">
-          <li>
-            · 결제대행: 페이앱(주식회사 유디아이디) · 결제 수단: 신용·체크카드,
-            휴대폰
-          </li>
-          <li>
-            · 결제 즉시 이용이 시작되며, 미사용 패스는 환불 정책에 따라
-            환불됩니다.
-          </li>
-          <li>
-            · 본 서비스는 경진대회 출품작으로 베타 운영되며, 운영 종료 후
-            데이터가 소멸될 수 있습니다.
-          </li>
-        </ul>
-        <div className="mt-6 px-4">
-          <p>운영 COZ:E(팀 홍데프)</p>
-          <div className="mt-1 flex flex-wrap items-center gap-x-2 text-gray-60">
-            <a
-              href="https://oil-silkworm-ddb.notion.site/407c130b53ba80ec90e5ffd7a0ded302?source=copy_link"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline underline-offset-2"
-            >
-              이용약관
-            </a>
-            <span aria-hidden="true">·</span>
-            <a
-              href="https://oil-silkworm-ddb.notion.site/407c130b53ba80bdbf28f9c444ca1e46?source=copy_link"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline underline-offset-2"
-            >
-              개인정보처리방침
-            </a>
-            <span aria-hidden="true">·</span>
-            <a
-              href="https://oil-silkworm-ddb.notion.site/407c130b53ba8015989ef5852018676a?source=copy_link"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline underline-offset-2"
-            >
-              환불 정책
-            </a>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

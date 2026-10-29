@@ -3,6 +3,8 @@ import { getStockRanking, getTimeAttackRanking } from '../../api/ranking';
 import type { MyRankSummary } from '../../types/myRank';
 import { ROUTES } from '../../constants/routes';
 
+const RETRY_DELAYS = [5000, 15000, 30000] as const;
+
 export const useMyRankSummary = () => {
   const [data, setData] = useState<MyRankSummary[] | null>(null);
   const [status, setStatus] = useState<'loading' | 'error' | 'done'>('loading');
@@ -12,8 +14,16 @@ export const useMyRankSummary = () => {
     let refreshTimer: ReturnType<typeof setTimeout>;
 
     // 두 API를 동시에 호출 (size=1: 목록은 필요 없고 내 순위(myRanking)만 필요해서)
-    const load = () =>
-      Promise.all([getStockRanking(0, 1), getTimeAttackRanking(0, 1)])
+    const load = (retryAttempt = 0) => {
+      if (ignore) return;
+      clearTimeout(refreshTimer);
+      const dayMs = 24 * 60 * 60 * 1000;
+      const requestedAt = Date.now();
+      const nextMidnight =
+        requestedAt + dayMs - ((requestedAt + 9 * 60 * 60 * 1000) % dayMs);
+      let retryDelay: number | null = null;
+
+      return Promise.all([getStockRanking(0, 1), getTimeAttackRanking(0, 1)])
         .then(([stock, timeAttack]) => {
           if (ignore) return;
           const stockMy = stock.myRanking;
@@ -69,18 +79,26 @@ export const useMyRankSummary = () => {
           setStatus('done');
         })
         .catch(() => {
-          if (!ignore) setStatus('error');
+          if (ignore) return;
+          setStatus('error');
+          retryDelay = RETRY_DELAYS[retryAttempt] ?? null;
         })
         .finally(() => {
           if (ignore) return;
-          // 한국 시간 자정이 지나면 이전 날짜의 기록을 다시 조회
-          const dayMs = 24 * 60 * 60 * 1000;
-          const untilMidnight =
-            dayMs - ((Date.now() + 9 * 60 * 60 * 1000) % dayMs);
+          if (retryDelay !== null) {
+            refreshTimer = setTimeout(() => {
+              void load(retryAttempt + 1);
+            }, retryDelay);
+            return;
+          }
+          // 요청 시작 당시의 자정을 기준으로, 이미 자정을 넘겼으면 바로 갱신
+          const now = Date.now();
+          const delay = now >= nextMidnight ? 0 : nextMidnight - now + 1000;
           refreshTimer = setTimeout(() => {
             void load();
-          }, untilMidnight + 1000);
+          }, delay);
         });
+    };
 
     void load();
 

@@ -83,7 +83,7 @@ const RankRow = ({
       </div>
       <span
         title={nickname}
-        className="min-w-0 flex-1 truncate text-[16px] font-semibold text-gray-60 lg:overflow-visible lg:whitespace-normal"
+        className="min-w-0 flex-1 truncate text-[16px] font-semibold text-gray-60"
       >
         {nickname}
       </span>

@@ -46,11 +46,12 @@ const StreakRecoveryCompletion = () => {
       if (!active || running) return;
       running = true;
       clearTimeout(timer);
+      let retryDelay: number | null = null;
       try {
         const recovery = await getStreakRecovery();
         if (!active || !recovery) return;
         if (recovery.status === 'PENDING') {
-          timer = setTimeout(check, 10000);
+          retryDelay = 10000;
           return;
         }
         const key = `${memberId}:${recovery.eventId}`;
@@ -63,10 +64,18 @@ const StreakRecoveryCompletion = () => {
         const streak = await getMyStreak();
         if (active && streak) setCompletion({ recovery, streak });
       } catch {
-        if (active) timer = setTimeout(check, 30000);
+        retryDelay = 30000;
       } finally {
         running = false;
-        if (active) setCheckedKey(checkKey);
+        if (active) {
+          if (retryDelay !== null) {
+            // 복구 대기·오류 재시도가 남아 있으면 랭킹 보상은 계속 대기
+            setCheckedKey(null);
+            timer = setTimeout(check, retryDelay);
+          } else {
+            setCheckedKey(checkKey);
+          }
+        }
       }
     };
     const checkVisible = () => {
