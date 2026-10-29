@@ -53,6 +53,8 @@ const NicknameModal = ({
   const titleId = useId();
   const messageId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const [opener] = useState(() => document.activeElement as HTMLElement | null);
   const [nickname, setNickname] = useState('');
   const [isTooLong, setIsTooLong] = useState(false);
   const [checkResult, setCheckResult] = useState<
@@ -69,10 +71,28 @@ const NicknameModal = ({
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();
+      if (event.key !== 'Tab' || !dialogRef.current) return;
+      const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), input:not([disabled])'
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+      const isInside = dialogRef.current.contains(active);
+      if (event.shiftKey && (active === first || !isInside)) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (active === last || !isInside)) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
+
+  useEffect(() => () => opener?.focus(), [opener]);
 
   const isValid =
     nickname.length >= NICKNAME_MIN &&
@@ -161,6 +181,7 @@ const NicknameModal = ({
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
