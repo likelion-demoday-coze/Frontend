@@ -301,7 +301,7 @@ const TimeAttackPlayPage = () => {
       </div>
 
       <aside className="flex flex-col gap-5 lg:mt-25">
-        <QuizCatPanel mood={catMood} seed={correctCount} />
+        <QuizCatPanel mood={catMood} seed={correctCount} hideStockMessages />
         {stockPoints.length > 0 && (
           <QuizStockPanel
             points={stockPoints}
