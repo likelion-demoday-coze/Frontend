@@ -114,6 +114,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
     descriptions: [
       <>
         <strong>정규장 5문제를 끝까지</strong> 풀어야 그날 학습 완료예요.
+        <br />
         (시간외거래는 연속학습에서 제외)
       </>,
       <>

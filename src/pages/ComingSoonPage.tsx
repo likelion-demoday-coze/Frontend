@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Info } from 'lucide-react';
 import comingSoonBackground from '../assets/onboarding/commingsoon/comming_bg.svg';
+import comingSoonMobileBackground from '../assets/onboarding/commingsoon/coming_bg_mobild.svg';
 import logo from '../assets/logos/coze_text_logo_black.svg';
 import kakaoLogo from '../assets/landing/kakao_login_logo.svg';
 import instagramLogo from '../assets/landing/instagram.svg';
@@ -38,11 +39,16 @@ const CommingSoonPage = () => {
       <main className="relative isolate min-h-dvh w-full overflow-hidden bg-white">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 -z-10 bg-cover bg-no-repeat"
+          className="pointer-events-none absolute inset-0 -z-10 hidden bg-cover bg-no-repeat sm:block"
           style={{
             backgroundImage: `url(${comingSoonBackground})`,
             backgroundPosition: 'center clamp(100px, 14dvh, 160px)',
           }}
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10 bg-cover bg-bottom bg-no-repeat sm:hidden"
+          style={{ backgroundImage: `url(${comingSoonMobileBackground})` }}
         />
         <header className="mx-auto flex w-full max-w-320 flex-wrap items-center justify-between gap-x-6 gap-y-4 px-6 py-6 lg:px-10">
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
@@ -52,9 +58,7 @@ const CommingSoonPage = () => {
               COZ:E는 실제 투자 서비스가 아닌, 경제 지식을 쌓는 학습 서비스예요.
             </p>
           </div>
-          <p className="text-sm font-semibold text-blue-60">
-            2026. 10. 31 (토) 오픈
-          </p>
+
           <nav aria-label="COZ:E 소셜 채널" className="flex gap-3">
             <a
               href="https://pf.kakao.com/_ngMWX"
@@ -88,46 +92,53 @@ const CommingSoonPage = () => {
               </span>
             ))}
           </h1>
-          <div
-            role="timer"
-            aria-label="서비스 오픈까지 남은 시간"
-            className="mt-5 grid grid-cols-4 gap-2 md:gap-8"
-          >
-            {countdown.map(({ value, unit }) => (
-              <div
-                key={unit}
-                className="flex items-baseline justify-center gap-1 md:gap-3"
-              >
-                <span className="text-[clamp(44px,8vw,112px)] leading-none font-light tabular-nums text-blue-60">
-                  {String(value).padStart(2, '0')}
-                </span>
-                <span className="text-xs font-semibold text-gray-60 md:text-base">
-                  {unit}
-                </span>
-              </div>
-            ))}
+          <div className="flex flex-col items-center justify-center">
+            <div
+              role="timer"
+              aria-label="서비스 오픈까지 남은 시간"
+              className="mt-5 grid grid-cols-4 gap-2 md:gap-8"
+            >
+              {countdown.map(({ value, unit }) => (
+                <div
+                  key={unit}
+                  className="flex items-baseline justify-center gap-1 md:gap-3"
+                >
+                  <span className="text-[clamp(44px,8vw,112px)] leading-none font-light tabular-nums text-blue-60">
+                    {String(value).padStart(2, '0')}
+                  </span>
+                  <span className="text-xs font-semibold text-gray-60 md:text-base">
+                    {unit}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <p className="mt-6 text-center text-[24px] font-semibold text-blue-50">
+              2026. 10. 31 (토) 오픈
+            </p>
           </div>
 
-          <div className="mt-auto grid gap-5 pt-[clamp(240px,30dvh,380px)] md:grid-cols-[1fr_1.2fr] md:items-end">
-            <h2 className="text-[clamp(26px,3vw,42px)] leading-relaxed font-light text-black">
-              하루 5분,
-              <br />
-              경제 지식이
-              <br />내 주가가 되는 곳
-            </h2>
-            <p className="text-sm leading-relaxed text-gray-60 md:pb-2 md:text-base">
-              경제 퀴즈를 맞힐수록 내 주가가 올라가요.
-              <br />
-              매일 5문제로 지식 수익률을 쌓고, 랭킹에서 겨뤄보세요.
-            </p>
+          <div className="mt-auto pt-[clamp(240px,30dvh,380px)]">
+            <div className="mx-auto grid w-full max-w-200 gap-5 rounded-2xl bg-white/65 p-5 md:grid-cols-[max-content_minmax(0,1fr)] md:items-end md:gap-x-8 md:p-6">
+              <h2 className="text-[clamp(26px,3vw,42px)] leading-relaxed font-light text-black">
+                하루 5분,
+                <br />
+                경제 지식이
+                <br />내 주가가 되는 곳
+              </h2>
+              <p className="text-sm leading-relaxed text-gray-60 md:justify-self-end md:pb-2 md:text-right md:text-base">
+                경제 퀴즈를 맞힐수록 내 주가가 올라가요.
+                <br />
+                매일 5문제로 지식 수익률을 쌓고, 랭킹에서 겨뤄보세요.
+              </p>
+            </div>
           </div>
         </div>
       </main>
-      <StockGrowthSection />
-      <DailyQuizSection />
-      <TimeAttackSection />
+      <StockGrowthSection comingSoonMobile />
+      <DailyQuizSection comingSoonMobile />
+      <TimeAttackSection comingSoonMobile />
       <GrowthRewardSection />
-      <EconomicRoutineSection />
+      <EconomicRoutineSection comingSoonMobile />
       <FaqSection />
       <ComingSoonClosingSection countdown={countdown} />
       <LandingFooter />
