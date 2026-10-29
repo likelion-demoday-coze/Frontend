@@ -70,10 +70,9 @@ function App() {
             path={ROUTES.COMINGSOON}
             element={isOpen ? <LandingPage /> : <ComingSoonPage />}
           />
+          {/*맛보기 퀴즈: 비로그인만, 로그인 사용자는 홈으로*/}
+          <Route path={ROUTES.TRY} element={<TryQuizPage />} />
         </Route>
-
-        {/*맛보기 퀴즈: 비로그인 공개*/}
-        <Route path={ROUTES.TRY} element={<TryQuizPage />} />
 
         {/*로그인 안하면 로그인 페이지로 쫓겨나는 가드*/}
         <Route element={<ProtectedRoute />}>
