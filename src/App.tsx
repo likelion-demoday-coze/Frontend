@@ -21,9 +21,6 @@ import ShopPage from './pages/ShopPage';
 import FullScreenLayout from './components/layouts/FullScreenLayout';
 
 import { ROUTES } from './constants/routes';
-import TermsPage from './pages/Onboarding/TermsPage';
-import NicknamePage from './pages/Onboarding/NicknamePage';
-import TutorialPage from './pages/Onboarding/TutorialPage';
 import TryQuizPage from './pages/Try/TryQuizPage';
 import QuizModePage from './pages/Quiz/QuizModePage';
 import DailyCategoryPage from './pages/Quiz/Daily/DailyCategoryPage';
@@ -75,10 +72,6 @@ function App() {
           />
         </Route>
 
-        {/*온보딩 -> 이거 곧 삭제할게요 튜토리얼도 닉네임페이지도 안씀!*/}
-        <Route path={ROUTES.ONBOARDING_TERMS} element={<TermsPage />} />
-        <Route path={ROUTES.ONBOARDING_NICKNAME} element={<NicknamePage />} />
-        <Route path={ROUTES.ONBOARDING_TUTORIAL} element={<TutorialPage />} />
         {/*맛보기 퀴즈: 비로그인 공개*/}
         <Route path={ROUTES.TRY} element={<TryQuizPage />} />
 
