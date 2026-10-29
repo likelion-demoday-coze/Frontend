@@ -18,7 +18,7 @@ const PaymentResultPage = () => {
       return null;
     }
   }, [params]);
-  const { state, passPeriod, isLoadingPassPeriod, retry } =
+  const { state, passPeriod, isLoadingPassPeriod, retry, retryPassPeriod } =
     usePaymentResult(orderNumber);
   const [confirmedPaymentId, setConfirmedPaymentId] = useState<number | null>(
     null
@@ -107,7 +107,7 @@ const PaymentResultPage = () => {
         <PassStartedModal
           passPeriod={passPeriod}
           isLoadingPeriod={isLoadingPassPeriod}
-          onRetry={retry}
+          onRetry={retryPassPeriod}
           onClose={toShop}
           onQuiz={() => leave(ROUTES.QUIZ)}
         />

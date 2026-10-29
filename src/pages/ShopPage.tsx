@@ -57,6 +57,23 @@ const ShopPage = () => {
   const fishBalanceVersion = useRef(0);
   const purchaseRequestId = useRef<string | null>(null);
   const mounted = useRef(true);
+  const shopRef = useRef<HTMLDivElement>(null);
+  const purchaseTrigger = useRef<HTMLButtonElement | null>(null);
+  const shouldRestorePurchaseFocus = useRef(false);
+
+  useEffect(() => {
+    if (completedRecoveryCount !== null || !shouldRestorePurchaseFocus.current)
+      return;
+    shouldRestorePurchaseFocus.current = false;
+    const trigger = purchaseTrigger.current;
+    if (trigger?.isConnected && !trigger.disabled) {
+      trigger.focus();
+      return;
+    }
+    const heading = shopRef.current?.querySelector('h1');
+    heading?.setAttribute('tabindex', '-1');
+    heading?.focus();
+  }, [completedRecoveryCount]);
 
   const refreshFishBalance = useCallback(async () => {
     if (!mounted.current) return;
@@ -102,8 +119,7 @@ const ShopPage = () => {
 
     getCurrentPass()
       .then((result) => {
-        if (active)
-          setPassStatus(result.active ? 'active' : 'inactive');
+        if (active) setPassStatus(result.active ? 'active' : 'inactive');
       })
       .catch(() => {
         if (active) setPassStatus('error');
@@ -264,7 +280,7 @@ const ShopPage = () => {
   };
 
   return (
-    <div className="mx-auto w-full max-w-260">
+    <div ref={shopRef} className="mx-auto w-full max-w-260">
       <PageTitleSection
         title="상점"
         description="1주일 패스로 더 자유롭게 풀어보세요. 결제하면 바로 시작돼요."
@@ -329,7 +345,7 @@ const ShopPage = () => {
                 }
               : undefined
           }
-          onPurchase={() => {
+          onPurchase={(event) => {
             if (
               !recoveryItem ||
               fishBalance === null ||
@@ -339,6 +355,7 @@ const ShopPage = () => {
               purchaseLock.current
             )
               return;
+            purchaseTrigger.current = event.currentTarget;
             setPurchaseError('');
             setIsRecoveryPurchaseOpen(true);
             void refreshFishBalance();
@@ -364,7 +381,10 @@ const ShopPage = () => {
       {completedRecoveryCount !== null && (
         <RecoveryPurchaseCompleteModal
           ownedCount={completedRecoveryCount}
-          onClose={() => setCompletedRecoveryCount(null)}
+          onClose={() => {
+            shouldRestorePurchaseFocus.current = true;
+            setCompletedRecoveryCount(null);
+          }}
         />
       )}
     </div>

@@ -6,8 +6,10 @@ import { fetchCsrfToken } from './api/axiosInstance';
 
 import ProtectedRoute from './components/guards/ProtectedRoute';
 import GuestOnlyRoute from './components/guards/GuestOnlyRoute';
+import useServiceOpen from './hooks/useServiceOpen';
 
 import LandingPage from './pages/Auth/LandingPage';
+import SignupPage from './pages/Auth/SignupPage';
 import ComingSoonPage from './pages/ComingSoonPage';
 
 import HomePage from './pages/HomePage';
@@ -34,6 +36,7 @@ import TimeAttackResultPage from './pages/Quiz/TimeAttack/TimeAttackResultPage';
 import PaymentResultPage from './pages/payment/PaymentResultPage';
 
 function App() {
+  const isOpen = useServiceOpen();
   //새로고침 시 로그인 상태인지 서버에 물어보고, 내정보 저장
   useEffect(() => {
     const init = async () => {
@@ -55,12 +58,21 @@ function App() {
       <Routes>
         <Route element={<GuestOnlyRoute />}>
           <Route path={ROUTES.LANDING} element={<LandingPage />}></Route>
-          {/* 커밍순 기간에는 가입 화면 대신 커밍순으로 이동 */}
+          {/* 오픈 전에는 가입 화면 대신 커밍순으로 이동 */}
           <Route
             path={ROUTES.SIGNUP}
-            element={<Navigate to={ROUTES.COMINGSOON} replace />}
+            element={
+              isOpen ? (
+                <SignupPage />
+              ) : (
+                <Navigate to={ROUTES.COMINGSOON} replace />
+              )
+            }
           />
-          <Route path={ROUTES.COMINGSOON} element={<ComingSoonPage />} />
+          <Route
+            path={ROUTES.COMINGSOON}
+            element={isOpen ? <LandingPage /> : <ComingSoonPage />}
+          />
         </Route>
 
         {/*온보딩 -> 이거 곧 삭제할게요 튜토리얼도 닉네임페이지도 안씀!*/}

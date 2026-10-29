@@ -1,3 +1,4 @@
+import type { MouseEventHandler } from 'react';
 import recoveryImage from '../../assets/store/Recover_Ticket_Orange.svg';
 
 interface RecoveryProductCardProps {
@@ -5,7 +6,7 @@ interface RecoveryProductCardProps {
   fishPrice?: number;
   disabled?: boolean;
   isPurchasing?: boolean;
-  onPurchase?: () => void;
+  onPurchase?: MouseEventHandler<HTMLButtonElement>;
   fishBalance?: number | null;
   statusMessage?: string;
   onRetry?: () => void;

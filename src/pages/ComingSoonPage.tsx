@@ -12,8 +12,7 @@ import EconomicRoutineSection from '../components/landing/EconomicRoutineSection
 import FaqSection from '../components/landing/FaqSection';
 import ComingSoonClosingSection from '../components/landing/ComingSoonClosingSection';
 import LandingFooter from '../components/landing/LandingFooter';
-
-const OPEN_AT = new Date('2026-10-31T00:00:00+09:00').getTime();
+import { OPEN_AT } from '../constants/launch';
 
 const CommingSoonPage = () => {
   const [remaining, setRemaining] = useState(() =>

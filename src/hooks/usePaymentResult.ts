@@ -16,6 +16,7 @@ const PENDING = ['READY', 'PAYMENT_REQUESTED', 'APPROVED', 'CANCEL_REQUESTED'];
 
 export const usePaymentResult = (orderNumber: string | null) => {
   const [attempt, setAttempt] = useState(0);
+  const [periodAttempt, setPeriodAttempt] = useState(0);
   const [stored, setStored] = useState<{
     orderNumber: string | null;
     attempt: number;
@@ -28,6 +29,7 @@ export const usePaymentResult = (orderNumber: string | null) => {
   const [period, setPeriod] = useState<{
     paymentId: number;
     attempt: number;
+    periodAttempt: number;
     value: PassPeriod | null;
   } | null>(null);
   const state: PaymentCheckState =
@@ -144,6 +146,7 @@ export const usePaymentResult = (orderNumber: string | null) => {
         setPeriod({
           paymentId: completedId,
           attempt,
+          periodAttempt,
           value: pass
             ? { startedAt: pass.startedAt, expiresAt: pass.expiresAt }
             : null,
@@ -153,17 +156,24 @@ export const usePaymentResult = (orderNumber: string | null) => {
     return () => {
       active = false;
     };
-  }, [completedId, attempt]);
+  }, [completedId, attempt, periodAttempt]);
 
   return {
     state,
     passPeriod:
-      period?.paymentId === completedId && period.attempt === attempt
+      period?.paymentId === completedId &&
+      period.attempt === attempt &&
+      period.periodAttempt === periodAttempt
         ? period.value
         : null,
     isLoadingPassPeriod:
       completedId !== null &&
-      (period?.paymentId !== completedId || period.attempt !== attempt),
+      (period?.paymentId !== completedId ||
+        period.attempt !== attempt ||
+        period.periodAttempt !== periodAttempt),
+    retryPassPeriod: () => {
+      if (completedId !== null) setPeriodAttempt((value) => value + 1);
+    },
     retry: () => setAttempt((value) => value + 1),
   };
 };
