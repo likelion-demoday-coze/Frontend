@@ -72,7 +72,7 @@ const DailyCategoryPage = () => {
 
   return (
     <div className="flex flex-1 flex-col items-center bg-white px-4 py-8 lg:py-10">
-      <div className="flex w-full max-w-244 flex-col gap-8 lg:gap-20">
+      <div className="flex w-full max-w-244 flex-col gap-8 pb-6 lg:gap-20 lg:pb-0">
         <PageTitle
           title="오늘 집중 공략할 카테고리를 선택해주세요"
           description="8개 카테고리 중 오직 1개만 단일 선택할 수 있습니다."
