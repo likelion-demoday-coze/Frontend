@@ -1,9 +1,9 @@
 import type { RankingType } from '../types/ranking';
 
 export const ROUTES = {
-  LANDING: '/',
+  LANDING: '/landing', // '/'
   HOME: '/home',
-  COMINGSOON: '/comingsoon',
+  COMINGSOON: '/', // 삭제예정
   SIGNUP: '/signup', //백엔드가 신규 회원을 보내는 경로
 
   //온보딩

@@ -17,7 +17,7 @@ const StartInvestingSection = () => {
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+        className="pointer-events-none absolute inset-0 -z-10 hidden overflow-hidden lg:block"
       >
         <img
           src={basicCat}
@@ -63,7 +63,7 @@ const StartInvestingSection = () => {
           />
         </div>
 
-        <div className="relative z-10 -mt-4 flex w-full max-w-150 shrink-0 gap-3 md:-mt-6 md:-translate-x-[min(200px,max(0px,calc((100vw-680px)/2)))] md:gap-4">
+        <div className="relative z-10 mt-4 flex w-full max-w-150 shrink-0 justify-center gap-3 md:gap-4 lg:-mt-6 lg:-translate-x-[min(200px,max(0px,calc((100vw-680px)/2)))]">
           <button
             type="button"
             onClick={() => navigate(ROUTES.TRY)}
@@ -83,7 +83,7 @@ const StartInvestingSection = () => {
         <img
           src={textLogo}
           alt="COZ:E"
-          className="mt-3 h-14 w-auto shrink-0 self-end md:absolute md:right-0 md:bottom-0 md:mt-0 md:h-14"
+          className="mt-3 h-14 w-auto shrink-0 self-center lg:absolute lg:right-0 lg:bottom-0 lg:mt-0"
         />
       </div>
     </section>

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { getMe } from './api/auth';
 import useAuthstore from './stores/useAuthStore';
@@ -8,7 +8,6 @@ import ProtectedRoute from './components/guards/ProtectedRoute';
 import GuestOnlyRoute from './components/guards/GuestOnlyRoute';
 
 import LandingPage from './pages/Auth/LandingPage';
-import SignupPage from './pages/Auth/SignupPage';
 import ComingSoonPage from './pages/ComingSoonPage';
 
 import HomePage from './pages/HomePage';
@@ -56,7 +55,11 @@ function App() {
       <Routes>
         <Route element={<GuestOnlyRoute />}>
           <Route path={ROUTES.LANDING} element={<LandingPage />}></Route>
-          <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
+          {/* 커밍순 기간에는 가입 화면 대신 커밍순으로 이동 */}
+          <Route
+            path={ROUTES.SIGNUP}
+            element={<Navigate to={ROUTES.COMINGSOON} replace />}
+          />
           <Route path={ROUTES.COMINGSOON} element={<ComingSoonPage />} />
         </Route>
 

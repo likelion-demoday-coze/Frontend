@@ -6,7 +6,6 @@ import { useOutletContext } from 'react-router-dom';
 import PageTitleSection from '../components/common/PageTitle';
 import PassProductCard from '../components/shop/PassProductCard';
 import RecoveryProductCard from '../components/shop/RecoveryProductCard';
-import { getAttendanceToday } from '../api/attendance';
 import {
   PAYMENT_ENABLED,
   PAYMENT_DISABLED_MESSAGE,
@@ -101,12 +100,10 @@ const ShopPage = () => {
           setIsLoadingFishBalance(false);
       });
 
-    getAttendanceToday()
+    getCurrentPass()
       .then((result) => {
         if (active)
-          setPassStatus(
-            result.status === 'PASS_ACTIVE' ? 'active' : 'inactive'
-          );
+          setPassStatus(result.active ? 'active' : 'inactive');
       })
       .catch(() => {
         if (active) setPassStatus('error');

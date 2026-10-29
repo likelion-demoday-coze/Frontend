@@ -10,7 +10,7 @@ import TimeAttackSection from '../components/landing/TimeAttackSection';
 import GrowthRewardSection from '../components/landing/GrowthRewardSection';
 import EconomicRoutineSection from '../components/landing/EconomicRoutineSection';
 import FaqSection from '../components/landing/FaqSection';
-import StartInvestingSection from '../components/landing/StartInvestingSection';
+import ComingSoonClosingSection from '../components/landing/ComingSoonClosingSection';
 import LandingFooter from '../components/landing/LandingFooter';
 
 const OPEN_AT = new Date('2026-10-31T00:00:00+09:00').getTime();
@@ -130,10 +130,8 @@ const CommingSoonPage = () => {
       <GrowthRewardSection />
       <EconomicRoutineSection />
       <FaqSection />
-      <div className="flex min-h-dvh flex-col overflow-x-clip">
-        <StartInvestingSection />
-        <LandingFooter />
-      </div>
+      <ComingSoonClosingSection countdown={countdown} />
+      <LandingFooter />
     </div>
   );
 };
