@@ -1,6 +1,12 @@
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Card } from '../../common/Card';
 import type { MyRankSummary } from '../../../types/myRank';
-import { Link } from 'react-router-dom';
+
+const formatRemainingTime = (seconds: number) =>
+  [Math.floor(seconds / 3600), Math.floor((seconds % 3600) / 60), seconds % 60]
+    .map((value) => String(value).padStart(2, '0'))
+    .join(':');
 
 const MyRankSummaryCard = ({
   title,
@@ -9,17 +15,36 @@ const MyRankSummaryCard = ({
   footnote,
   stats,
   challengeTo,
+  resetAt,
 }: MyRankSummary) => {
+  const [now, setNow] = useState(Date.now);
+  useEffect(() => {
+    if (resetAt === undefined || !Number.isFinite(resetAt)) return;
+    const timer = setInterval(() => {
+      const current = Date.now();
+      setNow(current);
+      if (current >= resetAt) clearInterval(timer);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [resetAt]);
+
+  const note =
+    resetAt !== undefined && Number.isFinite(resetAt)
+      ? `초기화까지 ${formatRemainingTime(Math.max(0, Math.ceil((resetAt - now) / 1000)))}`
+      : footnote;
+
   return (
-    <Card className="flex gap-2 xl:gap-5 bg-white p-5 h-full justify-between">
-      <div className="flex min-w-0 max-w-full flex-col gap-5">
-        <h3 className="text-[14px] text-gray-60 font-semibold">{title}</h3>
-        <div className="flex gap-4.5">
-          <span className="flex items-center text-[24px] text-blue-60">
+    <Card className="grid min-h-42.5 w-full grid-cols-[minmax(0,1fr)_108px] gap-x-3 gap-y-2 bg-white p-5">
+      <div
+        className={`flex min-w-0 flex-col justify-between gap-3 ${challengeTo ? '' : 'row-span-2'}`}
+      >
+        <h3 className="text-[16px] font-semibold break-keep text-gray-60">
+          {title}
+        </h3>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="flex items-baseline gap-2 whitespace-nowrap text-[32px] leading-tight font-medium text-blue-60">
             {rank ?? '-'}
-            {rank !== null && (
-              <span className="px-2 text-[14px] text-gray-60">위</span>
-            )}
+            <span className="text-[14px] font-normal text-gray-60">위</span>
           </span>
           {!!change && (
             <span className="flex items-center gap-1 text-sm font-semibold">
@@ -30,30 +55,41 @@ const MyRankSummaryCard = ({
             </span>
           )}
         </div>
-        {/* 안내문이 있을 때만 줄을 그림 */}
-        {footnote && <p className="text-[12px] text-gray-60">{footnote}</p>}
+        {!challengeTo && note && (
+          <p className="text-[12px] leading-relaxed tabular-nums text-gray-60">
+            {note}
+          </p>
+        )}
       </div>
       {challengeTo ? (
         <Link
           to={challengeTo}
-          className="flex w-30 min-w-0 shrink items-center justify-center self-center whitespace-nowrap rounded-2xl bg-blue-60 px-2 py-3 xl:px-3 xl:py-4 text-[14px] font-semibold text-white"
+          className="flex min-h-13 items-center justify-center self-center rounded-2xl bg-blue-60 px-3 py-3 text-[16px] font-semibold whitespace-nowrap text-white"
         >
           도전하기
         </Link>
       ) : (
-      <ul className="flex w-30 shrink-0 flex-col gap-4">
-        {stats.map(({ label, value }) => (
-          <li
-            key={label}
-            className="flex flex-1 items-center justify-center gap-1 rounded-2xl bg-gray-05 px-3"
-          >
-            <span className="text-[12px] text-gray-60">{label}</span>
-            <span className="text-[14px] font-semibold text-blue-60">
-              {value}
-            </span>
-          </li>
-        ))}
-      </ul>
+        <ul className="row-span-2 flex min-w-0 flex-col gap-3">
+          {stats.map(({ label, value }) => (
+            <li
+              key={label}
+              className="flex min-h-12 flex-1 items-center justify-center gap-1 rounded-2xl bg-gray-05 px-2"
+            >
+              <span className="shrink-0 text-[12px] text-gray-60">{label}</span>
+              <span
+                title={value}
+                className="min-w-0 truncate text-[16px] font-semibold text-blue-60"
+              >
+                {value}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {challengeTo && note && (
+        <p className="col-span-2 text-[12px] leading-relaxed text-gray-60">
+          {note}
+        </p>
       )}
     </Card>
   );

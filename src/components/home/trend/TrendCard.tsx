@@ -1,5 +1,4 @@
 import type { TrendItem } from '../../../types/trend';
-import { Card } from '../../common/Card';
 import macroEconomy from '../../../assets/home/category/macro_economy_blur.svg';
 import financialMarket from '../../../assets/home/category/financial_market_blur.svg';
 import stockInvestment from '../../../assets/home/category/stock_investment_blur.svg';
@@ -25,19 +24,15 @@ const CATEGORY_BACKGROUNDS: Record<string, string> = {
   LIVING_ECONOMY: livingEconomy,
 };
 
-const MAX_TITLE_LENGTH = 35;
-
 const TrendCard = ({ category, categoryCode, title, onClick }: TrendCardProps) => {
   const background = CATEGORY_BACKGROUNDS[categoryCode];
-  const shortTitle =
-    title.length > MAX_TITLE_LENGTH
-      ? `${title.slice(0, MAX_TITLE_LENGTH)}…`
-      : title;
 
   return (
-    <Card
+    <button
+      type="button"
+      aria-haspopup="dialog"
       onClick={onClick}
-      className="relative overflow-hidden flex flex-col justify-end bg-white px-4 h-55.75 py-12.5 cursor-pointer"
+      className="relative overflow-hidden flex flex-col justify-end rounded-2xl border border-gray-20 bg-white px-4 h-55.75 py-12.5 text-left cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-60"
     >
       {background && (
         <img
@@ -46,9 +41,9 @@ const TrendCard = ({ category, categoryCode, title, onClick }: TrendCardProps) =
           className="pointer-events-none absolute top-0 right-0 w-49.25 h-43 object-contain object-top-right"
         />
       )}
-      <div className="relative text-[16px] text-gray-60">{category}</div>
-      <div className="relative text-[16px] text-black font-semibold">{shortTitle}</div>
-    </Card>
+      <span className="relative block text-[16px] text-gray-60">{category}</span>
+      <span className="relative line-clamp-2 break-words text-[16px] text-black font-semibold">{title}</span>
+    </button>
   );
 };
 

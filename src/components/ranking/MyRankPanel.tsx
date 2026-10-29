@@ -57,11 +57,15 @@ const MyRankPanel = ({
             style={{ left: `${percent}%` }}
           >
             <span className="text-[10px] leading-none text-blue-60">▲</span>
-            <span className="mt-1 text-[16px] font-bold whitespace-nowrap text-blue-60">
+            <span className="mt-3 text-[16px] font-bold whitespace-nowrap text-blue-60">
               내 순위
             </span>
           </div>
           </>}
+        </div>
+        <div className="mt-3 flex justify-between text-sm text-gray-60">
+          <span>{lastRank > 0 ? `${lastRank}위` : '-'}</span>
+          <span>1위</span>
         </div>
       </div>
       <ul className="mt-24 flex flex-col gap-3">

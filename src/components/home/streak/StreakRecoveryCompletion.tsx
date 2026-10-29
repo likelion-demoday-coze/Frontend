@@ -8,6 +8,7 @@ import {
 import type { MyStreak, StreakRecovery } from '../../../api/streak';
 import type { StreakDayStatus } from '../../../types/streak';
 import useAuthstore from '../../../stores/useAuthStore';
+import { useBlockRankingReward } from '../../../hooks/useRankingRewardGate';
 import {
   RECOVERY_STATUS_CHANGED,
   isRecoveryCompletionSeen,
@@ -28,21 +29,34 @@ const StreakRecoveryCompletion = () => {
   } | null>(null);
   const seen = useRef(new Set<string>());
   const acknowledged = useRef(new Set<string>());
+  const checkKey = `${memberId}:${pathname}:${isPreview}`;
+  const [checkedKey, setCheckedKey] = useState<string | null>(null);
+  const [failedKey, setFailedKey] = useState<string | null>(null);
+  const [skippedKey, setSkippedKey] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  useBlockRankingReward(
+    isPreview ||
+      completion !== null ||
+      (memberId !== undefined && checkedKey !== checkKey)
+  );
 
   useEffect(() => {
-    if (memberId === undefined || isPreview) return;
+    if (memberId === undefined || isPreview || skippedKey === checkKey) return;
     let active = true;
     let running = false;
+    let consecutiveErrors = 0;
     let timer: ReturnType<typeof setTimeout>;
     const check = async () => {
-      if (!active || running) return;
+      if (!active || running || consecutiveErrors >= 3) return;
       running = true;
       clearTimeout(timer);
+      let retryDelay: number | null = null;
       try {
         const recovery = await getStreakRecovery();
         if (!active || !recovery) return;
         if (recovery.status === 'PENDING') {
-          timer = setTimeout(check, 10000);
+          consecutiveErrors = 0;
+          retryDelay = 10000;
           return;
         }
         const key = `${memberId}:${recovery.eventId}`;
@@ -50,14 +64,30 @@ const StreakRecoveryCompletion = () => {
           recovery.status !== 'RECOVERED' ||
           seen.current.has(key) ||
           isRecoveryCompletionSeen(memberId, recovery.eventId)
-        )
+        ) {
+          consecutiveErrors = 0;
           return;
+        }
         const streak = await getMyStreak();
+        consecutiveErrors = 0;
         if (active && streak) setCompletion({ recovery, streak });
       } catch {
-        if (active) timer = setTimeout(check, 30000);
+        consecutiveErrors += 1;
+        if (consecutiveErrors < 3) retryDelay = 30000;
+        else if (active) setFailedKey(checkKey);
       } finally {
         running = false;
+        if (active) {
+          if (retryDelay !== null) {
+            // 복구 대기·오류 재시도가 남아 있으면 랭킹 보상은 계속 대기
+            setCheckedKey(null);
+            timer = setTimeout(check, retryDelay);
+          } else if (consecutiveErrors < 3) {
+            setCheckedKey(checkKey);
+          } else {
+            setCheckedKey(null);
+          }
+        }
       }
     };
     const checkVisible = () => {
@@ -74,7 +104,44 @@ const StreakRecoveryCompletion = () => {
       window.removeEventListener('focus', checkVisible);
       document.removeEventListener('visibilitychange', checkVisible);
     };
-  }, [pathname, memberId, isPreview]);
+  }, [pathname, memberId, isPreview, checkKey, skippedKey, retryCount]);
+
+  if (failedKey === checkKey && skippedKey !== checkKey) {
+    return (
+      <div
+        role="alert"
+        className="m-6 rounded-xl border border-gray-20 bg-white p-4 text-sm text-gray-60"
+      >
+        <p>연속학습 복구 상태를 확인하지 못했어요.</p>
+        <div className="mt-3 flex flex-wrap gap-3">
+          <button
+            type="button"
+            className="text-blue-60 underline"
+            onClick={() => {
+              setFailedKey(null);
+              setRetryCount((count) => count + 1);
+            }}
+          >
+            다시 확인
+          </button>
+          <button
+            type="button"
+            className="text-blue-60 underline"
+            onClick={() => {
+              // 현재 화면에서는 복구 조회를 멈춰 보상 팝업 이후의 끼어들기를 방지
+              setSkippedKey(checkKey);
+              setCheckedKey(checkKey);
+            }}
+          >
+            보상 먼저 확인
+          </button>
+        </div>
+        <p className="mt-2">
+          보상을 먼저 확인하면 복구 상태는 다음 화면 이동 시 다시 확인해요.
+        </p>
+      </div>
+    );
+  }
 
   if (isPreview) {
     const statuses: StreakDayStatus[] = [

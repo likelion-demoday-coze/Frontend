@@ -20,7 +20,6 @@ const MobileTopNav = ({ topOffset = 0 }: { topOffset?: number }) => (
         key={to}
         to={to}
         end={to === ROUTES.HOME}
-        onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
         className={({ isActive }) =>
           `flex h-14 min-w-0 items-center justify-center border-b-2 px-1 text-[14px] whitespace-nowrap sm:text-[14px] ${isActive ? 'border-black font-bold text-black' : 'border-transparent text-gray-60'}`
         }

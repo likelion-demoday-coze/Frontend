@@ -1,11 +1,13 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Link, Outlet, matchPath, useLocation } from 'react-router-dom';
 import textLogo from '../../assets/logos/coze_text_logo_black.svg';
 import LeftNavbar from './LeftNavbar';
 import MobileTopNav from './MobileTopNav';
 import MobileHomeHero from '../home/top/MobileHomeHero';
 import { ROUTES } from '../../constants/routes';
 import TopBar from './Topbar/Topbar';
+import LandingFooter from '../landing/LandingFooter';
+import RankingRewardNotification from '../ranking/RankingRewardNotification';
 import { useMyStreak } from '../../hooks/useMyStreak';
 import { getCurrentPass } from '../../api/pass';
 import { getFishBalance } from '../../api/fish';
@@ -14,8 +16,13 @@ import type { PassOrCash } from '../../types/PassOrCash';
 const Layout = () => {
   const streakState = useMyStreak();
   const { pathname } = useLocation();
+  const isShopPage = pathname === ROUTES.SHOP;
   const [isMobile, setIsMobile] = useState(
     () => !window.matchMedia('(min-width: 1024px)').matches
+  );
+  const hideMobileNavigation = isMobile && Boolean(
+    matchPath(ROUTES.DAILY_QUIZ_PLAY, pathname) ||
+    matchPath(ROUTES.TIME_ATTACK_PLAY, pathname)
   );
   const [passOrCash, setPassOrCash] = useState<PassOrCash>({
     hasPass: false,
@@ -30,15 +37,19 @@ const Layout = () => {
     setFishBalance(balance);
   }, []);
 
+  useLayoutEffect(() => {
+    if (isMobile) window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [pathname, isMobile]);
+
   useEffect(() => {
     const element = mobileTopBarRef.current;
-    if (!isMobile || !element) return;
+    if (!isMobile || hideMobileNavigation || !element) return;
     const observer = new ResizeObserver(() => {
       setMobileTopBarHeight(Math.ceil(element.getBoundingClientRect().height));
     });
     observer.observe(element);
     return () => observer.disconnect();
-  }, [isMobile]);
+  }, [isMobile, hideMobileNavigation]);
 
   useEffect(() => {
     const query = window.matchMedia('(min-width: 1024px)');
@@ -101,10 +112,10 @@ const Layout = () => {
     };
   }, [pathname]);
   return (
-    <div className="flex min-h-screen">
+    <div className={`flex ${isShopPage ? 'min-h-dvh' : 'min-h-screen'}`}>
       <LeftNavbar />
-      <div className="min-w-0 flex-1 overflow-x-clip">
-        {isMobile && (
+      <div className={`min-w-0 flex-1 overflow-x-clip ${isShopPage ? 'flex flex-col' : ''}`}>
+        {isMobile && !hideMobileNavigation && (
           <div
             ref={mobileTopBarRef}
             className={`sticky top-0 z-50 flex flex-wrap items-center justify-between gap-3 px-6 py-4 ${pathname === ROUTES.HOME ? 'bg-blue-08' : 'bg-white'}`}
@@ -120,9 +131,11 @@ const Layout = () => {
           </div>
         )}
         {isMobile && pathname === ROUTES.HOME && <MobileHomeHero onBalanceChange={updateFishBalance} />}
-        <MobileTopNav topOffset={mobileTopBarHeight} />
+        {!hideMobileNavigation && (
+          <MobileTopNav key={pathname} topOffset={mobileTopBarHeight} />
+        )}
         {/* 본문 틀: 폭 제한 + 가운데 + 공통 패딩 */}
-        <div className="relative mx-auto w-full max-w-360 px-6 pt-6 pb-10 lg:pt-16">
+        <div className={`relative mx-auto w-full max-w-360 px-6 pt-6 pb-10 lg:pt-16 ${isShopPage ? 'flex-1' : ''}`}>
           <div className="hidden lg:absolute lg:top-16 lg:right-33.25 lg:block">
             <TopBar
               streakDays={streakState.streak?.currentStreak ?? null}
@@ -134,6 +147,10 @@ const Layout = () => {
             <Outlet context={{ ...streakState, updateFishBalance, isMobile }} />
           </main>
         </div>
+        {(pathname === ROUTES.HOME || pathname === ROUTES.RANKING) && (
+          <RankingRewardNotification onBalanceChange={updateFishBalance} />
+        )}
+        {isShopPage && <LandingFooter />}
       </div>
     </div>
   );

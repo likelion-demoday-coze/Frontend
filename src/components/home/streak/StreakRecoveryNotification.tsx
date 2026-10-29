@@ -16,6 +16,7 @@ import nobleCat from '../../../assets/character/basic_3.svg';
 import type { StreakDayStatus } from '../../../types/streak';
 import StreakRecoveryModal from './StreakRecoveryModal';
 import { useStreakRecoveryAction } from '../../../hooks/useStreakRecoveryAction';
+import { useBlockRankingReward } from '../../../hooks/useRankingRewardGate';
 
 // 백엔드와 공통인 상품 코드로 복구권을 구분
 const RECOVERY_CODE = 'STREAK_RECOVERY';
@@ -70,8 +71,12 @@ const StreakRecoveryNotification = () => {
   const [state, setState] =
     useState<Awaited<ReturnType<typeof loadNotification>>>(null);
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
   const recoveryAction = useStreakRecoveryAction(() => setState(null));
   const acknowledged = useRef(new Set<number>());
+  useBlockRankingReward(
+    isLoading || state !== null || Boolean(recoveryAction.modal)
+  );
 
   useEffect(() => {
     let active = true;
@@ -86,6 +91,9 @@ const StreakRecoveryNotification = () => {
               ? error.message
               : '복구 알림을 불러오지 못했어요.'
           );
+      })
+      .finally(() => {
+        if (active) setIsLoading(false);
       });
     return () => {
       active = false;

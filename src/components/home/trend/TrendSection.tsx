@@ -62,7 +62,12 @@ const TrendSection = () => {
             {message}
           </p>
         ) : (
-          <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+          <div
+            role="region"
+            aria-label="경제 트렌드 카드 목록"
+            tabIndex={0}
+            className="mt-4 grid auto-cols-[200px] grid-flow-col snap-x snap-proximity gap-3 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-2 [&>*]:snap-start md:auto-cols-auto md:grid-flow-row md:grid-cols-3 md:snap-none md:overflow-x-visible md:pb-0"
+          >
             {items.map((item, index) => (
               <TrendCard
                 key={item.trendId}

@@ -12,6 +12,9 @@ interface RankingRewardModalProps {
   score: number;
   balanceBefore?: number;
   balanceAfter?: number;
+  rankingDate?: string;
+  isAcknowledging?: boolean;
+  errorMessage?: string;
   onClose: () => void;
   onViewRanking: () => void;
 }
@@ -25,6 +28,9 @@ const RankingRewardModal = ({
   score,
   balanceBefore,
   balanceAfter,
+  rankingDate,
+  isAcknowledging = false,
+  errorMessage,
   onClose,
   onViewRanking,
 }: RankingRewardModalProps) => {
@@ -33,6 +39,7 @@ const RankingRewardModal = ({
   const [balance, setBalance] = useState<number | null>(null);
   const isRegular = type === 'regular';
   const rankingName = isRegular ? '정규장' : '시간외거래';
+  const dateLabel = rankingDate ? rankingDate.replaceAll('-', '.') : '어제';
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -40,17 +47,18 @@ const RankingRewardModal = ({
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     let ignore = false;
-    getFishBalance()
-      .then((result) => {
-        if (!ignore) setBalance(result);
-      })
-      .catch(() => {});
+    if (balanceBefore === undefined || balanceAfter === undefined)
+      getFishBalance()
+        .then((result) => {
+          if (!ignore) setBalance(result);
+        })
+        .catch(() => {});
     return () => {
       ignore = true;
       dialog?.close();
       document.body.style.overflow = previousOverflow;
     };
-  }, []);
+  }, [balanceBefore, balanceAfter]);
 
   return (
     <dialog
@@ -58,13 +66,13 @@ const RankingRewardModal = ({
       aria-labelledby={titleId}
       onCancel={(event) => {
         event.preventDefault();
-        onClose();
+        if (!isAcknowledging) onClose();
       }}
-      className="m-auto w-[calc(100%-32px)] max-w-103 rounded-[20px] border-0 bg-white p-6 backdrop:bg-black/30"
+      className="m-auto w-[calc(100%-32px)] max-h-[calc(100dvh-32px)] overflow-y-auto max-w-103 rounded-[20px] border-0 bg-white p-6 backdrop:bg-black/30"
     >
       <div className="relative flex flex-col items-center text-center">
-        <span className="absolute top-0 left-0 rounded-lg border border-blue-60 px-3 py-2 text-sm font-bold text-blue-60">
-          어제의 랭킹 보상
+        <span className="self-start rounded-lg border border-blue-60 px-3 py-2 text-sm font-bold text-blue-60">
+          {dateLabel} 랭킹 보상
         </span>
         <img
           src={RANK_IMAGES[rank]}
@@ -78,7 +86,7 @@ const RankingRewardModal = ({
           id={titleId}
           className="mt-5 text-lg font-bold break-keep text-black"
         >
-          어제 {rankingName} 랭킹 {rank}위를 했어요
+          {dateLabel} {rankingName} 랭킹 {rank}위를 했어요
         </h2>
         <p className="mt-2 text-sm text-gray-60">
           {isRegular
@@ -125,7 +133,7 @@ const RankingRewardModal = ({
           </div>
           <div className="flex items-center justify-between gap-2 py-3">
             <dt className="text-gray-60">
-              {isRegular ? '어제 최종 주가' : '최고 기록'}
+              {isRegular ? '최종 주가' : '최고 기록'}
             </dt>
             <dd className="font-semibold text-blue-60">
               {isRegular
@@ -137,20 +145,27 @@ const RankingRewardModal = ({
             </dd>
           </div>
         </dl>
+        {errorMessage && (
+          <p role="alert" className="mt-3 text-sm text-red-55">
+            {errorMessage}
+          </p>
+        )}
         <div className="mt-5 flex w-full gap-4 px-5">
           <button
             type="button"
             onClick={onViewRanking}
-            className="h-14 flex-1 cursor-pointer rounded-xl border border-gray-10 bg-white font-semibold text-gray-40"
+            disabled={isAcknowledging}
+            className="h-14 flex-1 cursor-pointer rounded-xl border border-gray-10 bg-white font-semibold text-gray-40 disabled:cursor-wait disabled:opacity-60"
           >
             랭킹 보기
           </button>
           <button
             type="button"
             onClick={onClose}
-            className="h-14 flex-1 cursor-pointer rounded-xl bg-blue-60 font-semibold text-white"
+            disabled={isAcknowledging}
+            className="h-14 flex-1 cursor-pointer rounded-xl bg-blue-60 font-semibold text-white disabled:cursor-wait disabled:opacity-60"
           >
-            확인
+            {isAcknowledging ? '확인 중…' : '확인'}
           </button>
         </div>
       </div>

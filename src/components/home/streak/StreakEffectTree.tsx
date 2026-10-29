@@ -73,7 +73,7 @@ const StreakEffectTree = ({ data }: StreakEffectTreeProps) => {
             <ProgressBar percent={percentage} />
           </div>
 
-          <div className="mt-3 flex items-center justify-between gap-2 text-[11px]">
+          <div className="mt-3 flex items-center justify-between gap-2 text-[14px]">
             <span className="shrink-0 text-gray-40">{progress.from}일</span>
 
             <p className="text-center text-gray-60">

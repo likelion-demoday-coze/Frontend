@@ -75,7 +75,7 @@ const StreakNotice = ({ view, deadlineLabel }: StreakNoticeProps) => {
 
   return (
     <div
-      className={`flex min-h-10 flex-col items-center justify-center rounded-lg border px-2 py-2 text-center text-[11px] leading-4 ${borderClass}`}
+      className={`flex min-h-10 flex-col items-center justify-center rounded-lg border px-2 py-2 text-center text-[12px] leading-4 ${borderClass}`}
     >
       <p
         className={`flex items-center justify-center gap-1 ${

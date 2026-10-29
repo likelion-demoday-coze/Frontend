@@ -5,7 +5,7 @@ const TimeAttackSection = () => {
   return (
     <section
       aria-labelledby="time-attack-title"
-      className="flex min-h-dvh flex-col overflow-x-clip bg-gray-05 px-[clamp(24px,11.11vw,160px)] pt-[clamp(24px,11.11dvh,100px)] pb-[clamp(24px,4dvh,40px)]"
+      className="flex min-h-dvh flex-col overflow-x-clip bg-white px-[clamp(24px,11.11vw,160px)] pt-[clamp(24px,11.11dvh,100px)] pb-[clamp(24px,4dvh,40px)]"
     >
       <div className="mx-auto flex min-h-min w-full max-w-300 flex-1 flex-col">
         <div className="grid shrink-0 gap-4 md:grid-cols-[minmax(0,667fr)_minmax(0,387fr)] md:gap-x-[clamp(24px,4vw,64px)]">

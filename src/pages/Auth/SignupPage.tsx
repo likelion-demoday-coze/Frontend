@@ -74,6 +74,7 @@ const MESSAGE: Record<Status, string> = {
 
 const SignupPage = () => {
   const [nickname, setNickname] = useState('');
+  const [isAgeConfirmed, setIsAgeConfirmed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
   const [isChecked, setIsChecked] = useState(false); // 사용 가능 확인 완료
@@ -92,7 +93,12 @@ const SignupPage = () => {
     if (!viewport) return;
     const observer = new ResizeObserver(([entry]) => {
       setIsCompact(entry.contentRect.width < 1024);
-      setPageScale(Math.min(entry.contentRect.width / 1440, entry.contentRect.height / 1024));
+      setPageScale(
+        Math.min(
+          entry.contentRect.width / 1440,
+          entry.contentRect.height / 1024
+        )
+      );
     });
     observer.observe(viewport);
     return () => observer.disconnect();
@@ -165,7 +171,7 @@ const SignupPage = () => {
   // 체크 가능 조건
   const canCheck = isValid && !isChecked && !isChecking;
   //회원가입 가능 조건
-  const canSignup = isValid && isChecked && !isLoading;
+  const canSignup = isValid && isChecked && isAgeConfirmed && !isLoading;
 
   const handleCheckNickname = async () => {
     if (!canCheck) return; // 규칙 위반, 확인 완료, 요청 중이면 종료
@@ -229,114 +235,182 @@ const SignupPage = () => {
 
   return (
     <div ref={viewportRef} className="relative h-dvh overflow-hidden bg-white">
-      <div className="absolute bottom-0 origin-bottom"
-        style={isCompact ? { inset: 0 } : { left: '50%', width: 1440, height: `${100 / pageScale}%`, transform: `translateX(-50%) scale(${pageScale})` }}>
-      <header className="mx-auto w-full max-w-300 shrink-0 px-6 pt-6 lg:px-15">
-        <img src={textlogo} alt="COZ:E" className="h-6 lg:h-8" />
-      </header>
-      <div className="absolute inset-x-0 top-[clamp(80px,12dvh,140px)] bottom-0 lg:top-50 flex flex-col items-center overflow-hidden px-4">
-        <div className="z-10 w-full max-w-170 shrink-0">
-          <div className="mb-6 text-center lg:mb-13 lg:text-left">
-            <h1 className="text-[22px] font-semibold lg:text-[28px]">닉네임을 정해주세요</h1>
-            <p className="mx-auto mt-2 max-w-65 text-[14px] text-gray-60 lg:mx-0 lg:max-w-none lg:text-[18px]">
-              랭킹에 공개되는 이름이에요. 마이페이지에서 언제든 바꿀 수 있어요.
+      <div
+        className="absolute bottom-0 origin-bottom"
+        style={
+          isCompact
+            ? { inset: 0 }
+            : {
+                left: '50%',
+                width: 1440,
+                height: `${100 / pageScale}%`,
+                transform: `translateX(-50%) scale(${pageScale})`,
+              }
+        }
+      >
+        <header className="mx-auto w-full max-w-300 shrink-0 px-6 pt-6 lg:px-15">
+          <img src={textlogo} alt="COZ:E" className="h-6 lg:h-8" />
+        </header>
+        <div className="absolute inset-x-0 top-[clamp(80px,12dvh,140px)] bottom-0 lg:top-50 flex flex-col items-center overflow-hidden px-4">
+          <div className="z-10 min-h-0 w-full max-w-170 overflow-y-auto">
+            <div className="mb-6 text-center lg:mb-13 lg:text-left">
+              <h1 className="text-[22px] font-semibold lg:text-[28px]">
+                닉네임을 정해주세요
+              </h1>
+              <p className="mx-auto mt-2 max-w-65 text-[14px] text-gray-60 lg:mx-0 lg:max-w-none lg:text-[18px]">
+                랭킹에 공개되는 이름이에요. 마이페이지에서 언제든 바꿀 수
+                있어요.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 lg:gap-5">
+              <div
+                className={`flex h-14 min-w-0 flex-1 items-center rounded-xl border bg-white px-3 lg:px-5 transition-colors ${style.border}`}
+              >
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={nickname}
+                  onChange={(e) => handleChange(e.target.value)}
+                  onKeyDown={(e) => {
+                    // Enter로 중복확인 가능
+                    if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+                      handleCheckNickname();
+                    }
+                  }}
+                  placeholder={`한글, 영문, 숫자 ${NICKNAME_MIN}~${NICKNAME_MAX}자`}
+                  aria-invalid={isError}
+                  aria-label="닉네임"
+                  aria-describedby="nickname-message" // 아래 메시지와 연결
+                  className="min-w-0 flex-1 bg-transparent text-base outline-none"
+                />
+
+                {/* 입력 지우기 버튼: 입력값이 있을 때만 노출 */}
+                {nickname && (
+                  <button
+                    type="button"
+                    onClick={handleClear}
+                    aria-label="입력 지우기"
+                    className="mr-3 flex h-3 w-3 items-center justify-center rounded-full bg-gray-10 text-gray-60 text-[10px] cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                )}
+
+                {/* 글자수 카운터  */}
+                <span
+                  className={`text-sm tabular-nums ${style.bedge || 'text-gray-50'}`}
+                >
+                  {nickname.length}/{NICKNAME_MAX}
+                </span>
+              </div>
+
+              {/* 중복 확인 버튼 */}
+              <button
+                type="button"
+                onClick={handleCheckNickname}
+                disabled={!canCheck}
+                className={`shrink-0 rounded-full px-4 py-2 text-[14px] font-bold transition ${
+                  isChecked
+                    ? 'cursor-default bg-gray-20 text-gray-50'
+                    : 'bg-blue-60 text-white hover:brightness-95 disabled:opacity-50'
+                }`}
+              >
+                {isChecked
+                  ? '확인완료'
+                  : isChecking
+                    ? '확인 중...'
+                    : '중복확인'}
+              </button>
+            </div>
+
+            {/* 입력중일땐 아무것도 안뜸*/}
+            <div className="mt-2 min-h-5 px-1">
+              {status !== 'idle' && (
+                <p
+                  id="nickname-message"
+                  className={`flex items-center gap-1 text-[14px] ${style.text}`}
+                  role={isError ? 'alert' : undefined}
+                >
+                  {status === 'available' && (
+                    <CheckIcon
+                      aria-hidden
+                      className={`h-3 w-3 ${style.bedge}`}
+                    />
+                  )}
+                  {isError && (
+                    <CrossIcon
+                      aria-hidden
+                      className={`h-3 w-3 ${style.bedge}`}
+                    />
+                  )}
+                  {MESSAGE[status]}
+                </p>
+              )}
+            </div>
+
+            <div className="mt-4">
+              <label className="flex cursor-pointer items-center gap-2 text-[16px] font-semibold text-black lg:text-[18px]">
+                <input
+                  type="checkbox"
+                  required
+                  aria-required="true"
+                  checked={isAgeConfirmed}
+                  onChange={(event) => setIsAgeConfirmed(event.target.checked)}
+                  disabled={isLoading}
+                  aria-describedby="signup-age-help"
+                  className="size-5 shrink-0 cursor-pointer accent-blue-60 disabled:cursor-wait"
+                />
+                만 14세 이상입니다
+              </label>
+              <p id="signup-age-help" className="mt-1 text-[12px] text-gray-60">
+                만 14세 미만은 COZ:E에 가입할 수 없어요.
+              </p>
+            </div>
+
+            <button
+              onClick={handleSignup}
+              type="button"
+              disabled={!canSignup}
+              className="mx-auto mt-4 block h-14 w-44 rounded-lg lg:mt-8 lg:h-16 lg:w-full bg-blue-60 text-[18px] font-semibold text-white transition hover:brightness-95 disabled:opacity-50"
+            >
+              {isLoading ? '가입 중...' : '투자 시작하기'}
+            </button>
+            <p className="mt-2 text-center text-[11px] leading-relaxed text-gray-60 lg:text-[12px]">
+              시작하기를 누르면 COZ:E의{' '}
+              <a
+                href="https://oil-silkworm-ddb.notion.site/407c130b53ba80ec90e5ffd7a0ded302?source=copy_link"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold underline underline-offset-2"
+              >
+                이용약관
+              </a>
+              과{' '}
+              <a
+                href="https://oil-silkworm-ddb.notion.site/407c130b53ba80bdbf28f9c444ca1e46?source=copy_link"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold underline underline-offset-2"
+              >
+                개인정보 처리방침
+              </a>
+              에 동의하는 것으로 봅니다.
             </p>
           </div>
 
-          <div className="flex items-center gap-2 lg:gap-5">
-            <div
-              className={`flex h-14 min-w-0 flex-1 items-center rounded-xl border bg-white px-3 lg:px-5 transition-colors ${style.border}`}
-            >
-              <input
-                ref={inputRef}
-                type="text"
-                value={nickname}
-                onChange={(e) => handleChange(e.target.value)}
-                onKeyDown={(e) => {
-                  // Enter로 중복확인 가능
-                  if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
-                    handleCheckNickname();
-                  }
-                }}
-                placeholder={`한글, 영문, 숫자 ${NICKNAME_MIN}~${NICKNAME_MAX}자`}
-                aria-invalid={isError}
-                aria-label="닉네임"
-                aria-describedby="nickname-message" // 아래 메시지와 연결
-                className="min-w-0 flex-1 bg-transparent text-base outline-none"
-              />
-
-              {/* 입력 지우기 버튼: 입력값이 있을 때만 노출 */}
-              {nickname && (
-                <button
-                  type="button"
-                  onClick={handleClear}
-                  aria-label="입력 지우기"
-                  className="mr-3 flex h-3 w-3 items-center justify-center rounded-full bg-gray-10 text-gray-60 text-[10px] cursor-pointer"
-                >
-                  ✕
-                </button>
-              )}
-
-              {/* 글자수 카운터  */}
-              <span
-                className={`text-sm tabular-nums ${style.bedge || 'text-gray-50'}`}
-              >
-                {nickname.length}/{NICKNAME_MAX}
-              </span>
+          <div className="relative mt-[clamp(16px,5dvh,48px)] flex min-h-0 w-full max-w-105 flex-1 flex-col items-center overflow-hidden lg:absolute lg:bottom-0 lg:mt-0 lg:block lg:h-127.5 lg:w-218.75 lg:max-w-none lg:flex-none">
+            <div className="z-10 shrink-0 rounded-full lg:absolute lg:top-[58%] lg:left-[3.2%] bg-blue-50 px-3 py-2 text-sm font-bold text-blue-05">
+              뭐라고 불러주면 될까 냥?
             </div>
 
-            {/* 중복 확인 버튼 */}
-            <button
-              type="button"
-              onClick={handleCheckNickname}
-              disabled={!canCheck}
-              className={`shrink-0 rounded-full px-4 py-2 text-[14px] font-bold transition ${
-                isChecked
-                  ? 'cursor-default bg-gray-20 text-gray-50'
-                  : 'bg-blue-60 text-white hover:brightness-95 disabled:opacity-50'
-              }`}
-            >
-              {isChecked ? '확인완료' : isChecking ? '확인 중...' : '중복확인'}
-            </button>
+            <img
+              src={isCompact ? standingCat : catImage}
+              alt="고양이"
+              className="block min-h-0 w-full flex-1 translate-y-[20%] object-contain object-bottom lg:h-auto lg:flex-none lg:translate-y-0"
+            />
           </div>
-
-          {/* 입력중일땐 아무것도 안뜸*/}
-          <div className="mt-2 min-h-5 px-1">
-            {status !== 'idle' && (
-              <p
-                id="nickname-message"
-                className={`flex items-center gap-1 text-[14px] ${style.text}`}
-                role={isError ? 'alert' : undefined}
-              >
-                {status === 'available' && (
-                  <CheckIcon aria-hidden className={`h-3 w-3 ${style.bedge}`} />
-                )}
-                {isError && (
-                  <CrossIcon aria-hidden className={`h-3 w-3 ${style.bedge}`} />
-                )}
-                {MESSAGE[status]}
-              </p>
-            )}
-          </div>
-
-          <button
-            onClick={handleSignup}
-            type="button"
-            disabled={!canSignup}
-            className="mx-auto mt-4 block h-14 w-44 rounded-lg lg:mt-8 lg:h-16 lg:w-full bg-blue-60 text-[18px] font-semibold text-white transition hover:brightness-95 disabled:opacity-50"
-          >
-            {isLoading ? '가입 중...' : '시작하기'}
-          </button>
         </div>
-
-        <div className="relative mt-[clamp(16px,5dvh,48px)] flex min-h-0 w-full max-w-105 flex-1 flex-col items-center overflow-hidden lg:absolute lg:bottom-0 lg:mt-0 lg:block lg:h-[510px] lg:w-218.75 lg:max-w-none lg:flex-none">
-          <div className="z-10 shrink-0 rounded-full lg:absolute lg:top-[58%] lg:left-[3.2%] bg-blue-50 px-3 py-2 text-sm font-bold text-blue-05">
-            뭐라고 불러주면 될까 냥?
-          </div>
-
-          <img src={isCompact ? standingCat : catImage} alt="고양이" className="block min-h-0 w-full flex-1 translate-y-[20%] object-contain object-bottom lg:h-auto lg:flex-none lg:translate-y-0" />
-        </div>
-      </div>
       </div>
     </div>
   );
