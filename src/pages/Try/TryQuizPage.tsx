@@ -8,6 +8,8 @@ import QuestionText from '../../components/quiz/QuestionText';
 import QuizCatPanel from '../../components/quiz/QuizCatPanel';
 import QuizProgressBar from '../../components/quiz/QuizProgressBar';
 import QuizStockPanel from '../../components/quiz/QuizStockPanel';
+import type { ReviewItem } from '../../components/quiz/ReviewList';
+import TryQuizSummary from '../../components/try/TryQuizSummary';
 import { startKaKaoLogin } from '../../api/auth';
 import {
   getPreviewQuizzes,
@@ -34,6 +36,7 @@ const TryQuizPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [stockPoints, setStockPoints] = useState([START_STOCK]);
   const [lastChange, setLastChange] = useState<number | null>(null);
+  const [reviewItems, setReviewItems] = useState<ReviewItem[]>([]);
   const [isFinished, setIsFinished] = useState(false);
 
   useEffect(() => {
@@ -63,8 +66,13 @@ const TryQuizPage = () => {
       return <p className="text-base text-gray-60">불러오는 중...</p>;
     }
     if (isFinished) {
-      //TODO: 맛보기 총정리 화면
-      return null;
+      return (
+        <TryQuizSummary
+          items={reviewItems}
+          startStock={START_STOCK}
+          finalStock={stockPoints[stockPoints.length - 1]}
+        />
+      );
     }
 
     const total = questions.length;
@@ -152,6 +160,17 @@ const TryQuizPage = () => {
       );
       const rise = answer.correct ? getRisePercent() : 0;
       setResult(answer);
+      setReviewItems((prev) => [
+        ...prev,
+        {
+          id: index,
+          number: index + 1,
+          content: questions[index].content,
+          correct: answer.correct,
+          correctOptionContent: answer.correctOptionContent,
+          explanation: answer.explanation,
+        },
+      ]);
       setLastChange(rise);
       setStockPoints((prev) => {
         const current = prev[prev.length - 1];
@@ -180,13 +199,15 @@ const TryQuizPage = () => {
     <div className="flex min-h-screen flex-col bg-white">
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-gray-10 px-4 lg:h-16 lg:px-10">
         <img src={textlogo} alt="COZ:E" className="h-7 w-auto lg:h-8" />
-        <button
-          type="button"
-          onClick={startKaKaoLogin}
-          className="cursor-pointer text-sm font-medium text-blue-60 lg:text-lg"
-        >
-          건너뛰고 가입하기
-        </button>
+        {!isFinished && (
+          <button
+            type="button"
+            onClick={startKaKaoLogin}
+            className="cursor-pointer text-sm font-medium text-blue-60 lg:text-lg"
+          >
+            건너뛰고 가입하기
+          </button>
+        )}
       </header>
       <main className="mx-auto w-full max-w-251.5 flex-1 px-4 pt-8 pb-10 lg:px-0 lg:pt-14">
         {renderBody()}
