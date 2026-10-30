@@ -17,6 +17,7 @@ const MyPage = () => {
   const [pass, setPass] = useState<mypass | null>(null);
   const [isError, setIsError] = useState(false);
   const [isNicknameOpen, setIsNicknameOpen] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const setMember = useAuthStore((state) => state.setMember);
 
   useEffect(() => {
@@ -34,7 +35,7 @@ const MyPage = () => {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [reloadKey]);
 
   if (!data) {
     return (
@@ -71,7 +72,7 @@ const MyPage = () => {
           )}
           <MyAssets assets={data.assets} isPass={profile.passActive} />
           <MyRecords records={data.records} />
-          <UsageHistory />
+          <UsageHistory onRefunded={() => setReloadKey((prev) => prev + 1)} />
         </div>
         <SettingsCard memberId={profile.memberId} />
       </div>
