@@ -340,7 +340,7 @@ const UsageHistory = ({ onRefunded }: UsageHistoryProps) => {
                     <button
                       type="button"
                       onClick={() => setRefundTarget(payment)}
-                      className="cursor-pointer rounded-lg border border-gray-20 bg-white px-2 py-1 text-xs font-bold text-gray-60 hover:bg-gray-05"
+                      className="cursor-pointer text-xs font-semibold text-gray-40 underline underline-offset-2"
                     >
                       환불하기
                     </button>
