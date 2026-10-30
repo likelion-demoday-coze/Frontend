@@ -1,14 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { isAxiosError } from 'axios';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import ArrowIcon from '../../assets/icons/arrow.svg?react';
 import fishImage from '../../assets/store/Fish_a.svg';
+import passImage from '../../assets/store/Pass_Big.svg';
 import { getFishTransactions } from '../../api/fish';
-import { getPaymentHistories } from '../../api/payment';
+import { cancelPayment, getPaymentHistories } from '../../api/payment';
+import { getPassHistories } from '../../api/pass';
+import QuizDialog from '../quiz/QuizDialog';
 import { ROUTES } from '../../constants/routes';
 import type { FishTransaction, FishTransactionType } from '../../types/fish';
+import type { PassHistory } from '../../types/pass';
 import type { PaymentHistory } from '../../types/payment';
-import { formatMonthDay, formatTime } from '../../utils/date';
+import {
+  formatMonthDay,
+  formatMonthDayTime,
+  formatTime,
+} from '../../utils/date';
 
 type HistoryTab = 'fish' | 'payment';
 
@@ -25,8 +34,9 @@ const fishLabels: Record<FishTransactionType, string> = {
 };
 
 const paymentStatus: Record<string, { label: string; style: string }> = {
+  APPROVED: { label: '결제 완료', style: 'border-blue-60 text-blue-60' },
   COMPLETED: { label: '결제 완료', style: 'border-blue-60 text-blue-60' },
-  REFUNDED: { label: '환불 완료', style: 'border-gray-20 text-gray-60' },
+  REFUNDED: { label: '환불 완료', style: 'border-red-55 text-red-55' },
   CANCELLED: { label: '결제 취소', style: 'border-gray-20 text-gray-60' },
   CANCEL_REQUESTED: {
     label: '취소 요청',
@@ -81,8 +91,20 @@ const EmptyHistory = ({
   </div>
 );
 
+interface UsageHistoryProps {
+  onRefunded: () => void;
+}
+
+//결제 건마다 패스가 따로 붙으므로, 그 결제의 패스가 아직 유효할 때만 환불 가능
+const isRefundable = (payment: PaymentHistory, pass?: PassHistory) => {
+  if (payment.status !== 'APPROVED' && payment.status !== 'COMPLETED')
+    return false;
+  if (!pass) return true;
+  return !pass.cancelledAt && Date.parse(pass.expiresAt) > Date.now();
+};
+
 //마이페이지 이용 내역 (FISH 내역 / 결제 내역)
-const UsageHistory = () => {
+const UsageHistory = ({ onRefunded }: UsageHistoryProps) => {
   const [tab, setTab] = useState<HistoryTab>('fish');
   const [fishItems, setFishItems] = useState<FishTransaction[] | null>(null);
   const [fishPage, setFishPage] = useState(0);
@@ -92,6 +114,12 @@ const UsageHistory = () => {
   const [fishReloadKey, setFishReloadKey] = useState(0);
   const [payments, setPayments] = useState<PaymentHistory[] | null>(null);
   const [isPaymentError, setIsPaymentError] = useState(false);
+  const [passByPayment, setPassByPayment] = useState<
+    Record<number, PassHistory>
+  >({});
+  const [refundTarget, setRefundTarget] = useState<PaymentHistory | null>(null);
+  const [isRefunding, setIsRefunding] = useState(false);
+  const refundLock = useRef(false);
 
   useEffect(() => {
     let ignore = false;
@@ -119,9 +147,18 @@ const UsageHistory = () => {
     if (tab !== 'payment' || payments || isPaymentError) return;
     let ignore = false;
     //운영 기간이 3주라 결제 내역은 한 번에 조회
-    getPaymentHistories(0, 20)
-      .then((data) => {
-        if (!ignore) setPayments(data.payments);
+    Promise.all([
+      getPaymentHistories(0, 20),
+      getPassHistories(0, 20).catch(() => null),
+    ])
+      .then(([data, passes]) => {
+        if (ignore) return;
+        setPayments(data.payments);
+        setPassByPayment(
+          Object.fromEntries(
+            (passes?.passes ?? []).map((pass) => [pass.paymentId, pass])
+          )
+        );
       })
       .catch((error) => {
         console.error('결제 내역 조회 실패', error);
@@ -131,6 +168,37 @@ const UsageHistory = () => {
       ignore = true;
     };
   }, [tab, payments, isPaymentError]);
+
+  const handleRefund = async () => {
+    if (!refundTarget || refundLock.current) return;
+    refundLock.current = true;
+    setIsRefunding(true);
+    try {
+      const result = await cancelPayment(refundTarget.paymentId);
+      setPayments(
+        (prev) =>
+          prev?.map((payment) =>
+            payment.paymentId === result.paymentId
+              ? { ...payment, status: result.status }
+              : payment
+          ) ?? prev
+      );
+      setRefundTarget(null);
+      alert(`${result.refundedAmount.toLocaleString()}원이 환불되었어요.`);
+      onRefunded();
+    } catch (error) {
+      console.error('결제 취소 실패', error);
+      const message = isAxiosError(error)
+        ? error.response?.data?.message
+        : error instanceof Error
+          ? error.message
+          : null;
+      alert(message || '환불하지 못했어요. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      refundLock.current = false;
+      setIsRefunding(false);
+    }
+  };
 
   const loadMoreFish = () => {
     if (isFishLoading) return;
@@ -262,10 +330,21 @@ const UsageHistory = () => {
                 </span>
               </span>
               <span className="flex shrink-0 flex-col-reverse items-end gap-1 lg:flex-row lg:items-center lg:gap-6">
-                <span
-                  className={`rounded-lg border px-2 py-1 text-xs font-bold ${status.style}`}
-                >
-                  {status.label}
+                <span className="flex items-center gap-2">
+                  <span
+                    className={`rounded-lg border px-2 py-1 text-xs font-bold ${status.style}`}
+                  >
+                    {status.label}
+                  </span>
+                  {isRefundable(payment, passByPayment[payment.paymentId]) && (
+                    <button
+                      type="button"
+                      onClick={() => setRefundTarget(payment)}
+                      className="cursor-pointer text-xs font-semibold text-gray-40 underline underline-offset-2"
+                    >
+                      환불하기
+                    </button>
+                  )}
                 </span>
                 <strong className="text-sm font-semibold text-black lg:text-base">
                   ₩ {payment.amount.toLocaleString()}
@@ -281,7 +360,9 @@ const UsageHistory = () => {
   return (
     <section className="flex flex-col gap-4">
       <div className="flex items-center gap-6 lg:gap-9">
-        <h2 className="text-lg font-semibold text-black lg:text-xl">이용 내역</h2>
+        <h2 className="text-lg font-semibold text-black lg:text-xl">
+          이용 내역
+        </h2>
         <div
           role="tablist"
           aria-label="이용 내역 종류"
@@ -308,6 +389,25 @@ const UsageHistory = () => {
         <p className="text-sm text-gray-40">
           결제 관련 문의는 고객센터 이메일로 주문번호를 알려 주세요.
         </p>
+      )}
+      {refundTarget && (
+        <QuizDialog
+          icon={passImage}
+          title={`${refundTarget.productName}를 환불할까요?`}
+          description={`₩ ${refundTarget.amount.toLocaleString()} 전액 환불되고\n${
+            passByPayment[refundTarget.paymentId]
+              ? `${formatMonthDayTime(passByPayment[refundTarget.paymentId].startedAt)} ~ ${formatMonthDayTime(passByPayment[refundTarget.paymentId].expiresAt)} 이용 기간이`
+              : '이 결제의 패스가'
+          } 바로 종료돼요.`}
+          secondary={{
+            label: isRefunding ? '환불 중...' : '환불하기',
+            onClick: handleRefund,
+          }}
+          primary={{ label: '닫기', onClick: () => setRefundTarget(null) }}
+          onClose={() => {
+            if (!isRefunding) setRefundTarget(null);
+          }}
+        />
       )}
     </section>
   );
