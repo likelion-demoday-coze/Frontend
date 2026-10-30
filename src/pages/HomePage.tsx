@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import useAuthstore from '../stores/useAuthStore';
 import { completeTutorial } from '../api/auth';
 import { useBlockRankingReward } from '../hooks/useRankingRewardGate';
@@ -19,9 +19,6 @@ const HomePage = () => {
     isMobile: boolean;
     updateFishBalance: (balance: number) => void;
   }>();
-  const [searchParams] = useSearchParams();
-  const isCompletionPreview =
-    import.meta.env.DEV && searchParams.get('recoveryComplete') === '1';
   const member = useAuthstore((state) => state.member);
   const isInitialized = useAuthstore((state) => state.isInitialized);
   const [isTutorialDismissed, setIsTutorialDismissed] = useState(false);
@@ -36,7 +33,7 @@ const HomePage = () => {
     member?.tutorialCompleted === false &&
     !isTutorialDismissed;
 
-  useBlockRankingReward(isTutorialOpen || isCompletionPreview);
+  useBlockRankingReward(isTutorialOpen);
 
   const closeTutorial = () => {
     setIsTutorialDismissed(true);
@@ -66,7 +63,7 @@ const HomePage = () => {
       ) : (
         <HeroSection onBalanceChange={updateFishBalance} />
       )}
-      {!isTutorialOpen && !isCompletionPreview && (
+      {!isTutorialOpen && (
         <StreakRecoveryNotification />
       )}
       <div className="mt-12 flex flex-col gap-6 lg:flex-row">
@@ -78,7 +75,7 @@ const HomePage = () => {
           <StreakSection />
         </div>
       </div>
-      {isTutorialOpen && !isCompletionPreview && (
+      {isTutorialOpen && (
         <TutorialModal
           onClose={closeTutorial}
           onComplete={handleTutorialComplete}
