@@ -51,7 +51,7 @@ const MyPage = () => {
 
   return (
     <div className="flex flex-col gap-6 lg:gap-9">
-      <h1 className="text-2xl leading-9 font-semibold text-black lg:text-[28px]">
+      <h1 className="text-xl leading-9 font-semibold text-black lg:text-[28px]">
         마이페이지
       </h1>
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
