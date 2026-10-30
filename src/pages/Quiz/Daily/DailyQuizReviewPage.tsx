@@ -43,7 +43,7 @@ const DailyQuizReviewPage = () => {
 
   return (
     <div className="flex flex-1 flex-col items-center bg-white px-4 py-8 lg:py-10">
-      <div className="flex w-full max-w-251 flex-col gap-8 lg:gap-12">
+      <div className="flex w-full max-w-251 flex-col gap-8 pb-6 lg:gap-12 lg:pb-0">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-col gap-2">
             <h1 className="flex items-center gap-3">

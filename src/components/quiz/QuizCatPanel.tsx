@@ -6,7 +6,11 @@ export type QuizCatMood = 'idle' | 'correct' | 'wrong';
 interface QuizCatPanelProps {
   mood: QuizCatMood;
   seed?: number;
+  hideStockMessages?: boolean;
 }
+
+//주가에 반영되지 않는 시간외거래에서는 빼는 문구
+const STOCK_MESSAGES = ['주가 오른다 냥!', '매수 신호다 냥!', '손절이다 냥..'];
 
 const moods: Record<
   QuizCatMood,
@@ -51,8 +55,15 @@ const moods: Record<
 };
 
 //문제풀이 고양이 창 (seed로 문제마다 말풍선 문구를 바꿈)
-const QuizCatPanel = ({ mood, seed = 0 }: QuizCatPanelProps) => {
-  const { messages, bubble, image } = moods[mood];
+const QuizCatPanel = ({
+  mood,
+  seed = 0,
+  hideStockMessages = false,
+}: QuizCatPanelProps) => {
+  const { bubble, image } = moods[mood];
+  const messages = hideStockMessages
+    ? moods[mood].messages.filter((text) => !STOCK_MESSAGES.includes(text))
+    : moods[mood].messages;
   const message = messages[seed % messages.length];
 
   return (
