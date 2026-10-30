@@ -119,9 +119,7 @@ const StreakSection = () => {
           isRestoring={recoveryAction.isSubmitting}
           deadlineLabel={
             recovery?.expiresAt
-              ? new Date(recovery.expiresAt).toLocaleString('ko-KR', {
-                  timeZone: 'Asia/Seoul',
-                })
+              ? '오늘 오후 11:59:59'
               : undefined
           }
           onStartQuiz={() => navigate(ROUTES.QUIZ)}

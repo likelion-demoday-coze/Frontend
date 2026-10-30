@@ -22,8 +22,8 @@ import { getFishBalance } from '../api/fish';
 
 // 판매 일정 API 연결 전 사용할 목데이터 (한국 시간)
 const MOCK_PASS_SCHEDULE = {
-  saleEndsAt: '2026-11-03T23:59:59.999+09:00',
-  serviceEndsAt: '2026-11-06T00:00:00+09:00',
+  saleEndsAt: '2026-11-21T23:59:59.999+09:00',
+  serviceEndsAt: '2026-11-28T23:59:59.999+09:00',
 };
 
 const ShopPage = () => {
