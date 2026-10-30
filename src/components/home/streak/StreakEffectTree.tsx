@@ -26,7 +26,7 @@ const StreakEffectTree = ({ data }: StreakEffectTreeProps) => {
 
   return (
     <div className="@container">
-      <h3 className="mb-4 text-[13px] font-semibold text-gray-40">
+      <h3 className="mb-4 hidden text-[13px] font-semibold text-gray-40 lg:block">
         이펙트 트리
       </h3>
       <div className="relative">

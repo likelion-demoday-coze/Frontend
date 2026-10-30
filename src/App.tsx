@@ -7,10 +7,12 @@ import { fetchCsrfToken } from './api/axiosInstance';
 import ProtectedRoute from './components/guards/ProtectedRoute';
 import GuestOnlyRoute from './components/guards/GuestOnlyRoute';
 import useServiceOpen from './hooks/useServiceOpen';
+import AnalyticsTracker from './components/AnalyticsTracker';
 
 import LandingPage from './pages/Auth/LandingPage';
 import SignupPage from './pages/Auth/SignupPage';
 import ComingSoonPage from './pages/ComingSoonPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 import HomePage from './pages/HomePage';
 import MyPage from './pages/MyPage';
@@ -52,6 +54,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <AnalyticsTracker />
       <Routes>
         <Route element={<GuestOnlyRoute />}>
           <Route path={ROUTES.LANDING} element={<LandingPage />}></Route>
@@ -126,6 +129,7 @@ function App() {
             />
           </Route>
         </Route>
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );

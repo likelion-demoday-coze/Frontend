@@ -100,6 +100,7 @@ const RankingPage = () => {
             className="max-h-[calc(100vh-24rem)] overflow-y-auto"
           >
             <RankList
+              key={type}
               me={view.me}
               items={view.items}
               isStock={type === 'regular'}

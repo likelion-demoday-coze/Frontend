@@ -1,5 +1,27 @@
 const pad = (value: number) => String(value).padStart(2, '0');
 
+// 랭킹 기준일을 한국 시간의 어제와 비교하고, 나머지는 연도 없이 표시
+export const formatRankingRewardDate = (
+  rankingDate?: string,
+  now = Date.now()
+) => {
+  if (!rankingDate) return '';
+  const date = new Date(`${rankingDate}T00:00:00Z`);
+  if (
+    !Number.isFinite(date.getTime()) ||
+    date.toISOString().slice(0, 10) !== rankingDate
+  )
+    return '';
+  const dayMs = 24 * 60 * 60 * 1000;
+  const kstOffset = 9 * 60 * 60 * 1000;
+  const yesterday = new Date(now + kstOffset - dayMs)
+    .toISOString()
+    .slice(0, 10);
+  return rankingDate === yesterday
+    ? '어제'
+    : `${date.getUTCMonth() + 1}월 ${date.getUTCDate()}일`;
+};
+
 //10.24.
 export const formatMonthDay = (dateTime: string) => {
   const date = new Date(dateTime);

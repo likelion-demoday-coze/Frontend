@@ -1,3 +1,5 @@
+import { useId, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 import type { StreakData } from '../../../types/streak';
 import { Card } from '../../common/Card';
 import StreakWeek from './StreakWeek';
@@ -43,6 +45,8 @@ const StreakCard = ({
   deadlineLabel,
   showWeek = true,
 }: StreakCardProps) => {
+  const [isEffectOpen, setIsEffectOpen] = useState(false);
+  const effectPanelId = useId();
   const { view, currentDays, bestDays } = data;
 
   // 복구 전에는 오늘 학습 여부와 관계없이 복구 버튼을 표시할 수 있어.
@@ -62,7 +66,7 @@ const StreakCard = ({
       : 'text-yellow-45';
 
   return (
-    <Card className="min-h-[450px] mt-4 flex w-full flex-col bg-white p-5">
+    <Card className="lg:min-h-[450px] mt-4 flex w-full flex-col bg-white p-5">
       {/* 상단: 일수 + 설명 + 버튼 또는 최고 기록 */}
       <div className="mb-5 flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
@@ -124,8 +128,30 @@ const StreakCard = ({
       </div>
 
       {/* 이펙트 단계와 진행 상태 */}
-      <div className="mt-auto pt-10">
-        <StreakEffectTree data={data} />
+      <div className="mt-5 border-t border-gray-10 pt-3 lg:mt-auto lg:border-0 lg:pt-10">
+        <button
+          type="button"
+          aria-expanded={isEffectOpen}
+          aria-controls={effectPanelId}
+          onClick={() => setIsEffectOpen((open) => !open)}
+          className="flex w-full cursor-pointer items-center justify-between gap-2 rounded-md py-2 text-sm font-semibold text-gray-60 lg:hidden"
+        >
+          이펙트 트리
+          <ChevronDown
+            aria-hidden="true"
+            className={`size-4 transition-transform duration-300 motion-reduce:transition-none ${isEffectOpen ? 'rotate-180' : ''}`}
+          />
+        </button>
+        <div
+          id={effectPanelId}
+          className={`grid transition-[grid-template-rows] duration-300 motion-reduce:transition-none lg:grid-rows-[1fr] ${isEffectOpen ? 'grid-rows-[1fr] visible' : 'grid-rows-[0fr] invisible lg:visible'}`}
+        >
+          <div className="min-h-0 overflow-hidden">
+            <div className="pt-4 lg:pt-0">
+              <StreakEffectTree data={data} />
+            </div>
+          </div>
+        </div>
       </div>
     </Card>
   );

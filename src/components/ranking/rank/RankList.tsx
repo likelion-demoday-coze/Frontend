@@ -11,7 +11,7 @@ const RankList = ({ me, items, isStock }: RankListProps) => (
   <ul className="flex flex-col ">
     {me && <RankRow {...me} isMe isStock={isStock} />}
     {items.map((item) => (
-      <RankRow key={item.rank} {...item} isStock={isStock} />
+      <RankRow key={item.memberId ?? item.nickname} {...item} isStock={isStock} />
     ))}
   </ul>
 );
