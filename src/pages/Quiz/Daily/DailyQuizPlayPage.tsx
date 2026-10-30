@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import DailyQuizEndModal from '../../../components/quiz/DailyQuizEndModal';
 import FeedbackBar from '../../../components/quiz/FeedbackBar';
@@ -18,7 +18,17 @@ import {
   submitRetryAnswer,
 } from '../../../api/dailyQuiz';
 import { getStockGraph } from '../../../api/stock';
+import { getMyCharacter } from '../../../api/character';
 import { getMyStreak, getStreakRecovery } from '../../../api/streak';
+import StreakAchievementModal from '../../../components/home/streak/StreakAchievementModal';
+import useAuthstore from '../../../stores/useAuthStore';
+import {
+  claimStreakAchievement,
+  getStreakAchievement,
+  readStreakAchievementStart,
+  rememberStreakAchievementStart,
+} from '../../../utils/streakAchievement';
+import type { StreakAchievement } from '../../../utils/streakAchievement';
 import { QUIZ_CATEGORY_INFO } from '../../../constants/quizCategory';
 import { DAILY_FISH_COST } from '../../../constants/quizCost';
 import { ROUTES, toDailyQuizReview } from '../../../constants/routes';
@@ -38,6 +48,12 @@ const DailyQuizPlayPage = () => {
   const { sessionId: sessionIdParam } = useParams();
   const sessionId = Number(sessionIdParam);
   const navigate = useNavigate();
+  const memberId = useAuthstore((state) => state.member?.memberId);
+  const finishingRef = useRef(false);
+  const activeRunRef = useRef({ active: true });
+  const [achievement, setAchievement] = useState<StreakAchievement | null>(
+    null
+  );
 
   const [session, setSession] = useState<QuizSessionDetail | null>(null);
   const [isError, setIsError] = useState(false);
@@ -60,14 +76,30 @@ const DailyQuizPlayPage = () => {
   //새로고침해도 아직 안 푼 문제부터 이어서 풀기
   useEffect(() => {
     let ignore = false;
+    const run = { active: true };
+    activeRunRef.current = run;
+    finishingRef.current = false;
     Promise.all([
       getSessionDetail(sessionId),
       getStockGraph('DAY').catch(() => null),
       getMyStreak().catch(() => null),
-      getStreakRecovery().catch(() => null),
+      getStreakRecovery().catch(() => undefined),
+      getMyCharacter().catch(() => null),
     ])
-      .then(([detail, stock, streak, recovery]) => {
+      .then(([detail, stock, streak, recovery, character]) => {
         if (ignore) return;
+        if (memberId !== undefined && streak) {
+          rememberStreakAchievementStart(memberId, sessionId, {
+            date: streak.date,
+            currentStreak: streak.currentStreak,
+            learnedToday: streak.learnedToday,
+            lastLearningDate: streak.lastLearningDate,
+            effects: character?.effects ?? null,
+            // 복구 상태를 확인하지 못했으면 일반 달성 팝업은 생략
+            recoveryPending:
+              recovery === undefined || recovery?.status === 'PENDING',
+          });
+        }
         setLearnedToday(!!streak?.learnedToday);
         setIsRecovering(recovery?.status === 'PENDING');
         if (detail.status === 'EXPIRED') {
@@ -103,8 +135,9 @@ const DailyQuizPlayPage = () => {
       });
     return () => {
       ignore = true;
+      run.active = false;
     };
-  }, [sessionId, navigate]);
+  }, [sessionId, navigate, memberId]);
 
   const leaveGuard = useLeaveGuard(!!session && !isEndOpen && !isCompleting);
 
@@ -191,20 +224,58 @@ const DailyQuizPlayPage = () => {
   };
 
   const handleFinish = async () => {
-    if (isCompleting) return;
+    if (finishingRef.current) return;
+    finishingRef.current = true;
+    const run = activeRunRef.current;
     setIsCompleting(true);
     try {
       await completeSession(sessionId);
-      navigate(toDailyQuizReview(sessionId));
     } catch (error) {
+      if (!run.active) return;
       console.error('정규장 완료 처리 실패', error);
       alert('정산하지 못했어요. 잠시 후 다시 시도해 주세요.');
+      finishingRef.current = false;
       setIsCompleting(false);
+      return;
     }
+    if (!run.active) return;
+
+    // 완료 요청이 성공한 뒤의 조회 실패로 정산 요청을 반복하지 않음
+    try {
+      const before =
+        memberId !== undefined
+          ? readStreakAchievementStart(memberId, sessionId)
+          : null;
+      if (before && !before.recoveryPending) {
+        const [streak, character, recovery] = await Promise.all([
+          getMyStreak(),
+          getMyCharacter().catch(() => null),
+          getStreakRecovery(),
+        ]);
+        if (!run.active) return;
+        const next =
+          recovery?.status === 'PENDING'
+            ? null
+            : getStreakAchievement(before, streak, character);
+        if (
+          next &&
+          memberId !== undefined &&
+          claimStreakAchievement(memberId, streak.date)
+        ) {
+          setIsEndOpen(false);
+          setAchievement(next);
+          return;
+        }
+      }
+    } catch (error) {
+      console.error('정규장 완료 후 연속학습 조회 실패', error);
+    }
+    if (run.active) navigate(toDailyQuizReview(sessionId));
   };
 
   //틀린 문제 중 아직 다시 풀지 않은 문제만 순서대로
   const handleRetry = () => {
+    if (finishingRef.current) return;
     const queue = results
       .map((isCorrect, i) => (isCorrect ? -1 : i))
       .filter((i) => i >= 0 && !session.questions[i].retryAnswered);
@@ -342,11 +413,18 @@ const DailyQuizPlayPage = () => {
         />
       )}
 
-      {result && (
+      {result && !isCompleting && (
         <FeedbackBar
           isCorrect={result.correct}
           explanation={result.explanation}
           onNext={handleNext}
+        />
+      )}
+
+      {achievement && (
+        <StreakAchievementModal
+          achievement={achievement}
+          onClose={() => navigate(toDailyQuizReview(sessionId))}
         />
       )}
     </div>
