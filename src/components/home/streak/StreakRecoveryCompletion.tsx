@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import {
   acknowledgeStreakPenaltyNotification,
   getMyStreak,
@@ -19,9 +19,6 @@ import StreakRecoveryCompleteModal from './StreakRecoveryCompleteModal';
 
 const StreakRecoveryCompletion = () => {
   const { pathname } = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const isPreview =
-    import.meta.env.DEV && searchParams.get('recoveryComplete') === '1';
   const memberId = useAuthstore((state) => state.member?.memberId);
   const [completion, setCompletion] = useState<{
     recovery: StreakRecovery;
@@ -29,19 +26,18 @@ const StreakRecoveryCompletion = () => {
   } | null>(null);
   const seen = useRef(new Set<string>());
   const acknowledged = useRef(new Set<string>());
-  const checkKey = `${memberId}:${pathname}:${isPreview}`;
+  const checkKey = `${memberId}:${pathname}`;
   const [checkedKey, setCheckedKey] = useState<string | null>(null);
   const [failedKey, setFailedKey] = useState<string | null>(null);
   const [skippedKey, setSkippedKey] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   useBlockRankingReward(
-    isPreview ||
-      completion !== null ||
+    completion !== null ||
       (memberId !== undefined && checkedKey !== checkKey)
   );
 
   useEffect(() => {
-    if (memberId === undefined || isPreview || skippedKey === checkKey) return;
+    if (memberId === undefined || skippedKey === checkKey) return;
     let active = true;
     let running = false;
     let consecutiveErrors = 0;
@@ -104,7 +100,7 @@ const StreakRecoveryCompletion = () => {
       window.removeEventListener('focus', checkVisible);
       document.removeEventListener('visibilitychange', checkVisible);
     };
-  }, [pathname, memberId, isPreview, checkKey, skippedKey, retryCount]);
+  }, [pathname, memberId, checkKey, skippedKey, retryCount]);
 
   if (failedKey === checkKey && skippedKey !== checkKey) {
     return (
@@ -140,45 +136,6 @@ const StreakRecoveryCompletion = () => {
           보상을 먼저 확인하면 복구 상태는 다음 화면 이동 시 다시 확인해요.
         </p>
       </div>
-    );
-  }
-
-  if (isPreview) {
-    const statuses: StreakDayStatus[] = [
-      'completed',
-      'restored',
-      'todayCompleted',
-      'incomplete',
-      'incomplete',
-      'incomplete',
-      'incomplete',
-    ];
-    return (
-      <StreakRecoveryCompleteModal
-        streakDays={8}
-        days={['월', '화', '수', '목', '금', '토', '일'].map(
-          (label, index) => ({
-            id: `example-${index}`,
-            label,
-            status: statuses[index],
-          })
-        )}
-        restoredDate="2026-10-27"
-        stockBefore={115}
-        stockAfter={142.15}
-        requestedBeforeLearning={false}
-        onShown={() => {}}
-        onClose={() =>
-          setSearchParams(
-            (previous) => {
-              const next = new URLSearchParams(previous);
-              next.delete('recoveryComplete');
-              return next;
-            },
-            { replace: true }
-          )
-        }
-      />
     );
   }
 

@@ -77,14 +77,16 @@ const RankingPage = () => {
   );
 
   return (
-    <div className="mx-auto w-full max-w-260">
-      <TapToggle
-        tabs={TABS}
-        value={type}
-        onChange={(key) => setParams({ tab: key }, { replace: true })}
-      />
+    <div className="-mx-6 w-[calc(100%+48px)] max-w-260 lg:mx-auto lg:w-full">
+      <div className="flex justify-center border-b border-gray-20 px-4 pb-3 lg:justify-start lg:border-0 lg:px-0 lg:pb-0">
+        <TapToggle
+          tabs={TABS}
+          value={type}
+          onChange={(key) => setParams({ tab: key }, { replace: true })}
+        />
+      </div>
 
-      <div className="mt-9.5">
+      <div className="sr-only lg:not-sr-only lg:mt-9.5">
         <PageTitleSection title={c.title} />
         <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
           <p className="text-[18px] text-gray-60">{c.description}</p>
@@ -92,12 +94,14 @@ const RankingPage = () => {
         </div>
       </div>
 
-      <div className="mt-10 flex flex-col gap-10 lg:flex-row lg:gap-18">
+      <div className="mt-6 flex flex-col gap-10 lg:mt-10 lg:flex-row lg:gap-18">
         <div className="min-w-0 flex-1">
-          <RankingRewardBanner />
+          <div className="px-5 lg:px-0">
+            <RankingRewardBanner />
+          </div>
           <div
             ref={scrollRef}
-            className="max-h-[calc(100vh-24rem)] overflow-y-auto"
+            className="max-h-[calc(100dvh-16rem)] overflow-y-auto lg:max-h-[calc(100vh-24rem)]"
           >
             <RankList
               key={type}
@@ -136,27 +140,29 @@ const RankingPage = () => {
 
         {/* 내 기록이 없으면(오늘 미참여 등) 패널을 숨김 → 시안 확인 후 정하기 */}
         {(view.me || type === 'afterhours') && (
-          <MyRankPanel
-            criteria={c.criteria}
-            actionLabel={c.actionLabel}
-            rank={view.me?.rank ?? null}
-            emptyMessage={
-              type === 'afterhours' && view.status === 'idle' && !view.me
-                ? '오늘은 아직 참여하지 않았어요!'
-                : undefined
-            }
-            lastRank={view.totalMemberCount}
-            stats={
-              view.stats.length
-                ? view.stats
-                : [
-                    { label: '상위', value: '-' },
-                    { label: '나의 최고 기록', value: '-' },
-                    { label: '유저 평균 정답수', value: '-' },
-                  ]
-            }
-            onAction={() => navigate(ACTION_PATH[type])}
-          />
+          <div className="hidden lg:block">
+            <MyRankPanel
+              criteria={c.criteria}
+              actionLabel={c.actionLabel}
+              rank={view.me?.rank ?? null}
+              emptyMessage={
+                type === 'afterhours' && view.status === 'idle' && !view.me
+                  ? '오늘은 아직 참여하지 않았어요!'
+                  : undefined
+              }
+              lastRank={view.totalMemberCount}
+              stats={
+                view.stats.length
+                  ? view.stats
+                  : [
+                      { label: '상위', value: '-' },
+                      { label: '나의 최고 기록', value: '-' },
+                      { label: '유저 평균 정답수', value: '-' },
+                    ]
+              }
+              onAction={() => navigate(ACTION_PATH[type])}
+            />
+          </div>
         )}
       </div>
     </div>

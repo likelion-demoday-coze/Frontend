@@ -71,8 +71,8 @@ const RankRow = ({
 }: RankRowProps) => {
   return (
     <li
-      className={`flex h-14 items-center gap-2 rounded-2xl px-3 cursor-pointer lg:gap-4 lg:px-5 ${
-        isMe ? 'border border-blue-60 bg-blue-08' : 'border-t border-gray-20'
+      className={`flex h-14 items-center gap-2 rounded-[20px] px-3 cursor-pointer lg:gap-4 lg:rounded-2xl lg:px-5 ${
+        isMe ? 'sticky top-0 z-10 border border-blue-60 bg-blue-08' : 'border-t border-gray-20'
       }`}
     >
       <div className="flex min-w-9 shrink-0 items-center lg:w-20">
@@ -83,12 +83,12 @@ const RankRow = ({
       </div>
       <span
         title={nickname}
-        className="min-w-0 flex-1 truncate text-[16px] font-semibold text-gray-60"
+        className={`min-w-0 flex-1 truncate text-[16px] font-semibold ${isMe ? 'text-blue-60 lg:text-gray-60' : 'text-gray-60'}`}
       >
         {nickname}
       </span>
       <div className="shrink-0">
-        <ScoreBadge value={score} isStock={isStock} />
+        <ScoreBadge value={score} isStock={isStock} isMe={isMe} />
       </div>
     </li>
   );

@@ -28,10 +28,14 @@ const RankingRewardBanner = () => {
   }, []);
 
   return (
-    <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-gray-05 px-4 py-3">
-      <div className="flex items-center gap-4">
-        <img src={fishImage} alt="" className="size-11 object-contain" />
-        <div>
+    <div className="mb-3 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-gray-05 px-4 py-3 lg:mb-5">
+      <div className="flex min-w-0 items-center gap-3 lg:gap-4">
+        <img
+          src={fishImage}
+          alt=""
+          className="size-8 shrink-0 object-contain lg:size-11"
+        />
+        <div className="min-w-0">
           <p className="text-sm font-semibold text-gray-80">
             매일 <span className="text-blue-60">1~3위</span>에게{' '}
             <span className="text-blue-60">FISH 100개!</span>
@@ -41,7 +45,7 @@ const RankingRewardBanner = () => {
           </p>
         </div>
       </div>
-      <div className="flex items-center gap-1 rounded-lg border border-blue-60 bg-white px-3 py-2 text-xs font-semibold text-blue-60">
+      <div className="hidden items-center gap-1 rounded-lg border border-blue-60 bg-white px-3 py-2 text-xs font-semibold text-blue-60 lg:flex">
         <Timer aria-hidden="true" className="size-4" />
         <span className="tabular-nums">마감까지 {remainingTime}</span>
       </div>
