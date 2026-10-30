@@ -96,7 +96,7 @@ const DailyResultChart = ({
           );
         })}
 
-        <span className="absolute top-0 left-2 flex h-9 items-center gap-2 rounded-lg border border-blue-60 bg-blue-05 px-3 text-base font-medium text-blue-60 lg:h-11 lg:text-xl">
+        <span className="absolute top-0 left-2 hidden h-9 items-center gap-2 lg:flex rounded-lg border border-blue-60 bg-blue-05 px-3 text-base font-medium text-blue-60 lg:h-11 lg:text-xl">
           <CorrectIcon aria-hidden="true" className="size-4 text-green-65" />
           {correctCount}/{total}
           <span className="sr-only">문제 정답</span>

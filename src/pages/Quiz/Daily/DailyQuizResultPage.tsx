@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import bellIcon from '../../../assets/icons/big_bell.svg';
 import CorrectIcon from '../../../assets/quiz/correct.svg?react';
 import WrongIcon from '../../../assets/quiz/wrong.svg?react';
-import PageTitle from '../../../components/common/PageTitle';
 import DailyResultChart from '../../../components/quiz/DailyResultChart';
 import { getSessionResult } from '../../../api/dailyQuiz';
 import { ROUTES, toRanking } from '../../../constants/routes';
@@ -47,10 +46,16 @@ const DailyQuizResultPage = () => {
   return (
     <div className="flex flex-1 flex-col items-center gap-8 bg-white px-4 py-8 lg:gap-12 lg:py-10">
       <div className="flex w-full max-w-240 flex-col gap-6 lg:gap-8">
-        <PageTitle
-          title="이번 정규장이 마감되었습니다."
-          description="이번 투자 결과를 확인해 보세요!"
-        />
+        <div className="flex flex-col gap-1 lg:gap-2">
+          <h1 className="text-xl font-semibold lg:text-[28px]">
+            이번 정규장이 마감되었
+            <span className="lg:hidden">어요</span>
+            <span className="hidden lg:inline">습니다.</span>
+          </h1>
+          <p className="text-sm text-gray-60 lg:text-lg">
+            이번 투자 결과를 확인해 보세요!
+          </p>
+        </div>
 
         <section className="flex flex-col gap-8 rounded-[20px] border border-gray-20 bg-white px-5 py-6 lg:gap-10 lg:px-18 lg:py-10">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
@@ -59,13 +64,13 @@ const DailyQuizResultPage = () => {
                 오늘의 총 수익
               </span>
               <div className="flex flex-wrap items-center gap-2">
-                <strong className="text-5xl font-normal text-blue-60 lg:text-[64px]">
+                <strong className="text-[32px] font-normal text-blue-60 lg:text-[64px]">
                   {isUp ? '+' : ''}
                   {result.totalProfit.toFixed(2)}
                 </strong>
-                <img src={bellIcon} alt="" className="size-14 lg:size-20" />
+                <img src={bellIcon} alt="" className="size-10 lg:size-20" />
                 <span
-                  className={`rounded-sm p-2 text-base font-bold ${isUp ? 'bg-red-05 text-red-55' : 'bg-gray-05 text-gray-60'}`}
+                  className={`rounded-sm p-1.5 text-sm font-bold lg:p-2 lg:text-base ${isUp ? 'bg-red-05 text-red-55' : 'bg-gray-05 text-gray-60'}`}
                 >
                   {isUp
                     ? `▲ ${result.totalReturnPercent.toFixed(2)}%`
@@ -73,7 +78,7 @@ const DailyQuizResultPage = () => {
                 </span>
               </div>
             </div>
-            <dl className="flex items-center justify-between gap-10 rounded-[20px] border border-gray-20 px-7 py-6 lg:w-90">
+            <dl className="hidden items-center justify-between gap-10 rounded-[20px] border border-gray-20 px-7 py-6 lg:flex lg:w-90">
               <div className="flex flex-col items-center gap-1.5">
                 <dt className="text-sm text-gray-40">시작 주가</dt>
                 <dd className="text-xl font-medium text-black">
@@ -100,7 +105,7 @@ const DailyQuizResultPage = () => {
             }))}
           />
 
-          <ol className="grid grid-cols-3 gap-3 lg:flex lg:justify-between lg:gap-4">
+          <ol className="hidden lg:flex lg:justify-between lg:gap-4">
             <li className="flex flex-col items-center justify-center gap-5 rounded-xl bg-gray-05 px-4 py-4 lg:px-6">
               <span className="text-sm text-gray-40">시작 주가</span>
               <span className="text-lg font-medium text-black">
@@ -141,6 +146,24 @@ const DailyQuizResultPage = () => {
             ))}
           </ol>
         </section>
+
+        <dl className="flex items-center gap-6 self-center rounded-[20px] border border-gray-20 px-5 py-3 lg:hidden">
+          <div className="flex flex-col gap-1">
+            <dt className="text-sm text-gray-40">시작 주가</dt>
+            <dd className="text-lg font-medium text-black">
+              {result.startStock.toFixed(2)}
+            </dd>
+          </div>
+          <span aria-hidden="true" className="text-gray-20">
+            →
+          </span>
+          <div className="flex flex-col items-end gap-1">
+            <dt className="text-sm text-gray-40">최종 주가</dt>
+            <dd className="text-lg font-bold text-blue-50">
+              {result.endStock.toFixed(2)}
+            </dd>
+          </div>
+        </dl>
       </div>
 
       {/*TODO: 공통 Button 컴포넌트가 생기면 교체*/}
