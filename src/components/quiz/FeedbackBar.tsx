@@ -40,7 +40,7 @@ const FeedbackBar = ({
       <section
         ref={barRef}
         aria-live="polite"
-        className="fixed inset-x-0 bottom-0 z-30 w-full bg-gray-05 px-4 pt-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-[0_-4px_12px_rgba(0,0,0,0.06)] lg:static lg:px-0 lg:py-7 lg:shadow-none"
+        className="fixed inset-x-0 bottom-0 z-30 max-h-dvh w-full overflow-y-auto bg-gray-05 px-4 pt-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-[0_-4px_12px_rgba(0,0,0,0.06)] lg:static lg:max-h-none lg:overflow-visible lg:px-0 lg:py-7 lg:shadow-none"
       >
         <div className="mx-auto flex w-full max-w-251.5 flex-col gap-4 lg:flex-row lg:items-center lg:gap-15">
           <div className="flex flex-1 items-start gap-4 lg:items-center lg:gap-15">
@@ -57,7 +57,12 @@ const FeedbackBar = ({
               >
                 {isCorrect ? '정답입니다' : '오답입니다'}
               </strong>
-              <p className="max-h-[30vh] overflow-y-auto text-sm leading-5.5 font-medium break-keep text-gray-60 lg:max-h-none lg:overflow-visible lg:text-base">
+              <p
+                tabIndex={0}
+                role="region"
+                aria-label="해설"
+                className="max-h-[30vh] overflow-y-auto text-sm leading-5.5 font-medium break-keep text-gray-60 lg:max-h-none lg:overflow-visible lg:text-base"
+              >
                 {explanation}
               </p>
             </div>
