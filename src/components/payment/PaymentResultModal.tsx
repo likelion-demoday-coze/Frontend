@@ -4,6 +4,7 @@ import { LoaderCircle } from 'lucide-react';
 import completeIcon from '../../assets/payment/pay_complete.svg';
 import cancelledIcon from '../../assets/payment/pay_cancle.svg';
 import failureIcon from '../../assets/payment/pay_incomplete.svg';
+import passImage from '../../assets/store/Pass_Big.svg';
 import type { PaymentDetail } from '../../types/payment';
 import {
   PAYMENT_ENABLED,
@@ -19,6 +20,21 @@ type Closeable = { onClose: () => void };
 
 export type PaymentResultModalProps =
   | { status: 'checking'; message?: string }
+  | (Closeable & {
+      status:
+        | 'refund-confirm'
+        | 'refund-success'
+        | 'refund-pending'
+        | 'refund-failed';
+      amount: number;
+      orderNumber: string;
+      passPeriod: { startedAt: string; expiresAt: string } | null;
+      isRetrying?: boolean;
+      failureMessage?: string;
+      onRetry: () => void;
+      onHome: () => void;
+      onContact: () => void;
+    })
   | (Closeable & {
       status: 'delayed';
       onContact?: () => void;
@@ -49,6 +65,10 @@ export type PaymentResultModalProps =
     });
 
 const TITLES = {
+  'refund-confirm': '일주일 패스를 환불할까요?',
+  'refund-success': '환불이 완료되었습니다',
+  'refund-pending': '환불을 처리하고 있어요',
+  'refund-failed': '환불하지 못했어요',
   checking: '결제를 확인하고 있어요',
   delayed: '확인이 늦어지고 있어요',
   success: '결제가 완료되었습니다',
@@ -60,7 +80,10 @@ const TITLES = {
 const PaymentResultModal = (props: PaymentResultModalProps) => {
   const titleId = useId();
   const isChecking = props.status === 'checking';
-  const isWaiting = isChecking || props.status === 'delayed';
+  const isWaiting =
+    isChecking ||
+    props.status === 'delayed' ||
+    props.status === 'refund-pending';
   const isRetrying = 'isRetrying' in props && !!props.isRetrying;
   let description: ReactNode = null;
   let rows: PaymentSummaryRow[] = [];
@@ -70,6 +93,57 @@ const PaymentResultModal = (props: PaymentResultModalProps) => {
   } | null = null;
 
   switch (props.status) {
+    case 'refund-confirm':
+      description = `${props.amount.toLocaleString('ko-KR')}원이 전액 환불되고, 패스 혜택은 바로 종료돼요.`;
+      rows = [
+        {
+          label: '이용기간',
+          value: props.passPeriod
+            ? `${formatPaymentDateTime(props.passPeriod.startedAt)} ~ ${formatPaymentDateTime(props.passPeriod.expiresAt)}`
+            : '이용 기간 확인 불가',
+        },
+        {
+          label: '환불금액',
+          value: `₩ ${props.amount.toLocaleString('ko-KR')}`,
+          emphasis: 'red',
+        },
+      ];
+      break;
+    case 'refund-success':
+      rows = [
+        {
+          label: '환불 금액',
+          value: `${props.amount.toLocaleString('ko-KR')}원`,
+        },
+        { label: '주문번호', value: props.orderNumber },
+      ];
+      break;
+    case 'refund-pending':
+      description = (
+        <>
+          결제사 확인이 늦어지고 있어요.
+          <br />
+          결제 내역에서 환불 상태를 다시 확인해 주세요.
+        </>
+      );
+      break;
+    case 'refund-failed':
+      description =
+        props.failureMessage || '계속 실패하면 주문번호와 함께 문의해 주세요.';
+      rows = [{ label: '주문번호', value: props.orderNumber }];
+      actions = {
+        secondary: {
+          label: '홈으로',
+          onClick: props.onHome,
+          disabled: isRetrying,
+        },
+        primary: {
+          label: isRetrying ? '확인 중...' : '다시 시도하기',
+          onClick: props.onRetry,
+          disabled: isRetrying,
+        },
+      };
+      break;
     case 'checking':
       description =
         props.message ??
@@ -160,16 +234,18 @@ const PaymentResultModal = (props: PaymentResultModalProps) => {
         role={isChecking ? 'status' : undefined}
         className={`flex flex-col items-center text-center ${isChecking ? 'py-2' : ''}`}
       >
-        {isWaiting ? (
+        {props.status === 'refund-confirm' ? (
+          <img src={passImage} alt="" className="size-28 object-contain" />
+        ) : isWaiting ? (
           <LoaderCircle
             aria-hidden="true"
-            className={`size-12 text-blue-60 ${isChecking ? 'animate-spin motion-reduce:animate-none' : ''}`}
+            className={`size-12 text-blue-60 ${isChecking || props.status === 'refund-pending' ? 'animate-spin motion-reduce:animate-none' : ''}`}
             strokeWidth={1.5}
           />
         ) : (
           <img
             src={
-              props.status === 'success'
+              props.status === 'success' || props.status === 'refund-success'
                 ? completeIcon
                 : props.status === 'cancelled' || props.status === 'refunded'
                   ? cancelledIcon
@@ -194,7 +270,7 @@ const PaymentResultModal = (props: PaymentResultModalProps) => {
         )}
       </div>
       {rows.length > 0 && <PaymentSummary rows={rows} />}
-      {props.status === 'failed' && (
+      {(props.status === 'failed' || props.status === 'refund-failed') && (
         <p className="mt-3 text-center text-xs leading-5 text-gray-60">
           계속 실패하면{' '}
           <button
@@ -212,6 +288,57 @@ const PaymentResultModal = (props: PaymentResultModalProps) => {
         <p role="status" className="mt-3 text-center text-xs text-gray-60">
           {PAYMENT_DISABLED_MESSAGE}
         </p>
+      )}
+      {props.status === 'refund-confirm' && (
+        <>
+          <p
+            role={isRetrying ? 'status' : undefined}
+            className={`mt-3 text-center text-xs leading-5 ${isRetrying ? 'text-blue-60' : 'text-gray-50'}`}
+          >
+            {isRetrying
+              ? '환불을 요청하고 있어요. 창을 닫지 마세요.'
+              : '카드사에 따라 실제 취소는 3~7영업일 걸릴 수 있습니다.'}
+          </p>
+          <div className="mt-7 flex gap-3">
+            <button
+              type="button"
+              onClick={props.onClose}
+              disabled={isRetrying}
+              className="min-h-14 min-w-0 flex-1 cursor-pointer rounded-xl border border-gray-20 px-3 text-gray-40 disabled:opacity-50"
+            >
+              취소
+            </button>
+            <button
+              type="button"
+              onClick={props.onRetry}
+              disabled={isRetrying || !PAYMENT_ENABLED}
+              className="flex min-h-14 min-w-0 flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-red-55 px-3 font-semibold text-red-55 disabled:cursor-wait disabled:bg-red-02"
+            >
+              {isRetrying && (
+                <LoaderCircle
+                  aria-hidden="true"
+                  className="size-5 animate-spin motion-reduce:animate-none"
+                />
+              )}
+              {isRetrying ? '처리중' : '환불하기'}
+            </button>
+          </div>
+          {!PAYMENT_ENABLED && (
+            <p className="mt-3 text-center text-xs text-gray-60">
+              {PAYMENT_DISABLED_MESSAGE}
+            </p>
+          )}
+        </>
+      )}
+      {(props.status === 'refund-success' ||
+        props.status === 'refund-pending') && (
+        <button
+          type="button"
+          onClick={props.onClose}
+          className="mx-auto mt-7 block min-h-14 w-36 cursor-pointer rounded-xl border border-gray-20 font-semibold text-gray-40"
+        >
+          확인
+        </button>
       )}
       {actions && <PaymentModalActions {...actions} />}
       {props.status === 'success' && (

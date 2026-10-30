@@ -29,7 +29,9 @@ export const createPaymentOrder = async (
 export const cancelPayment = async (paymentId: number) => {
   if (!PAYMENT_ENABLED) throw new Error(PAYMENT_DISABLED_MESSAGE);
   const { data } = await api.post<ApiResponse<CancelPaymentResult>>(
-    `/api/v1/payments/${paymentId}/cancel`
+    `/api/v1/payments/${paymentId}/cancel`,
+    undefined,
+    { timeout: 30000, suppressNetworkAlert: true }
   );
   if (!data.isSuccess) throw new Error(data.message);
   return data.result;
@@ -38,7 +40,8 @@ export const cancelPayment = async (paymentId: number) => {
 // 내 결제 내역 상세 조회
 export const getPaymentDetail = async (paymentId: number) => {
   const { data } = await api.get<ApiResponse<PaymentDetail>>(
-    `/api/v1/payments/${paymentId}`
+    `/api/v1/payments/${paymentId}`,
+    { timeout: 15000, suppressNetworkAlert: true }
   );
   if (!data.isSuccess) throw new Error(data.message);
   return data.result;

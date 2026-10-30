@@ -1,23 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 import { isAxiosError } from 'axios';
 import type { ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ArrowIcon from '../../assets/icons/arrow.svg?react';
 import fishImage from '../../assets/store/Fish_a.svg';
-import passImage from '../../assets/store/Pass_Big.svg';
 import { getFishTransactions } from '../../api/fish';
-import { cancelPayment, getPaymentHistories } from '../../api/payment';
+import {
+  cancelPayment,
+  getPaymentDetail,
+  getPaymentHistories,
+} from '../../api/payment';
 import { getPassHistories } from '../../api/pass';
-import QuizDialog from '../quiz/QuizDialog';
+import PaymentResultModal from '../payment/PaymentResultModal';
 import { ROUTES } from '../../constants/routes';
 import type { FishTransaction, FishTransactionType } from '../../types/fish';
 import type { PassHistory } from '../../types/pass';
 import type { PaymentHistory } from '../../types/payment';
-import {
-  formatMonthDay,
-  formatMonthDayTime,
-  formatTime,
-} from '../../utils/date';
+import { formatMonthDay, formatTime } from '../../utils/date';
 
 type HistoryTab = 'fish' | 'payment';
 
@@ -105,6 +104,7 @@ const isRefundable = (payment: PaymentHistory, pass?: PassHistory) => {
 
 //마이페이지 이용 내역 (FISH 내역 / 결제 내역)
 const UsageHistory = ({ onRefunded }: UsageHistoryProps) => {
+  const navigate = useNavigate();
   const [tab, setTab] = useState<HistoryTab>('fish');
   const [fishItems, setFishItems] = useState<FishTransaction[] | null>(null);
   const [fishPage, setFishPage] = useState(0);
@@ -120,6 +120,34 @@ const UsageHistory = ({ onRefunded }: UsageHistoryProps) => {
   const [refundTarget, setRefundTarget] = useState<PaymentHistory | null>(null);
   const [isRefunding, setIsRefunding] = useState(false);
   const refundLock = useRef(false);
+  const active = useRef(true);
+  const refundTrigger = useRef<HTMLButtonElement | null>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const [refundPhase, setRefundPhase] = useState<
+    'refund-confirm' | 'refund-success' | 'refund-pending' | 'refund-failed'
+  >('refund-confirm');
+  const [refundAmount, setRefundAmount] = useState<number | null>(null);
+  const [refundError, setRefundError] = useState('');
+
+  useEffect(() => {
+    active.current = true;
+    return () => {
+      active.current = false;
+    };
+  }, []);
+
+  const closeRefund = () => {
+    if (refundLock.current) return;
+    const completed = refundPhase === 'refund-success';
+    setRefundTarget(null);
+    if (refundPhase === 'refund-pending') setPayments(null);
+    if (completed) onRefunded();
+    window.requestAnimationFrame(() => {
+      const trigger = refundTrigger.current;
+      if (trigger?.isConnected && !trigger.disabled) trigger.focus();
+      else headingRef.current?.focus();
+    });
+  };
 
   useEffect(() => {
     let ignore = false;
@@ -171,32 +199,60 @@ const UsageHistory = ({ onRefunded }: UsageHistoryProps) => {
 
   const handleRefund = async () => {
     if (!refundTarget || refundLock.current) return;
+    const target = refundTarget;
+    const retrying = refundPhase === 'refund-failed';
     refundLock.current = true;
     setIsRefunding(true);
+    setRefundError('');
     try {
-      const result = await cancelPayment(refundTarget.paymentId);
+      // 응답이 끊겼을 수 있으므로 재요청 전에 결제 상태부터 확인
+      const current = retrying
+        ? await getPaymentDetail(target.paymentId)
+        : null;
+      const result =
+        current &&
+        current.status !== 'COMPLETED' &&
+        current.status !== 'APPROVED'
+          ? current
+          : await cancelPayment(target.paymentId);
+      if (!active.current) return;
       setPayments(
         (prev) =>
           prev?.map((payment) =>
-            payment.paymentId === result.paymentId
+            payment.paymentId === target.paymentId
               ? { ...payment, status: result.status }
               : payment
           ) ?? prev
       );
-      setRefundTarget(null);
-      alert(`${result.refundedAmount.toLocaleString()}원이 환불되었어요.`);
-      onRefunded();
+      if (result.status === 'REFUNDED' || result.status === 'CANCELLED') {
+        setRefundAmount(
+          'refundedAmount' in result ? result.refundedAmount : result.amount
+        );
+        setRefundPhase('refund-success');
+      } else if (result.status === 'CANCEL_REQUESTED') {
+        setRefundPhase('refund-pending');
+      } else {
+        setRefundError(
+          '환불 완료 상태를 확인하지 못했어요. 다시 시도해 주세요.'
+        );
+        setRefundPhase('refund-failed');
+      }
     } catch (error) {
-      console.error('결제 취소 실패', error);
+      if (!active.current) return;
       const message = isAxiosError(error)
         ? error.response?.data?.message
         : error instanceof Error
           ? error.message
           : null;
-      alert(message || '환불하지 못했어요. 잠시 후 다시 시도해 주세요.');
+      setRefundError(
+        typeof message === 'string'
+          ? message
+          : '환불 결과를 확인하지 못했어요. 다시 시도해 주세요.'
+      );
+      setRefundPhase('refund-failed');
     } finally {
       refundLock.current = false;
-      setIsRefunding(false);
+      if (active.current) setIsRefunding(false);
     }
   };
 
@@ -339,7 +395,13 @@ const UsageHistory = ({ onRefunded }: UsageHistoryProps) => {
                   {isRefundable(payment, passByPayment[payment.paymentId]) && (
                     <button
                       type="button"
-                      onClick={() => setRefundTarget(payment)}
+                      onClick={(event) => {
+                        refundTrigger.current = event.currentTarget;
+                        setRefundPhase('refund-confirm');
+                        setRefundAmount(null);
+                        setRefundError('');
+                        setRefundTarget(payment);
+                      }}
                       className="cursor-pointer text-xs font-semibold text-gray-40 underline underline-offset-2"
                     >
                       환불하기
@@ -360,7 +422,11 @@ const UsageHistory = ({ onRefunded }: UsageHistoryProps) => {
   return (
     <section className="flex flex-col gap-4">
       <div className="flex items-center gap-6 lg:gap-9">
-        <h2 className="text-lg font-semibold text-black lg:text-xl">
+        <h2
+          ref={headingRef}
+          tabIndex={-1}
+          className="text-lg font-semibold text-black lg:text-xl"
+        >
           이용 내역
         </h2>
         <div
@@ -391,22 +457,28 @@ const UsageHistory = ({ onRefunded }: UsageHistoryProps) => {
         </p>
       )}
       {refundTarget && (
-        <QuizDialog
-          icon={passImage}
-          title={`${refundTarget.productName}를 환불할까요?`}
-          description={`₩ ${refundTarget.amount.toLocaleString()} 전액 환불되고\n${
-            passByPayment[refundTarget.paymentId]
-              ? `${formatMonthDayTime(passByPayment[refundTarget.paymentId].startedAt)} ~ ${formatMonthDayTime(passByPayment[refundTarget.paymentId].expiresAt)} 이용 기간이`
-              : '이 결제의 패스가'
-          } 바로 종료돼요.`}
-          secondary={{
-            label: isRefunding ? '환불 중...' : '환불하기',
-            onClick: handleRefund,
+        <PaymentResultModal
+          status={refundPhase}
+          amount={refundAmount ?? refundTarget.amount}
+          orderNumber={refundTarget.orderNumber}
+          passPeriod={passByPayment[refundTarget.paymentId] ?? null}
+          failureMessage={refundError}
+          isRetrying={isRefunding}
+          onRetry={() => {
+            void handleRefund();
           }}
-          primary={{ label: '닫기', onClick: () => setRefundTarget(null) }}
-          onClose={() => {
-            if (!isRefunding) setRefundTarget(null);
+          onClose={closeRefund}
+          onHome={() => {
+            closeRefund();
+            navigate(ROUTES.HOME);
           }}
+          onContact={() =>
+            window.open(
+              'https://pf.kakao.com/_ngMWX',
+              '_blank',
+              'noopener,noreferrer'
+            )
+          }
         />
       )}
     </section>

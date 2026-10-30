@@ -311,6 +311,20 @@ const ShopPage = () => {
             if (!orderLock.current) setIsPaymentOpen(false);
           }}
           onConfirm={handlePayment}
+          onOpenTerms={() =>
+            window.open(
+              'https://oil-silkworm-ddb.notion.site/407c130b53ba80ec90e5ffd7a0ded302?source=copy_link',
+              '_blank',
+              'noopener,noreferrer'
+            )
+          }
+          onOpenRefundPolicy={() =>
+            window.open(
+              'https://oil-silkworm-ddb.notion.site/407c130b53ba8015989ef5852018676a?source=copy_link',
+              '_blank',
+              'noopener,noreferrer'
+            )
+          }
         />
       )}
 
