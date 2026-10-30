@@ -11,6 +11,7 @@ import useServiceOpen from './hooks/useServiceOpen';
 import LandingPage from './pages/Auth/LandingPage';
 import SignupPage from './pages/Auth/SignupPage';
 import ComingSoonPage from './pages/ComingSoonPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 import HomePage from './pages/HomePage';
 import MyPage from './pages/MyPage';
@@ -126,6 +127,7 @@ function App() {
             />
           </Route>
         </Route>
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );

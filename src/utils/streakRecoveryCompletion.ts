@@ -8,6 +8,8 @@ interface RecoverySnapshot {
 const key = (memberId: number, eventId: number) =>
   `streak-recovery:${memberId}:${eventId}`;
 
+const seenCompletions = new Set<string>();
+
 export const rememberRecoverySnapshot = (
   memberId: number,
   eventId: number,
@@ -41,19 +43,39 @@ export const readRecoverySnapshot = (
 };
 
 export const isRecoveryCompletionSeen = (memberId: number, eventId: number) => {
+  const storageKey = `${key(memberId, eventId)}:seen`;
+  if (seenCompletions.has(storageKey)) return true;
+  let stored = false;
   try {
-    return sessionStorage.getItem(`${key(memberId, eventId)}:seen`) === 'true';
+    stored = localStorage.getItem(storageKey) === 'true';
   } catch {
-    return false;
+    /* 영구 저장소 사용 불가 시 기존 탭 기록 확인 */
   }
+  if (!stored) {
+    try {
+      stored = sessionStorage.getItem(storageKey) === 'true';
+    } catch {
+      /* 저장소 사용 불가 시 메모리 기록만 사용 */
+    }
+  }
+  // 기존 탭에 남은 확인 기록도 영구 저장소로 이전
+  if (stored) markRecoveryCompletionSeen(memberId, eventId);
+  return stored;
 };
 
 export const markRecoveryCompletionSeen = (
   memberId: number,
   eventId: number
 ) => {
+  const storageKey = `${key(memberId, eventId)}:seen`;
+  seenCompletions.add(storageKey);
   try {
-    sessionStorage.setItem(`${key(memberId, eventId)}:seen`, 'true');
+    localStorage.setItem(storageKey, 'true');
+  } catch {
+    /* 영구 저장소 사용 불가 시 탭 기록으로 유지 */
+  }
+  try {
+    sessionStorage.setItem(storageKey, 'true');
   } catch {
     /* 메모리에서도 확인 여부를 유지 */
   }
