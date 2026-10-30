@@ -12,7 +12,7 @@ interface MyAssetsProps {
 }
 
 const linkStyle =
-  'flex items-center gap-1 text-sm leading-4.5 font-semibold text-blue-60';
+  'flex items-center gap-1 text-xs leading-4.5 font-semibold whitespace-nowrap text-blue-60 lg:text-sm';
 
 //마이페이지 내 자산 (보유 FISH, 복구권, 현재 주가)
 const MyAssets = ({ assets, isPass }: MyAssetsProps) => {
@@ -54,23 +54,23 @@ const MyAssets = ({ assets, isPass }: MyAssetsProps) => {
 
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="text-xl font-semibold text-black">내 자산</h2>
-      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:gap-6">
+      <h2 className="text-lg font-semibold text-black lg:text-xl">내 자산</h2>
+      <ul className="-mx-6 flex gap-2 overflow-x-auto px-6 [scrollbar-width:none] lg:mx-0 lg:grid lg:grid-cols-3 lg:overflow-visible lg:px-0 lg:gap-6">
         {items.map(({ label, image, value, unit, footer }) => (
           <li
             key={label}
-            className="flex flex-col items-end gap-4 rounded-[20px] border border-gray-20 bg-white p-4 lg:h-35"
+            className="flex w-48 shrink-0 flex-col items-end gap-4 rounded-[20px] border border-gray-20 bg-white p-4 lg:w-auto lg:h-35"
           >
             <div className="flex w-full items-center justify-between gap-2">
               <span className="flex h-15 w-18 shrink-0 items-center justify-center rounded-[20px] bg-blue-05">
                 <img src={image} alt="" className="size-15 object-contain" />
               </span>
               <div className="flex flex-col items-end gap-3">
-                <span className="text-sm font-semibold text-gray-60">
+                <span className="text-xs font-semibold whitespace-nowrap text-gray-60 lg:text-sm">
                   {label}
                 </span>
                 <span className="flex items-end gap-1">
-                  <strong className="text-2xl leading-3.5 font-medium text-blue-60">
+                  <strong className="text-xl leading-3.5 font-medium text-blue-60 lg:text-2xl">
                     {value}
                   </strong>
                   {unit && (

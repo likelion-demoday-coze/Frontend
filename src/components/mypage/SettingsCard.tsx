@@ -15,7 +15,7 @@ interface SettingsCardProps {
 }
 
 const rowStyle =
-  'flex w-full items-center justify-between border-b border-gray-20 py-3.5 text-left text-base font-medium text-gray-80';
+  'flex w-full items-center justify-between border-b border-gray-20 py-3.5 text-left text-sm font-medium text-gray-80 lg:text-base';
 
 const ExternalIcon = () => (
   <svg
@@ -86,9 +86,11 @@ const SettingsCard = ({ memberId }: SettingsCardProps) => {
   };
 
   return (
-    <section className="flex w-full flex-col gap-2 rounded-2xl border border-gray-20 bg-white px-5 py-5 lg:w-70">
-      <h2 className="text-xl font-semibold text-black">설정 · 지원</h2>
-      <div className="flex flex-col">
+    <section className="flex w-full flex-col gap-4 lg:w-70 lg:gap-2 lg:rounded-2xl lg:border lg:border-gray-20 lg:bg-white lg:px-5 lg:py-5">
+      <h2 className="text-lg font-semibold text-black lg:text-xl">
+        설정 · 지원
+      </h2>
+      <div className="flex flex-col rounded-[20px] border border-gray-20 bg-white px-4 py-1 lg:rounded-none lg:border-0 lg:p-0">
         <button
           type="button"
           onClick={() => setIsTutorialOpen(true)}
@@ -107,7 +109,7 @@ const SettingsCard = ({ memberId }: SettingsCardProps) => {
         >
           로그아웃
         </button>
-        <div className="flex items-center justify-between pt-5 text-sm font-semibold text-gray-40">
+        <div className="flex items-center justify-between py-3 text-xs font-semibold text-gray-40 lg:pt-5 lg:pb-0 lg:text-sm">
           <button
             type="button"
             onClick={() => setIsWithdrawOpen(true)}

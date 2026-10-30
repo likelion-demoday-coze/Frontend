@@ -164,21 +164,21 @@ const UsageHistory = () => {
               key={item.transactionId}
               className="flex items-center justify-between gap-3 border-b border-gray-20 py-3"
             >
-              <span className="flex items-center gap-4">
-                <span className="w-12 shrink-0 text-sm font-medium text-gray-60">
+              <span className="flex flex-col-reverse gap-1 lg:flex-row lg:items-center lg:gap-4">
+                <span className="text-xs font-medium text-gray-60 lg:w-12 lg:shrink-0 lg:text-sm">
                   {formatMonthDay(item.createdAt)}
                 </span>
                 <span className="text-sm font-semibold text-gray-80">
                   {fishLabels[item.transactionType] ?? '기타'}
                 </span>
               </span>
-              <span className="flex shrink-0 items-center gap-3">
+              <span className="flex shrink-0 flex-col items-end gap-1 lg:flex-row lg:items-center lg:gap-3">
                 <strong
-                  className={`text-base font-semibold ${item.amount > 0 ? 'text-blue-60' : 'text-red-55'}`}
+                  className={`text-sm font-semibold lg:text-base ${item.amount > 0 ? 'text-blue-60' : 'text-red-55'}`}
                 >
                   {item.amount > 0 ? `+${item.amount}` : item.amount}
                 </strong>
-                <span className="w-16 text-right text-xs font-medium text-gray-60">
+                <span className="text-right text-xs font-medium text-gray-60 lg:w-16">
                   잔액 {item.balanceAfter.toLocaleString()}
                 </span>
               </span>
@@ -241,32 +241,33 @@ const UsageHistory = () => {
           return (
             <li
               key={payment.paymentId}
-              className="flex items-center justify-between gap-3 py-2"
+              className="flex items-start justify-between gap-3 border-b border-gray-20 py-3 last:border-b-0 lg:items-center lg:border-b-0 lg:py-2"
             >
-              <span className="flex items-start gap-4">
-                <span className="w-12 shrink-0 text-sm leading-[1.3] font-medium text-gray-60">
+              <span className="flex min-w-0 items-start gap-4">
+                <span className="hidden w-12 shrink-0 text-sm leading-[1.3] font-medium text-gray-60 lg:block">
                   {formatMonthDay(paidAt)}
                   <br />
                   {formatTime(paidAt)}
                 </span>
-                <span className="flex flex-col gap-1">
-                  <span className="flex items-center gap-2">
-                    <strong className="text-base font-semibold text-gray-80">
-                      {payment.productName}
-                    </strong>
-                  </span>
+                <span className="flex min-w-0 flex-col gap-1">
+                  <strong className="text-sm font-semibold text-gray-80 lg:text-base">
+                    {payment.productName}
+                  </strong>
                   <span className="text-xs font-medium break-all text-gray-40">
+                    <span className="text-gray-60 lg:hidden">
+                      {formatMonthDay(paidAt)}{' '}
+                    </span>
                     주문번호 {payment.orderNumber}
                   </span>
                 </span>
               </span>
-              <span className="flex shrink-0 items-center gap-3 lg:gap-6">
+              <span className="flex shrink-0 flex-col-reverse items-end gap-1 lg:flex-row lg:items-center lg:gap-6">
                 <span
                   className={`rounded-lg border px-2 py-1 text-xs font-bold ${status.style}`}
                 >
                   {status.label}
                 </span>
-                <strong className="text-base font-semibold text-black">
+                <strong className="text-sm font-semibold text-black lg:text-base">
                   ₩ {payment.amount.toLocaleString()}
                 </strong>
               </span>
@@ -280,7 +281,7 @@ const UsageHistory = () => {
   return (
     <section className="flex flex-col gap-4">
       <div className="flex items-center gap-6 lg:gap-9">
-        <h2 className="text-xl font-semibold text-black">이용 내역</h2>
+        <h2 className="text-lg font-semibold text-black lg:text-xl">이용 내역</h2>
         <div
           role="tablist"
           aria-label="이용 내역 종류"

@@ -50,12 +50,12 @@ const MyPage = () => {
   const activePass = pass?.active ? pass.pass : null;
 
   return (
-    <div className="flex flex-col gap-6 lg:gap-9">
-      <h1 className="text-2xl leading-9 font-semibold text-black lg:text-[28px]">
+    <div className="flex min-w-0 flex-col gap-6 lg:gap-9">
+      <h1 className="text-xl leading-9 font-semibold text-black lg:text-[28px]">
         마이페이지
       </h1>
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-        <div className="flex w-full flex-col gap-6 lg:w-172">
+        <div className="flex w-full min-w-0 flex-col gap-6 lg:w-172">
           <ProfileCard
             nickname={profile.nickname}
             joinedDays={profile.joinedDays}
