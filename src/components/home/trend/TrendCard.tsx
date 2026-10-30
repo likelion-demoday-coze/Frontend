@@ -43,6 +43,9 @@ const TrendCard = ({ category, categoryCode, title, onClick }: TrendCardProps) =
       )}
       <span className="relative block text-[16px] text-gray-60">{category}</span>
       <span className="relative line-clamp-2 break-words text-[16px] text-black font-semibold">{title}</span>
+      <span className="absolute inset-x-4 bottom-4 text-center text-sm text-gray-40">
+        클릭하여 상세보기
+      </span>
     </button>
   );
 };
