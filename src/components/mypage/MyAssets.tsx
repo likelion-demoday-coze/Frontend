@@ -54,7 +54,7 @@ const MyAssets = ({ assets, isPass }: MyAssetsProps) => {
 
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="text-xl font-semibold text-black">내 자산</h2>
+      <h2 className="text-lg font-semibold text-black lg:text-xl">내 자산</h2>
       <ul className="-mx-6 flex gap-2 overflow-x-auto px-6 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-3 sm:overflow-visible sm:px-0 lg:gap-6">
         {items.map(({ label, image, value, unit, footer }) => (
           <li

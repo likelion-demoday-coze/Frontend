@@ -281,7 +281,7 @@ const UsageHistory = () => {
   return (
     <section className="flex flex-col gap-4">
       <div className="flex items-center gap-6 lg:gap-9">
-        <h2 className="text-xl font-semibold text-black">이용 내역</h2>
+        <h2 className="text-lg font-semibold text-black lg:text-xl">이용 내역</h2>
         <div
           role="tablist"
           aria-label="이용 내역 종류"

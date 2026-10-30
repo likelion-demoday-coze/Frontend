@@ -47,7 +47,7 @@ const MyRecords = ({ records }: MyRecordsProps) => {
 
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="text-xl font-semibold text-black">내 기록</h2>
+      <h2 className="text-lg font-semibold text-black lg:text-xl">내 기록</h2>
       <ul className="grid grid-cols-2 gap-3 lg:flex lg:justify-between">
         {tiles.map(({ label, value, unit, isEmpty, note, emptyNote }) => (
           <li
