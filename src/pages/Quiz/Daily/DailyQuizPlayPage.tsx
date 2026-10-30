@@ -269,7 +269,7 @@ const DailyQuizPlayPage = () => {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-8 lg:flex-row lg:gap-8">
+      <div className="flex flex-col gap-8 lg:flex-row lg:justify-center lg:gap-8">
         <div className="flex w-full flex-col gap-6 lg:w-153 lg:gap-12">
           <div className="flex flex-col gap-5 lg:gap-6">
             <QuizHeader
