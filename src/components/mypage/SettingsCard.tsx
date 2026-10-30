@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ArrowIcon from '../../assets/icons/arrow.svg?react';
+import LinkIcon from '../../assets/icons/link.svg?react';
 import catSad from '../../assets/character/quiz_cat_sad.png';
 import { logout, withdraw } from '../../api/auth';
 import { clearCsrfToken } from '../../api/axiosInstance';
@@ -17,33 +18,12 @@ interface SettingsCardProps {
 const rowStyle =
   'flex w-full items-center justify-between border-b border-gray-20 py-3.5 text-left text-sm font-medium text-gray-80 lg:text-base';
 
-const ExternalIcon = () => (
-  <svg
-    aria-hidden="true"
-    viewBox="0 0 16 16"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="size-4 text-gray-40"
-  >
-    <path d="M13.25 9v4.25H2.75V2.75H7M10.75 2.75h2.5v2.5M8 8l5-5" />
-  </svg>
+const ExternalRow = ({ label, href }: { label: string; href: string }) => (
+  <a href={href} target="_blank" rel="noopener noreferrer" className={rowStyle}>
+    {label}
+    <LinkIcon aria-hidden="true" className="size-3.25 shrink-0" />
+  </a>
 );
-
-const ExternalRow = ({ label, href }: { label: string; href: string }) =>
-  href ? (
-    <a href={href} target="_blank" rel="noreferrer" className={rowStyle}>
-      {label}
-      <ExternalIcon />
-    </a>
-  ) : (
-    <span className={`${rowStyle} text-gray-40`}>
-      {label}
-      <span className="text-xs">준비 중</span>
-    </span>
-  );
 
 //마이페이지 설정·지원 카드
 const SettingsCard = ({ memberId }: SettingsCardProps) => {
@@ -100,7 +80,7 @@ const SettingsCard = ({ memberId }: SettingsCardProps) => {
           <ArrowIcon aria-hidden="true" className="h-4 w-2 text-gray-40" />
         </button>
         <ExternalRow label="고객 문의" href={SUPPORT_URL} />
-        <ExternalRow label="약관 및 정책" href={POLICY_URL} />
+        <ExternalRow label="이용약관" href={POLICY_URL} />
         <button
           type="button"
           onClick={handleLogout}
