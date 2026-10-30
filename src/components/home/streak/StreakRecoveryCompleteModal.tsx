@@ -29,7 +29,7 @@ const StreakRecoveryCompleteModal = ({
   const shown = useRef(onShown);
   const dateLabel = new Date(`${restoredDate}T00:00:00Z`).toLocaleDateString(
     'ko-KR',
-    { timeZone: 'UTC', month: 'numeric', day: 'numeric', weekday: 'long' }
+    { timeZone: 'UTC', weekday: 'long' }
   );
 
   useEffect(() => {

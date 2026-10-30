@@ -71,17 +71,17 @@ const StockChartCard = () => {
   return (
     <div className="flex h-full flex-col rounded-2xl border border-blue-15 bg-white p-3">
       <div className="@container flex flex-wrap items-center justify-between gap-3 px-1 py-4 sm:px-3 sm:py-5 xl:px-6 xl:py-6">
-        <div className="flex max-w-full flex-nowrap items-center gap-[min(10px,1.5cqi)] whitespace-nowrap">
+        <div className="flex max-w-full flex-nowrap items-center gap-[min(10px,1.2cqi)] whitespace-nowrap">
           <span className="shrink-0 text-[min(16px,4.5cqi)] font-semibold text-gray-60">
             현재 주가
           </span>
-          <span className="shrink-0 text-[min(28px,8cqi)] font-bold tabular-nums text-blue-50">
+          <span className="shrink-0 text-[min(28px,7.8cqi)] font-bold tabular-nums text-blue-50">
             {history ? history.currentStock.toFixed(2) : '-'}
           </span>
           <img src={bell} alt="" className="size-[min(44px,12cqi)] shrink-0" />
           {history && (
             <span
-              className={`shrink-0 text-[min(16px,4.5cqi)] font-bold tabular-nums ${isUp ? 'text-red-55' : 'text-blue-50'}`}
+              className={`shrink-0 text-[min(16px,4.3cqi)] font-bold tabular-nums ${isUp ? 'text-red-55' : 'text-blue-50'}`}
             >
               {isUp ? '▲' : '▼'} {Math.abs(rate).toFixed(2)}%
             </span>

@@ -316,7 +316,7 @@ const ShopPage = () => {
 
       <section className="mt-9" aria-labelledby="fish-products">
         <h2 id="fish-products" className="mb-4 text-xl font-semibold">
-          생선으로 교환
+          FISH로 교환
         </h2>
         <RecoveryProductCard
           ownedCount={ownedCount}
@@ -362,6 +362,12 @@ const ShopPage = () => {
           }}
         />
       </section>
+
+      <ul aria-label="결제 및 서비스 안내" className="mt-12 list-disc space-y-2 rounded-2xl bg-gray-05 py-4 pr-5 pl-9 text-xs leading-relaxed text-gray-40 sm:text-sm">
+        <li>결제대행: 페이앱(주식회사 유디아이디) · 결제 수단: 신용·체크카드</li>
+        <li>결제 즉시 이용이 시작되며, 미사용 패스는 환불 정책에 따라 환불됩니다.</li>
+        <li>본 서비스는 경진대회 출품작으로 베타 운영되며, 운영 종료 후 데이터가 소멸될 수 있습니다.</li>
+      </ul>
 
       {isRecoveryPurchaseOpen && recoveryItem && (
         <RecoveryPurchaseModal

@@ -10,7 +10,7 @@ const NotFoundPage = () => {
   const isInitialized = useAuthstore((state) => state.isInitialized);
 
   return (
-    <div className="flex min-h-dvh flex-col bg-[#fafcfe]">
+    <div className="flex min-h-dvh flex-col bg-white">
       <header className="flex h-16 shrink-0 items-center border-b border-gray-20 bg-white px-6 sm:px-9">
         <img src={logo} alt="COZ:E" className="h-auto w-27" />
       </header>

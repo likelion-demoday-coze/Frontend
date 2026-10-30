@@ -77,6 +77,30 @@ export const rememberStreakAchievementStart = (
   }
 };
 
+// 늦게 도착한 캐릭터 정보는 입장 시점과 일치할 때 효과 목록만 보완
+export const rememberStreakAchievementEffects = (
+  memberId: number,
+  sessionId: number,
+  character: MyCharacter
+) => {
+  const before = readStreakAchievementStart(memberId, sessionId);
+  if (
+    !before ||
+    before.effects !== null ||
+    before.date !== character.date ||
+    before.currentStreak !== character.currentStreak
+  )
+    return;
+  const snapshot = { ...before, effects: character.effects };
+  const key = startKey(memberId, sessionId);
+  starts.set(key, snapshot);
+  try {
+    sessionStorage.setItem(key, JSON.stringify(snapshot));
+  } catch {
+    // 저장할 수 없어도 현재 화면의 비교에는 메모리 사용
+  }
+};
+
 export const getStreakAchievement = (
   before: StreakAchievementStart,
   after: MyStreak,

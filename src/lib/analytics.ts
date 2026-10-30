@@ -4,6 +4,7 @@ const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
 const productionHosts = new Set(['coze.kids', 'www.coze.kids']);
 let initialized = false;
 let previousPageLocation = '';
+let currentPageFields = { page_location: '', page_referrer: '' };
 
 type AnalyticsValue = string | number | boolean;
 type AnalyticsParams = Record<
@@ -31,11 +32,14 @@ export const initializeAnalytics = () => {
   if (!canTrack() || initialized) return;
 
   previousPageLocation = withoutQuery(document.referrer);
+  currentPageFields = {
+    page_location: withoutQuery(window.location.href),
+    page_referrer: previousPageLocation,
+  };
   ReactGA.initialize(measurementId, {
     gtagOptions: {
       send_page_view: false,
-      page_location: withoutQuery(window.location.href),
-      page_referrer: previousPageLocation,
+      ...currentPageFields,
     },
   });
   initialized = true;
@@ -50,6 +54,7 @@ export const trackPageView = (path: string) => {
     page_location: pageLocation,
     page_referrer: previousPageLocation,
   };
+  currentPageFields = pageFields;
   ReactGA.set(pageFields);
   ReactGA.event('page_view', {
     ...pageFields,
@@ -65,5 +70,8 @@ export const trackEvent = (
 ) => {
   if (!canTrack() || !initialized) return;
 
-  ReactGA.event(name, params);
+  ReactGA.event(name, {
+    ...params,
+    ...currentPageFields,
+  });
 };

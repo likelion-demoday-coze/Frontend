@@ -27,6 +27,7 @@ import {
   getStreakAchievement,
   readStreakAchievementStart,
   rememberStreakAchievementStart,
+  rememberStreakAchievementEffects,
 } from '../../../utils/streakAchievement';
 import type { StreakAchievement } from '../../../utils/streakAchievement';
 import { QUIZ_CATEGORY_INFO } from '../../../constants/quizCategory';
@@ -79,14 +80,17 @@ const DailyQuizPlayPage = () => {
     const run = { active: true };
     activeRunRef.current = run;
     finishingRef.current = false;
+    const characterRequest = getMyCharacter({
+      timeout: 5000,
+      suppressNetworkAlert: true,
+    }).catch(() => null);
     Promise.all([
       getSessionDetail(sessionId),
       getStockGraph('DAY').catch(() => null),
       getMyStreak().catch(() => null),
       getStreakRecovery().catch(() => undefined),
-      getMyCharacter().catch(() => null),
     ])
-      .then(([detail, stock, streak, recovery, character]) => {
+      .then(([detail, stock, streak, recovery]) => {
         if (ignore) return;
         if (memberId !== undefined && streak) {
           rememberStreakAchievementStart(memberId, sessionId, {
@@ -94,10 +98,14 @@ const DailyQuizPlayPage = () => {
             currentStreak: streak.currentStreak,
             learnedToday: streak.learnedToday,
             lastLearningDate: streak.lastLearningDate,
-            effects: character?.effects ?? null,
+            effects: null,
             // 복구 상태를 확인하지 못했으면 일반 달성 팝업은 생략
             recoveryPending:
               recovery === undefined || recovery?.status === 'PENDING',
+          });
+          void characterRequest.then((character) => {
+            if (ignore || finishingRef.current || !character) return;
+            rememberStreakAchievementEffects(memberId, sessionId, character);
           });
         }
         setLearnedToday(!!streak?.learnedToday);
@@ -249,14 +257,25 @@ const DailyQuizPlayPage = () => {
       if (before && !before.recoveryPending) {
         const [streak, character, recovery] = await Promise.all([
           getMyStreak(),
-          getMyCharacter().catch(() => null),
+          getMyCharacter({ timeout: 5000, suppressNetworkAlert: true }).catch(
+            () => null
+          ),
           getStreakRecovery(),
         ]);
         if (!run.active) return;
-        const next =
-          recovery?.status === 'PENDING'
-            ? null
-            : getStreakAchievement(before, streak, character);
+        // 오늘 복구한 건도 일반 달성 대신 기존 복구 완료 팝업으로 안내
+        const yesterday = new Date(
+          Date.parse(`${streak.date}T00:00:00Z`) - 24 * 60 * 60 * 1000
+        )
+          .toISOString()
+          .slice(0, 10);
+        const recoveryUsed =
+          recovery?.status === 'PENDING' ||
+          (recovery?.status === 'RECOVERED' &&
+            recovery.missedDate === yesterday);
+        const next = recoveryUsed
+          ? null
+          : getStreakAchievement(before, streak, character);
         if (
           next &&
           memberId !== undefined &&
