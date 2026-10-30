@@ -158,11 +158,11 @@ const LandingPage = () => {
         </div>
       </main>
 
-      <StockGrowthSection />
-      <DailyQuizSection />
-      <TimeAttackSection />
+      <StockGrowthSection comingSoonMobile />
+      <DailyQuizSection comingSoonMobile />
+      <TimeAttackSection comingSoonMobile />
       <GrowthRewardSection />
-      <EconomicRoutineSection />
+      <EconomicRoutineSection comingSoonMobile />
       <FaqSection />
       <div className="flex min-h-dvh flex-col overflow-x-clip">
         <StartInvestingSection />
