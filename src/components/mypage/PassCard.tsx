@@ -10,7 +10,7 @@ interface PassCardProps {
 const PassCard = ({ startedAt, expiresAt }: PassCardProps) => {
   return (
     <section className="flex flex-col items-center gap-4 rounded-2xl border border-gray-20 bg-white px-5 py-5 lg:px-10">
-      <div className="flex w-full items-center justify-between gap-4">
+      <div className="flex w-full flex-wrap items-center justify-between gap-4">
         <div className="flex min-w-0 items-center gap-4 lg:gap-8">
           <img
             src={passImage}

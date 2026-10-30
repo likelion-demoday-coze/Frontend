@@ -26,9 +26,9 @@ const ProfileCard = ({
           className="size-17 shrink-0 rounded-[20px] bg-blue-05 object-contain lg:size-25"
         />
         <div className="flex min-w-0 flex-1 flex-col gap-1 lg:gap-1.5">
-          <div className="flex items-center justify-between gap-3 lg:justify-start">
-            <div className="flex min-w-0 items-center gap-3">
-              <h2 className="text-lg leading-9 font-bold break-all text-black lg:text-xl">
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 lg:justify-start">
+            <div className="flex items-center gap-3">
+              <h2 className="text-lg leading-9 font-bold whitespace-nowrap text-black lg:text-xl">
                 {nickname}
               </h2>
               {isPass && (
