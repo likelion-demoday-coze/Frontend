@@ -105,7 +105,7 @@ const DailyQuizResultPage = () => {
             }))}
           />
 
-          <ol className="hidden lg:flex lg:justify-between lg:gap-4">
+          <ol className="sr-only lg:not-sr-only lg:flex lg:justify-between lg:gap-4">
             <li className="flex flex-col items-center justify-center gap-5 rounded-xl bg-gray-05 px-4 py-4 lg:px-6">
               <span className="text-sm text-gray-40">시작 주가</span>
               <span className="text-lg font-medium text-black">
