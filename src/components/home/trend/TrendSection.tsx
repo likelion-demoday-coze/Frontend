@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getTodayEconomicTrends } from '../../../api/trend';
+import { trackEvent } from '../../../lib/analytics';
 import SectionTitle from '../../common/SectionTitle';
 import type { EconomicTrendItem } from '../../../types/trend';
 
@@ -74,7 +75,13 @@ const TrendSection = () => {
                 category={item.categoryName}
                 categoryCode={item.category}
                 title={item.title}
-                onClick={() => setSelectedIndex(index)}
+                onClick={() => {
+                  setSelectedIndex(index);
+                  trackEvent('trend_open', {
+                    trend_id: item.trendId,
+                    category: item.category,
+                  });
+                }}
               />
             ))}
           </div>
