@@ -5,7 +5,7 @@ import LinkIcon from '../../assets/icons/link.svg?react';
 import catSad from '../../assets/character/quiz_cat_sad.png';
 import { logout, withdraw } from '../../api/auth';
 import { clearCsrfToken } from '../../api/axiosInstance';
-import { POLICY_URL, SUPPORT_URL } from '../../constants/support';
+import { POLICY_URL, PRIVACY_POLICY_URL, SUPPORT_URL } from '../../constants/support';
 import { ROUTES } from '../../constants/routes';
 import useAuthStore from '../../stores/useAuthStore';
 import QuizDialog from '../quiz/QuizDialog';
@@ -81,6 +81,7 @@ const SettingsCard = ({ memberId }: SettingsCardProps) => {
         </button>
         <ExternalRow label="고객 문의" href={SUPPORT_URL} />
         <ExternalRow label="이용약관" href={POLICY_URL} />
+        <ExternalRow label="개인정보처리방침" href={PRIVACY_POLICY_URL} />
         <button
           type="button"
           onClick={handleLogout}
