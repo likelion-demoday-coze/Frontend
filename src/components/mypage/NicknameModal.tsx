@@ -10,6 +10,7 @@ import {
   NICKNAME_MAX,
   NICKNAME_MIN,
   ONLY_DIGITS,
+  HAS_JAMO,
   STRICT_PATTERN,
 } from '../../utils/nickname';
 
@@ -22,6 +23,7 @@ type Status =
   | 'tooLong'
   | 'tooShort'
   | 'onlyDigits'
+  | 'hasJamo'
   | 'invalid'
   | 'error';
 
@@ -34,6 +36,7 @@ const MESSAGE: Record<Status, string> = {
   tooLong: `최대 ${NICKNAME_MAX}자까지 입력할 수 있어요`,
   tooShort: `최소 ${NICKNAME_MIN}자부터 입력할 수 있어요`,
   onlyDigits: '숫자만으로는 만들 수 없어요',
+  hasJamo: '자음·모음만 따로 사용할 수 없어요.',
   invalid: '한글, 영문, 숫자만 사용할 수 있어요',
   error: '확인 중 오류가 발생했어요. 다시 시도해주세요',
 };
@@ -99,6 +102,7 @@ const NicknameModal = ({
     !isTooLong &&
     STRICT_PATTERN.test(nickname) &&
     !ONLY_DIGITS.test(nickname) &&
+    !HAS_JAMO.test(nickname) &&
     nickname !== currentNickname;
 
   const status: Status = (() => {
@@ -106,6 +110,7 @@ const NicknameModal = ({
     if (!LIVE_PATTERN.test(nickname)) return 'invalid';
     if (isTooLong) return 'tooLong';
     if (ONLY_DIGITS.test(nickname)) return 'onlyDigits';
+    if (HAS_JAMO.test(nickname)) return 'hasJamo';
     if (nickname.length < NICKNAME_MIN) return 'tooShort';
     if (nickname === currentNickname) return 'same';
     return checkResult ?? 'typing';
@@ -114,7 +119,7 @@ const NicknameModal = ({
   const isError = !['idle', 'typing', 'available'].includes(status);
   const isChecked = status === 'available';
   const canCheck = isValid && !isChecked && !isChecking;
-  const canSave = isChecked && !isSaving;
+  const canSave = isValid && isChecked && !isSaving;
 
   const handleChange = (value: string) => {
     const exceeded = value.length > NICKNAME_MAX;
