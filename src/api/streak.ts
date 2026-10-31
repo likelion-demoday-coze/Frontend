@@ -19,7 +19,6 @@ export interface MyStreak {
 
 export const getMyStreak = async () => {
   const { data } = await api.get<ApiResponse<MyStreak>>('/api/v1/streaks/me');
-  console.log('스트릭 조회 결과:', data.result);
   return data.result;
 };
 
