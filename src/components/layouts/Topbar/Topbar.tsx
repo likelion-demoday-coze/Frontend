@@ -14,11 +14,11 @@ const TopBar = ({ streakDays, fishBalance, passOrCash }: TopBarProps) => {
   return (
     <header className="flex min-w-0 shrink flex-nowrap items-center gap-2.5 text-sm sm:gap-4 sm:text-[15px] lg:shrink-0 lg:gap-4 lg:text-base">
       <StatItem
-        icon={<img src={streak_icon} alt="연속학습" className="size-7 min-w-4 shrink object-contain sm:size-8 sm:shrink-0 lg:size-9" />}
+        icon={<img src={streak_icon} alt="연속학습" className="mr-1 size-7 min-w-4 shrink object-contain sm:size-8 sm:shrink-0 lg:mr-0 lg:size-9" />}
         label={streakDays === null ? '-' : `${streakDays}일`}
       ></StatItem>
       <StatItem
-        icon={<img src={fishIcon} alt="FISH" className="size-7 min-w-4 shrink object-contain sm:size-8 sm:shrink-0 lg:size-9" />}
+        icon={<img src={fishIcon} alt="FISH" className="-mr-0.5 size-8 min-w-4 shrink object-contain sm:-mr-1 sm:size-9 sm:shrink-0 lg:mr-0 lg:size-9" />}
         label={fishBalance === null ? '-' : fishBalance.toLocaleString()}
       />
       <PassOrCashItem {...passOrCash} />
