@@ -16,6 +16,7 @@ import {
   LIVE_PATTERN,
   STRICT_PATTERN,
   ONLY_DIGITS,
+  HAS_JAMO,
 } from '../../utils/nickname';
 
 type Status =
@@ -26,6 +27,7 @@ type Status =
   | 'tooLong' // 글자 수 초과
   | 'tooShort' // 글자 수 부족
   | 'onlyDigits' // 숫자만 입력
+  | 'hasJamo' // 자음·모음 포함
   | 'invalid' // 사용 불가 문자
   | 'error'; // 서버 오류
 
@@ -56,6 +58,7 @@ const STYLE: Record<Status, { border: string; text: string; bedge: string }> = {
   tooLong: ERROR_STYLE,
   tooShort: ERROR_STYLE,
   onlyDigits: ERROR_STYLE,
+  hasJamo: ERROR_STYLE,
   invalid: ERROR_STYLE,
   error: ERROR_STYLE,
 };
@@ -68,6 +71,7 @@ const MESSAGE: Record<Status, string> = {
   tooLong: `최대 ${NICKNAME_MAX}자까지 입력할 수 있어요`,
   tooShort: `최소 ${NICKNAME_MIN}자부터 입력할 수 있어요`,
   onlyDigits: '숫자만으로는 만들 수 없어요',
+  hasJamo: '자음·모음만 따로 사용할 수 없어요.',
   invalid: '한글, 영문, 숫자만 사용할 수 있어요',
   error: '확인 중 오류가 발생했어요. 다시 시도해주세요',
 };
@@ -139,14 +143,16 @@ const SignupPage = () => {
   // → 화면, 중복확인, 가입에 쓰는 값이 항상 같음
   const hasInvalidChar = !LIVE_PATTERN.test(nickname);
   const isOnlyDigits = ONLY_DIGITS.test(nickname);
+  const hasJamo = HAS_JAMO.test(nickname);
   const isTooShort = nickname.length > 0 && nickname.length < NICKNAME_MIN;
 
   // 중복확인 전 단계의 규칙을 모두 통과했는지
   const isValid =
     nickname.length >= NICKNAME_MIN &&
     !isTooLong &&
-    STRICT_PATTERN.test(nickname) && // 조합이 끝난 글자만
-    !isOnlyDigits;
+    STRICT_PATTERN.test(nickname) &&
+    !isOnlyDigits &&
+    !hasJamo;
 
   // 현재 화면에 보여줄 상태를 하나로 결정
   // 위에서부터 우선순위 순으로 검사하고, 먼저 걸리는 상태를 사용함(순서체크)
@@ -155,6 +161,7 @@ const SignupPage = () => {
     if (hasInvalidChar) return 'invalid';
     if (isTooLong) return 'tooLong';
     if (isOnlyDigits) return 'onlyDigits';
+    if (hasJamo) return 'hasJamo';
     if (isTooShort) return 'tooShort';
     if (isChecked) return 'available';
     if (isDuplicate) return 'duplicate';
@@ -230,6 +237,7 @@ const SignupPage = () => {
     status === 'tooLong' ||
     status === 'tooShort' ||
     status === 'onlyDigits' ||
+    status === 'hasJamo' ||
     status === 'invalid' ||
     status === 'error';
 
