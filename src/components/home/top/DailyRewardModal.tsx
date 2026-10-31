@@ -3,17 +3,22 @@ import fishImage from '../../../assets/store/Fish_Bunddle 1.svg';
 
 interface DailyRewardModalProps {
   amount: number;
+  variant?: 'daily' | 'signup';
+  attendanceAmount?: number;
   onClose: () => void;
   onQuiz: () => void;
 }
 
 const DailyRewardModal = ({
   amount,
+  variant = 'daily',
+  attendanceAmount = 100,
   onClose,
   onQuiz,
 }: DailyRewardModalProps) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
+  const isSignup = variant === 'signup';
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -41,16 +46,18 @@ const DailyRewardModal = ({
           <img src={fishImage} alt="" className="size-28 object-contain" />
         </div>
         <p className="mt-2 rounded-full bg-blue-50 px-3 py-1.5 text-base font-semibold text-white">
-          오늘의 생선이다 냥!
+          {isSignup ? '가입을 축하한다 냥!' : '오늘의 생선이다 냥!'}
         </p>
         <h2
           id={titleId}
           className="mt-5 text-xl font-bold break-keep text-black"
         >
-          오늘의 생선 {amount}개를 받았어요
+          {isSignup ? '가입 기념' : '오늘의'} FISH {amount}개를 받았어요
         </h2>
         <p className="mt-1 text-sm break-keep text-gray-60">
-          정규장 2번, 시간외거래 1번을 풀 수 있어요.
+          {isSignup
+            ? `출석 보상까지 받으면 FISH ${amount + attendanceAmount}개로 시작해요`
+            : '정규장 2번, 시간외거래 1번을 풀 수 있어요.'}
         </p>
         <div className="mt-5 flex w-full gap-4">
           <button
