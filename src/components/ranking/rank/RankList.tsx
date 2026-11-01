@@ -5,13 +5,18 @@ interface RankListProps {
   me?: MyRank;
   items: RankItem[];
   isStock?: boolean;
+  onMeClick?: () => void;
 }
 
-const RankList = ({ me, items, isStock }: RankListProps) => (
+const RankList = ({ me, items, isStock, onMeClick }: RankListProps) => (
   <ul className="flex flex-col ">
-    {me && <RankRow {...me} isMe isStock={isStock} />}
+    {me && <RankRow {...me} isMe isStock={isStock} onClick={onMeClick} />}
     {items.map((item) => (
-      <RankRow key={item.memberId ?? item.nickname} {...item} isStock={isStock} />
+      <RankRow
+        key={item.memberId ?? item.nickname}
+        {...item}
+        isStock={isStock}
+      />
     ))}
   </ul>
 );

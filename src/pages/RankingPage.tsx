@@ -1,10 +1,15 @@
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useRef } from 'react';
+import {
+  useSearchParams,
+  useNavigate,
+  useOutletContext,
+} from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
 import type { RankingType } from '../types/ranking';
 import PageTitleSection from '../components/common/PageTitle';
 import TapToggle from '../components/ranking/TapToggle';
 import RankList from '../components/ranking/rank/RankList'; //랭킹
 import MyRankPanel from '../components/ranking/MyRankPanel';
+import MyRankModal from '../components/ranking/MyRankModal';
 import RankingRewardBanner from '../components/ranking/RankingRewardBanner';
 import { ROUTES } from '../constants/routes';
 import {
@@ -58,6 +63,16 @@ const RankingPage = () => {
   const c = CONFIG[type];
 
   const navigate = useNavigate();
+  const { isMobile } = useOutletContext<{ isMobile: boolean }>();
+  const [panelType, setPanelType] = useState<RankingType | null>(null);
+  useEffect(() => {
+    const query = window.matchMedia('(min-width: 1024px)');
+    const closeOnDesktop = (event: MediaQueryListEvent) => {
+      if (event.matches) setPanelType(null);
+    };
+    query.addEventListener('change', closeOnDesktop);
+    return () => query.removeEventListener('change', closeOnDesktop);
+  }, []);
 
   const stock = usePagedRanking(fetchStockPage, type === 'regular');
   const timeAttack = usePagedRanking(
@@ -65,6 +80,25 @@ const RankingPage = () => {
     type === 'afterhours'
   );
   const view = type === 'regular' ? stock : timeAttack;
+
+  const panelProps = {
+    criteria: c.criteria,
+    actionLabel: c.actionLabel,
+    rank: view.me?.rank ?? null,
+    emptyMessage:
+      type === 'afterhours' && view.status === 'idle' && !view.me
+        ? '오늘은 아직 참여하지 않았어요!'
+        : undefined,
+    lastRank: view.totalMemberCount,
+    stats: view.stats.length
+      ? view.stats
+      : [
+          { label: '상위', value: '-' },
+          { label: '나의 최고 기록', value: '-' },
+          { label: '유저 평균 정답수', value: '-' },
+        ],
+    onAction: () => navigate(ACTION_PATH[type]),
+  };
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -82,7 +116,10 @@ const RankingPage = () => {
         <TapToggle
           tabs={TABS}
           value={type}
-          onChange={(key) => setParams({ tab: key }, { replace: true })}
+          onChange={(key) => {
+            setPanelType(null);
+            setParams({ tab: key }, { replace: true });
+          }}
         />
       </div>
 
@@ -108,6 +145,7 @@ const RankingPage = () => {
               me={view.me}
               items={view.items}
               isStock={type === 'regular'}
+              onMeClick={isMobile ? () => setPanelType(type) : undefined}
             />
 
             {/* 이 요소가 화면 근처에 오면 다음 페이지를 불러옴 */}
@@ -141,30 +179,13 @@ const RankingPage = () => {
         {/* 내 기록이 없으면(오늘 미참여 등) 패널을 숨김 → 시안 확인 후 정하기 */}
         {(view.me || type === 'afterhours') && (
           <div className="hidden lg:block">
-            <MyRankPanel
-              criteria={c.criteria}
-              actionLabel={c.actionLabel}
-              rank={view.me?.rank ?? null}
-              emptyMessage={
-                type === 'afterhours' && view.status === 'idle' && !view.me
-                  ? '오늘은 아직 참여하지 않았어요!'
-                  : undefined
-              }
-              lastRank={view.totalMemberCount}
-              stats={
-                view.stats.length
-                  ? view.stats
-                  : [
-                      { label: '상위', value: '-' },
-                      { label: '나의 최고 기록', value: '-' },
-                      { label: '유저 평균 정답수', value: '-' },
-                    ]
-              }
-              onAction={() => navigate(ACTION_PATH[type])}
-            />
+            <MyRankPanel {...panelProps} />
           </div>
         )}
       </div>
+      {isMobile && panelType === type && view.me && (
+        <MyRankModal {...panelProps} onClose={() => setPanelType(null)} />
+      )}
     </div>
   );
 };
