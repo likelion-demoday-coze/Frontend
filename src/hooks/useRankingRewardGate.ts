@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { create } from 'zustand';
 
 interface RankingRewardGateState {
@@ -20,13 +20,16 @@ const useRankingRewardGate = create<RankingRewardGateState>((set) => ({
 }));
 
 export const useBlockRankingReward = (blocked: boolean) => {
+  const [id] = useState(() => Symbol('ranking-reward-blocker'));
   useLayoutEffect(() => {
     if (!blocked) return;
-    const id = Symbol('ranking-reward-blocker');
     useRankingRewardGate.getState().add(id);
     return () => useRankingRewardGate.getState().remove(id);
-  }, [blocked]);
+  }, [blocked, id]);
+  return id;
 };
 
-export const useCanShowRankingReward = () =>
-  useRankingRewardGate((state) => state.blockers.size === 0);
+export const useCanShowRankingReward = (ownBlocker?: symbol) =>
+  useRankingRewardGate((state) =>
+    [...state.blockers].every((id) => id === ownBlocker)
+  );

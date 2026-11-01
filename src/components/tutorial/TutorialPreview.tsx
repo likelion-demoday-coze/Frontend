@@ -23,7 +23,7 @@ export type PreviewType =
 const STOCK_LEVELS = [
   { name: '초보냥', stock: '100방울', image: basic_1 },
   { name: '큰손냥', stock: '1,000방울', image: basic_2 },
-  { name: '귀족냥', stock: '100,000방울', image: basic_3 },
+  { name: '왕족냥', stock: '10,000방울', image: basic_3 },
 ];
 
 const STREAK_EFFECTS = [

@@ -1,4 +1,8 @@
-import api, { clearCsrfToken, fetchCsrfToken } from './axiosInstance';
+import api, {
+  clearCsrfToken,
+  fetchCsrfToken,
+  hasCsrfToken,
+} from './axiosInstance';
 import type { ApiResponse } from '../types/api';
 
 const baseURL = import.meta.env.VITE_API_URL;
@@ -16,6 +20,7 @@ export interface SignupRequest {
 export interface SignupResult {
   memberId: number;
   nickname: string;
+  signupRewardPopupPending: boolean;
 }
 
 export interface NicknameRequest {
@@ -31,6 +36,7 @@ export interface getMeResult {
   memberId: number;
   nickname: string;
   tutorialCompleted: boolean;
+  signupRewardPopupPending: boolean;
 }
 
 //카카오 로그인 -> 브라우저 직접 이동
@@ -86,5 +92,17 @@ export const completeTutorial = async () => {
     throw new Error(data.message);
   }
 
+  return data.result;
+};
+
+// 이미 지급된 가입 보상의 팝업 확인만 처리 (FISH 추가 지급 없음)
+export const acknowledgeSignupRewardPopup = async () => {
+  if (!hasCsrfToken()) await fetchCsrfToken();
+  const { data } = await api.patch<ApiResponse<getMeResult>>(
+    '/api/v1/members/me/signup-reward/popup',
+    undefined,
+    { timeout: 15000, suppressNetworkAlert: true }
+  );
+  if (!data.isSuccess) throw new Error(data.message);
   return data.result;
 };
