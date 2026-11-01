@@ -67,18 +67,14 @@ const HomePage = () => {
     setRewardError('');
     try {
       const updatedMember = await acknowledgeSignupRewardPopup();
-      if (
-        !active.current ||
-        useAuthstore.getState().member?.memberId !== memberId
-      )
-        return;
+      if (useAuthstore.getState().member?.memberId !== memberId) return;
       if (
         updatedMember.memberId !== memberId ||
         updatedMember.signupRewardPopupPending !== false
       )
         throw new Error('보상 확인 상태가 해제되지 않았어요.');
       useAuthstore.getState().setMember(updatedMember);
-      if (goToQuiz) navigate(ROUTES.QUIZ);
+      if (active.current && goToQuiz) navigate(ROUTES.QUIZ);
     } catch {
       if (
         active.current &&
@@ -97,8 +93,9 @@ const HomePage = () => {
 
   // 마지막 '시작하기' 버튼을 눌렀을 때 실행
   const handleTutorialComplete = async () => {
-    if (completingRef.current) return;
+    if (completingRef.current || !member) return;
 
+    const memberId = member.memberId;
     completingRef.current = true;
 
     try {
@@ -106,12 +103,16 @@ const HomePage = () => {
       // 튜토리얼 완료 뒤 /me의 최신 보상 미확인 여부로 표시 판단
       const latestMember = await getMe().catch(() => updatedMember);
       if (
-        active.current &&
-        useAuthstore.getState().member?.memberId === latestMember.memberId
+        useAuthstore.getState().member?.memberId === memberId &&
+        latestMember.memberId === memberId
       )
         useAuthstore.getState().setMember(latestMember);
     } catch {
-      alert('튜토리얼 완료를 저장하지 못했어요. 다시 시도해 주세요.');
+      if (
+        active.current &&
+        useAuthstore.getState().member?.memberId === memberId
+      )
+        alert('튜토리얼 완료를 저장하지 못했어요. 다시 시도해 주세요.');
     } finally {
       completingRef.current = false;
     }

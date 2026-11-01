@@ -110,7 +110,6 @@ const RankRow = ({
           type="button"
           onClick={onClick}
           aria-haspopup="dialog"
-          aria-label="내 랭킹 분석 보기"
           className="flex h-full w-full min-w-0 cursor-pointer items-center gap-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-60 lg:gap-4"
         >
           {content}

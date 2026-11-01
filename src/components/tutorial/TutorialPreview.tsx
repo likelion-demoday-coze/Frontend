@@ -316,7 +316,7 @@ export default function TutorialPreview({ type }: { type: PreviewType }) {
           <div className="p-[min(16px,3.23cqi)] text-[min(14px,2.82cqi)]">
             <div className="flex justify-center">
               <p className="whitespace-nowrap rounded-full border border-blue-60 bg-white px-[1.2em] py-[0.65em] text-center leading-[1.4] text-gray-80">
-                가입 선물 + 오늘 출석 보상으로{' '}
+                가입·출석 보상을 모두 받으면{' '}
                 <strong className="font-bold text-blue-60">FISH 300개</strong>로
                 시작해요!
               </p>
@@ -326,7 +326,7 @@ export default function TutorialPreview({ type }: { type: PreviewType }) {
               {[
                 { label: '가입 보상', amount: '+200', badge: '처음 1번' },
                 { label: '출석 보상', amount: '+100', badge: '매일 1번' },
-                { label: '바로 쓸 수 있는', amount: '300', badge: null },
+                { label: '모두 받으면', amount: '300', badge: null },
               ].map((reward, index) => (
                 <div
                   key={reward.label}
@@ -365,13 +365,13 @@ export default function TutorialPreview({ type }: { type: PreviewType }) {
             <div className="mt-[1.4em] grid grid-cols-[0.9fr_1.35fr] items-center gap-[1em]">
               <div className="min-w-0">
                 <p className="whitespace-nowrap font-semibold leading-[1.5] text-gray-80">
-                  오늘 이렇게 쓸 수 있어요
+                  보상 수령 후 사용 예시
                 </p>
                 <p className="mt-[0.8em] whitespace-nowrap text-[0.875em] leading-[1.7] text-blue-60">
-                  정규장과 시간외거래를
+                  두 모드를 한 번씩 풀면
                   <br />
-                  모두 풀어도 FISH{' '}
-                  {300 - DAILY_FISH_COST - TIME_ATTACK_FISH_COST}개가 남아요.
+                  FISH {300 - DAILY_FISH_COST - TIME_ATTACK_FISH_COST}개가
+                  남아요.
                 </p>
               </div>
               <div className="flex min-w-0 flex-col gap-[0.45em]">

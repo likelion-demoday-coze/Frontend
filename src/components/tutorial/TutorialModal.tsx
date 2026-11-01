@@ -4,6 +4,10 @@ import TutorialPreview from './TutorialPreview';
 import type { PreviewType } from './TutorialPreview';
 
 import catImage from '../../assets/character/basic_pose_cat.svg';
+import {
+  DAILY_FISH_COST,
+  TIME_ATTACK_FISH_COST,
+} from '../../constants/quizCost';
 
 interface TutorialStep {
   label: string;
@@ -169,6 +173,10 @@ export default function TutorialModal({
     };
   }, []);
 
+  useEffect(() => {
+    if (dialogRef.current) dialogRef.current.scrollTop = 0;
+  }, [stepIndex]);
+
   const handleNext = () => {
     if (isLastStep) {
       onComplete();
@@ -189,7 +197,7 @@ export default function TutorialModal({
       }}
       className="m-auto @container h-fit max-h-[calc(100dvh-32px)] w-[calc(100%-32px)] max-w-140 overflow-y-auto rounded-[min(24px,4.29vw)] border-0 bg-white p-0 text-gray-60 backdrop:bg-black/45"
     >
-      <div className="flex min-h-[46em] flex-col px-[2.5em] py-[2em] text-[min(16px,2.857cqi)]">
+      <div className="flex flex-col px-5 py-6 text-base sm:min-h-184 sm:px-10 sm:py-8">
         {/* 진행 표시 */}
         <div className="mb-[1.5em] flex items-center gap-[1.5em]">
           <div
@@ -232,15 +240,28 @@ export default function TutorialModal({
 
         <h2
           id={titleId}
-          className="mb-[0.75em] text-[1.5em] leading-[1.5] font-normal text-black"
+          className="mb-4 text-[clamp(20px,4.286cqi,24px)] leading-[1.5] font-normal break-keep text-black"
         >
           {step.title}
         </h2>
 
-        <TutorialPreview type={step.preview} />
+        <div className="min-w-0 shrink-0 text-[min(16px,2.857cqi)]">
+          <TutorialPreview type={step.preview} />
+        </div>
+
+        {isLastStep && (
+          <p className="sr-only">
+            가입 보상 FISH 200개는 처음 한 번, 출석 보상 FISH 100개는 매일 한 번
+            받을 수 있어요. 두 보상을 모두 받으면 FISH 300개로 시작해요. 정규장
+            5문제는 FISH {DAILY_FISH_COST}개, 시간외거래 1분은 FISH{' '}
+            {TIME_ATTACK_FISH_COST}개가 필요해요. 보상 수령 후 두 모드를 한 번씩
+            풀면 FISH {300 - DAILY_FISH_COST - TIME_ATTACK_FISH_COST}개가
+            남아요.
+          </p>
+        )}
 
         {step.descriptions.length > 0 && (
-          <ul className="mt-[1.5em] list-disc space-y-[0.5em] pl-[1.5em] text-[0.8125em] leading-[1.65] font-medium [&_strong]:font-semibold [&_strong]:text-blue-60">
+          <ul className="mt-5 list-disc space-y-2 pl-5 text-[15px] leading-[1.65] font-medium break-keep [&_strong]:font-semibold [&_strong]:text-blue-60">
             {step.descriptions.map((description, index) => (
               <li key={index}>{description}</li>
             ))}
@@ -249,7 +270,7 @@ export default function TutorialModal({
 
         <div className="mt-auto pt-[1.25em]">
           <div className="flex items-center gap-[0.875em]">
-            <div className="h-[4.25em] w-[5em] shrink-0 overflow-hidden rounded-[1.25em] border border-blue-15">
+            <div className="h-14 w-16 shrink-0 overflow-hidden rounded-[1.25em] border border-blue-15 sm:h-17 sm:w-20">
               <img
                 src={catImage}
                 alt=""
@@ -257,7 +278,7 @@ export default function TutorialModal({
               />
             </div>
 
-            <p className="min-w-0 rounded-full bg-blue-50 px-[0.857em] py-[0.57em] text-[0.875em] leading-[1.4] font-bold whitespace-nowrap text-blue-05">
+            <p className="min-w-0 rounded-2xl bg-blue-50 px-3 py-2 text-[15px] leading-[1.5] font-bold break-keep text-blue-05 sm:rounded-full">
               {step.message}
             </p>
           </div>
@@ -267,7 +288,7 @@ export default function TutorialModal({
               <button
                 type="button"
                 onClick={() => setStepIndex((previous) => previous - 1)}
-                className="h-[4em] flex-[1] cursor-pointer rounded-[0.75em] border border-gray-20 bg-white font-semibold text-gray-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-60"
+                className="h-14 flex-[1] cursor-pointer rounded-[0.75em] border border-gray-20 bg-white text-base font-semibold text-gray-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-60 sm:h-16"
               >
                 이전
               </button>
@@ -276,7 +297,7 @@ export default function TutorialModal({
             <button
               type="button"
               onClick={handleNext}
-              className="h-[4em] flex-[1.8] cursor-pointer rounded-[0.75em] bg-blue-60 font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-60"
+              className="h-14 flex-[1.8] cursor-pointer rounded-[0.75em] bg-blue-60 text-base font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-60 sm:h-16"
             >
               {isLastStep ? '시작하기' : '다음'}
             </button>
