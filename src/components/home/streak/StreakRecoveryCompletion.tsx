@@ -8,6 +8,7 @@ import {
 import type { MyStreak, StreakRecovery } from '../../../api/streak';
 import type { StreakDayStatus } from '../../../types/streak';
 import useAuthstore from '../../../stores/useAuthStore';
+import { ROUTES } from '../../../constants/routes';
 import { useBlockRankingReward } from '../../../hooks/useRankingRewardGate';
 import {
   RECOVERY_STATUS_CHANGED,
@@ -20,6 +21,9 @@ import StreakRecoveryCompleteModal from './StreakRecoveryCompleteModal';
 const StreakRecoveryCompletion = () => {
   const { pathname } = useLocation();
   const memberId = useAuthstore((state) => state.member?.memberId);
+  const signupRewardPending = useAuthstore(
+    (state) => state.member?.signupRewardPopupPending === true
+  );
   const [completion, setCompletion] = useState<{
     recovery: StreakRecovery;
     streak: MyStreak;
@@ -32,8 +36,7 @@ const StreakRecoveryCompletion = () => {
   const [skippedKey, setSkippedKey] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   useBlockRankingReward(
-    completion !== null ||
-      (memberId !== undefined && checkedKey !== checkKey)
+    completion !== null || (memberId !== undefined && checkedKey !== checkKey)
   );
 
   useEffect(() => {
@@ -101,6 +104,9 @@ const StreakRecoveryCompletion = () => {
       document.removeEventListener('visibilitychange', checkVisible);
     };
   }, [pathname, memberId, checkKey, skippedKey, retryCount]);
+
+  // 홈의 가입 보상·튜토리얼 안내가 끝난 뒤 복구 완료 팝업 표시
+  if (pathname === ROUTES.HOME && signupRewardPending) return null;
 
   if (failedKey === checkKey && skippedKey !== checkKey) {
     return (

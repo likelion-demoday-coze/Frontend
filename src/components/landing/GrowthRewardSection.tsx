@@ -25,7 +25,7 @@ const GrowthRewardSection = () => {
         <div className="mt-[clamp(16px,6dvh,64px)] grid min-h-min flex-1 items-center justify-items-center gap-4 md:grid-cols-2 md:gap-8">
           <img
             src={characterEvolution}
-            alt="캐릭터 진화: 시작은 초보냥, 주가 1,000에는 큰손냥, 주가 100,000에는 왕족냥으로 진화해요."
+            alt="캐릭터 진화: 시작은 초보냥, 주가 1,000에는 큰손냥, 주가 10,000에는 왕족냥으로 진화해요."
             loading="lazy"
             className="h-auto max-h-[28dvh] w-[544px] max-w-full object-contain md:max-h-[calc(100dvh-260px)]"
           />

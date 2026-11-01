@@ -266,8 +266,9 @@ const SignupPage = () => {
                 닉네임을 정해주세요
               </h1>
               <p className="mx-auto mt-2 max-w-65 text-[14px] text-gray-60 lg:mx-0 lg:max-w-none lg:text-[18px]">
-                랭킹에 공개되는 이름이에요. 마이페이지에서 언제든 바꿀 수
-                있어요.
+                랭킹에 공개되는 이름이에요.
+                <br />
+                마이페이지에서 언제든 바꿀 수 있어요.
               </p>
             </div>
 

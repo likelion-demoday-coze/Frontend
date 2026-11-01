@@ -4,6 +4,10 @@ import TutorialPreview from './TutorialPreview';
 import type { PreviewType } from './TutorialPreview';
 
 import catImage from '../../assets/character/basic_pose_cat.svg';
+import {
+  DAILY_FISH_COST,
+  TIME_ATTACK_FISH_COST,
+} from '../../constants/quizCost';
 
 interface TutorialStep {
   label: string;
@@ -55,14 +59,14 @@ const TUTORIAL_STEPS: TutorialStep[] = [
         상승해요. 틀려도 떨어지지 않아요.
       </>,
       <>
-        주가가 오르면 냥이가 <strong>초보냥 → 큰손냥 → 귀족냥</strong>으로
+        주가가 오르면 냥이가 <strong>초보냥 → 큰손냥 → 왕족냥</strong>으로
         진화해요.
       </>,
       <>
         주가 반영은 <strong>하루 정규장 2회</strong>까지예요. (패스 회원 3회)
       </>,
     ],
-    message: '나를 귀족냥으로 만들어 달라 냥!',
+    message: '나를 왕족냥으로 만들어 달라 냥!',
   },
   {
     label: '정규장 · 데일리 퀴즈',
@@ -122,7 +126,8 @@ const TUTORIAL_STEPS: TutorialStep[] = [
         내려갈 수 있어요.
       </>,
       <>
-        당일 안에 <strong>하락 방지권(생선 200개)</strong>을 쓰면 모두 복구돼요.
+        <strong>쉰 다음 날 23:59까지 연속 학습 복구권</strong>을 쓰면 모두
+        복구돼요.
       </>,
     ],
     message: '매일매일 와야 반짝반짝해진다 냥',
@@ -135,17 +140,8 @@ const TUTORIAL_STEPS: TutorialStep[] = [
       </>
     ),
     preview: 'start',
-    descriptions: [
-      <>
-        생선은 매일 <strong>출석 보상</strong>으로 받고, 퀴즈에{' '}
-        <strong>입장할 때</strong> 써요.
-      </>,
-      <>
-        출석 보상 100개를 받으면 <strong>바로 정규장에 입장</strong>할 수
-        있어요.
-      </>,
-    ],
-    message: '오늘의 생선부터 받고 가자 냥',
+    descriptions: [],
+    message: '가입 선물부터 받으러 가자 냥!',
   },
 ];
 
@@ -177,6 +173,10 @@ export default function TutorialModal({
     };
   }, []);
 
+  useEffect(() => {
+    if (dialogRef.current) dialogRef.current.scrollTop = 0;
+  }, [stepIndex]);
+
   const handleNext = () => {
     if (isLastStep) {
       onComplete();
@@ -195,12 +195,15 @@ export default function TutorialModal({
         event.preventDefault();
         onClose();
       }}
-      className="m-auto h-170 max-h-[calc(100dvh-32px)] w-[calc(100%-32px)] max-w-140 overflow-y-auto rounded-2xl border-0 bg-white p-0 text-gray-60 backdrop:bg-black/45"
+      className="m-auto @container h-fit max-h-[calc(100dvh-32px)] w-[calc(100%-32px)] max-w-140 overflow-y-auto rounded-[min(24px,4.29vw)] border-0 bg-white p-0 text-gray-60 backdrop:bg-black/45"
     >
-      <div className="flex min-h-full flex-col px-8 py-8">
+      <div className="flex flex-col px-5 py-6 text-base sm:min-h-184 sm:px-10 sm:py-8">
         {/* 진행 표시 */}
-        <div className="mb-6 flex items-center gap-6">
-          <div className="relative h-0.5 flex-1 bg-gray-20" aria-hidden="true">
+        <div className="mb-[1.5em] flex items-center gap-[1.5em]">
+          <div
+            className="relative h-[0.0625em] flex-1 bg-gray-20"
+            aria-hidden="true"
+          >
             <div
               className="absolute inset-y-0 left-0 bg-blue-60"
               style={{
@@ -211,7 +214,7 @@ export default function TutorialModal({
             {TUTORIAL_STEPS.map((item, index) => (
               <span
                 key={item.preview}
-                className={`absolute top-1/2 size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full ${
+                className={`absolute top-1/2 size-[0.3125em] -translate-x-1/2 -translate-y-1/2 rounded-full ${
                   index <= stepIndex ? 'bg-blue-60' : 'bg-gray-20'
                 }`}
                 style={{
@@ -224,35 +227,50 @@ export default function TutorialModal({
           <span
             aria-live="polite"
             aria-atomic="true"
-            className="shrink-0 text-base font-semibold"
+            className="shrink-0 text-[1em] font-semibold"
           >
             <span className="sr-only">튜토리얼 단계 </span>
             {stepIndex + 1}/{totalSteps}
           </span>
         </div>
 
-        <p className="mb-6 text-[16px] font-semibold text-blue-60">
+        <p className="mb-[1em] text-[1em] font-semibold text-blue-60">
           {step.label}
         </p>
 
         <h2
           id={titleId}
-          className="mb-3 text-2xl leading-9 font-normal text-black"
+          className="mb-4 text-[clamp(20px,4.286cqi,24px)] leading-[1.5] font-normal break-keep text-black"
         >
           {step.title}
         </h2>
 
-        <TutorialPreview type={step.preview} />
+        <div className="min-w-0 shrink-0 text-[min(16px,2.857cqi)]">
+          <TutorialPreview type={step.preview} />
+        </div>
 
-        <ul className="mt-4 list-disc space-y-1.5 pl-7 text-sm leading-5 font-medium [&_strong]:font-semibold [&_strong]:text-blue-60">
-          {step.descriptions.map((description, index) => (
-            <li key={index}>{description}</li>
-          ))}
-        </ul>
+        {isLastStep && (
+          <p className="sr-only">
+            가입 보상 FISH 200개는 처음 한 번, 출석 보상 FISH 100개는 매일 한 번
+            받을 수 있어요. 두 보상을 모두 받으면 FISH 300개로 시작해요. 정규장
+            5문제는 FISH {DAILY_FISH_COST}개, 시간외거래 1분은 FISH{' '}
+            {TIME_ATTACK_FISH_COST}개가 필요해요. 보상 수령 후 두 모드를 한 번씩
+            풀면 FISH {300 - DAILY_FISH_COST - TIME_ATTACK_FISH_COST}개가
+            남아요.
+          </p>
+        )}
 
-        <div className="mt-auto pt-5.25">
-          <div className="flex items-center gap-3.5">
-            <div className="h-17 w-20 shrink-0 overflow-hidden rounded-xl border border-blue-15">
+        {step.descriptions.length > 0 && (
+          <ul className="mt-5 list-disc space-y-2 pl-5 text-[15px] leading-[1.65] font-medium break-keep [&_strong]:font-semibold [&_strong]:text-blue-60">
+            {step.descriptions.map((description, index) => (
+              <li key={index}>{description}</li>
+            ))}
+          </ul>
+        )}
+
+        <div className="mt-auto pt-[1.25em]">
+          <div className="flex items-center gap-[0.875em]">
+            <div className="h-14 w-16 shrink-0 overflow-hidden rounded-[1.25em] border border-blue-15 sm:h-17 sm:w-20">
               <img
                 src={catImage}
                 alt=""
@@ -260,17 +278,17 @@ export default function TutorialModal({
               />
             </div>
 
-            <p className="rounded-2xl bg-blue-50 px-3 py-2 text-sm leading-5 font-bold text-blue-05">
+            <p className="min-w-0 rounded-2xl bg-blue-50 px-3 py-2 text-[15px] leading-[1.5] font-bold break-keep text-blue-05 sm:rounded-full">
               {step.message}
             </p>
           </div>
 
-          <div className="mt-7 flex gap-3">
+          <div className="mt-[1.75em] flex gap-[0.75em]">
             {!isFirstStep && (
               <button
                 type="button"
                 onClick={() => setStepIndex((previous) => previous - 1)}
-                className="h-16 flex-[1] rounded-xl border border-gray-20 bg-white font-semibold text-gray-60 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-60"
+                className="h-14 flex-[1] cursor-pointer rounded-[0.75em] border border-gray-20 bg-white text-base font-semibold text-gray-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-60 sm:h-16"
               >
                 이전
               </button>
@@ -279,7 +297,7 @@ export default function TutorialModal({
             <button
               type="button"
               onClick={handleNext}
-              className="h-16 flex-[1.8] rounded-xl bg-blue-60 font-semibold text-white cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-60"
+              className="h-14 flex-[1.8] cursor-pointer rounded-[0.75em] bg-blue-60 text-base font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-60 sm:h-16"
             >
               {isLastStep ? '시작하기' : '다음'}
             </button>

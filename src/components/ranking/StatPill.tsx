@@ -14,23 +14,34 @@ const STAT_ICONS: Record<string, string> = {
 interface StatPillProps {
   label: string;
   value: string;
+  compact?: boolean;
 }
 
-const StatPill = ({ label, value }: StatPillProps) => (
-  <li className="flex items-center rounded-2xl gap-3 border border-gray-20 px-5 py-2 h-14">
+const StatPill = ({ label, value, compact = false }: StatPillProps) => (
+  <li
+    className={`flex h-14 items-center rounded-2xl border border-gray-20 py-2 ${compact ? 'gap-2 px-3' : 'gap-3 px-5'}`}
+  >
     {STAT_ICONS[label] ? (
       <img
         src={STAT_ICONS[label]}
         alt=""
-        className="h-11 w-11 shrink-0 object-contain"
+        className={`${compact ? 'size-8' : 'size-11'} shrink-0 object-contain`}
       />
     ) : (
-      <div className="h-11 w-11 shrink-0 rounded-full bg-gray-20" />
+      <div
+        className={`${compact ? 'size-8' : 'size-11'} shrink-0 rounded-full bg-gray-20`}
+      />
     )}
-    <span className="flex-1 font-semibold text-[16px] text-gray-60">
+    <span
+      className={`min-w-0 flex-1 font-semibold text-gray-60 ${compact ? 'text-sm' : 'text-[16px]'}`}
+    >
       {label}
     </span>
-    <span className=" text-blue-60">{value}</span>
+    <span
+      className={`text-blue-60 ${compact ? 'shrink-0 whitespace-nowrap text-sm' : ''}`}
+    >
+      {value}
+    </span>
   </li>
 );
 

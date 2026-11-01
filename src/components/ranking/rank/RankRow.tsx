@@ -23,6 +23,7 @@ const RANK_IMAGES: Record<number, string> = {
 interface RankRowProps extends MyRank {
   isMe?: boolean;
   isStock?: boolean;
+  onClick?: () => void;
 }
 //큰 타입에서, 필요한 속성만을 골라서 새로운 타입을 만듦 -> Pick
 const RankNumber = ({
@@ -68,28 +69,54 @@ const RankRow = ({
   score,
   isMe,
   change,
+  onClick,
 }: RankRowProps) => {
-  return (
-    <li
-      className={`flex h-14 items-center gap-2 rounded-[20px] px-3 cursor-pointer lg:gap-4 lg:rounded-2xl lg:px-5 ${
-        isMe ? 'sticky top-0 z-10 border border-blue-60 bg-blue-08' : 'border-t border-gray-20'
-      }`}
-    >
+  const content = (
+    <>
       <div className="flex min-w-9 shrink-0 items-center lg:w-20">
         <RankNumber rank={rank} isMe={isMe} change={change} />
       </div>
       <div className="shrink-0">
         <Avatar src={RANK_PROFILES[rank] ?? basic1} />
       </div>
-      <span
-        title={nickname}
-        className={`min-w-0 flex-1 truncate text-[16px] font-semibold ${isMe ? 'text-blue-60 lg:text-gray-60' : 'text-gray-60'}`}
-      >
-        {nickname}
+      <span className="min-w-0 flex-1">
+        <span
+          title={nickname}
+          className={`block truncate text-[16px] font-semibold ${isMe ? 'text-blue-60 lg:text-gray-60' : 'text-gray-60'}`}
+        >
+          {nickname}
+        </span>
+        {onClick && (
+          <span className="block truncate text-[10px] text-gray-40">
+            클릭하여 내 랭킹 분석 보기
+          </span>
+        )}
       </span>
       <div className="shrink-0">
         <ScoreBadge value={score} isStock={isStock} isMe={isMe} />
       </div>
+    </>
+  );
+  return (
+    <li
+      className={`flex h-14 items-center gap-2 rounded-[20px] px-3 cursor-pointer lg:gap-4 lg:rounded-2xl lg:px-5 ${
+        isMe
+          ? 'sticky top-0 z-10 border border-blue-60 bg-blue-08'
+          : 'border-t border-gray-20'
+      }`}
+    >
+      {onClick ? (
+        <button
+          type="button"
+          onClick={onClick}
+          aria-haspopup="dialog"
+          className="flex h-full w-full min-w-0 cursor-pointer items-center gap-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-60 lg:gap-4"
+        >
+          {content}
+        </button>
+      ) : (
+        content
+      )}
     </li>
   );
 };
