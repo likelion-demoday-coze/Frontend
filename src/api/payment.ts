@@ -6,6 +6,7 @@ import {
 } from '../constants/payment';
 import type {
   PaymentDetail,
+  PaymentOrderStatus,
   PaymentHistories,
   CreatePaymentOrderRequest,
   CreatePaymentOrderResult,
@@ -52,7 +53,7 @@ export const getPaymentStatus = async (
   orderNumber: string,
   signal?: AbortSignal
 ) => {
-  const { data } = await api.get<ApiResponse<PaymentDetail>>(
+  const { data } = await api.get<ApiResponse<PaymentOrderStatus>>(
     `/api/v1/payments/orders/${encodeURIComponent(orderNumber)}`,
     { signal }
   );

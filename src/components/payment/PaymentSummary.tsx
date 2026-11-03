@@ -6,8 +6,16 @@ export interface PaymentSummaryRow {
   emphasis?: 'blue' | 'red';
 }
 
-const PaymentSummary = ({ rows }: { rows: PaymentSummaryRow[] }) => (
-  <dl className="mt-6 divide-y divide-gray-20 rounded-xl bg-gray-05 px-4 text-xs sm:text-sm">
+const PaymentSummary = ({
+  rows,
+  compact = false,
+}: {
+  rows: PaymentSummaryRow[];
+  compact?: boolean;
+}) => (
+  <dl
+    className={`mt-6 divide-y divide-gray-20 rounded-xl bg-gray-05 px-4 ${compact ? 'text-xs' : 'text-xs sm:text-sm'}`}
+  >
     {rows.map(({ label, value, emphasis }) => (
       <div key={label} className="flex items-start justify-between gap-3 py-3">
         <dt className="shrink-0 font-semibold text-gray-60">{label}</dt>

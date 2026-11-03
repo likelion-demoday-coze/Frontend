@@ -6,6 +6,7 @@ interface PaymentModalFrameProps {
   children: ReactNode;
   onClose?: () => void;
   isBusy?: boolean;
+  maxWidth?: number;
 }
 
 const PaymentModalFrame = ({
@@ -13,6 +14,7 @@ const PaymentModalFrame = ({
   children,
   onClose,
   isBusy = false,
+  maxWidth,
 }: PaymentModalFrameProps) => {
   const ref = useRef<HTMLDialogElement>(null);
 
@@ -32,6 +34,7 @@ const PaymentModalFrame = ({
       ref={ref}
       aria-labelledby={titleId}
       aria-busy={isBusy}
+      style={maxWidth === undefined ? undefined : { maxWidth }}
       onCancel={(event) => {
         event.preventDefault();
         if (!isBusy) onClose?.();

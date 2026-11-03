@@ -10,12 +10,11 @@ import {
   getPaymentDetail,
   getPaymentHistories,
 } from '../../api/payment';
-import { getPassHistories } from '../../api/pass';
+import PaymentDetailModal from '../payment/PaymentDetailModal';
 import PaymentResultModal from '../payment/PaymentResultModal';
 import { ROUTES } from '../../constants/routes';
 import type { FishTransaction, FishTransactionType } from '../../types/fish';
-import type { PassHistory } from '../../types/pass';
-import type { PaymentHistory } from '../../types/payment';
+import type { PaymentDetail, PaymentHistory } from '../../types/payment';
 import { formatMonthDay, formatTime } from '../../utils/date';
 
 type HistoryTab = 'fish' | 'payment';
@@ -94,14 +93,6 @@ interface UsageHistoryProps {
   onRefunded: () => void;
 }
 
-//결제 건마다 패스가 따로 붙으므로, 그 결제의 패스가 아직 유효할 때만 환불 가능
-const isRefundable = (payment: PaymentHistory, pass?: PassHistory) => {
-  if (payment.status !== 'APPROVED' && payment.status !== 'COMPLETED')
-    return false;
-  if (!pass) return true;
-  return !pass.cancelledAt && Date.parse(pass.expiresAt) > Date.now();
-};
-
 //마이페이지 이용 내역 (FISH 내역 / 결제 내역)
 const UsageHistory = ({ onRefunded }: UsageHistoryProps) => {
   const navigate = useNavigate();
@@ -114,20 +105,33 @@ const UsageHistory = ({ onRefunded }: UsageHistoryProps) => {
   const [fishReloadKey, setFishReloadKey] = useState(0);
   const [payments, setPayments] = useState<PaymentHistory[] | null>(null);
   const [isPaymentError, setIsPaymentError] = useState(false);
-  const [passByPayment, setPassByPayment] = useState<
-    Record<number, PassHistory>
-  >({});
-  const [refundTarget, setRefundTarget] = useState<PaymentHistory | null>(null);
+  const [detailPaymentId, setDetailPaymentId] = useState<number | null>(null);
+  const [refundTarget, setRefundTarget] = useState<PaymentDetail | null>(null);
   const [isRefunding, setIsRefunding] = useState(false);
   const refundLock = useRef(false);
   const active = useRef(true);
   const refundTrigger = useRef<HTMLButtonElement | null>(null);
+  const hadPaymentModal = useRef(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const [refundPhase, setRefundPhase] = useState<
     'refund-confirm' | 'refund-success' | 'refund-pending' | 'refund-failed'
   >('refund-confirm');
   const [refundAmount, setRefundAmount] = useState<number | null>(null);
   const [refundError, setRefundError] = useState('');
+
+  useEffect(() => {
+    const isOpen = detailPaymentId !== null || refundTarget !== null;
+    const shouldRestore = hadPaymentModal.current && !isOpen;
+    hadPaymentModal.current = isOpen;
+    if (!shouldRestore) return;
+    // 모달이 제거된 뒤 목록의 상세보기 버튼으로 포커스 복귀
+    const frame = window.requestAnimationFrame(() => {
+      const trigger = refundTrigger.current;
+      if (trigger?.isConnected && !trigger.disabled) trigger.focus();
+      else headingRef.current?.focus();
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [detailPaymentId, refundTarget]);
 
   useEffect(() => {
     active.current = true;
@@ -142,11 +146,6 @@ const UsageHistory = ({ onRefunded }: UsageHistoryProps) => {
     setRefundTarget(null);
     if (refundPhase === 'refund-pending') setPayments(null);
     if (completed) onRefunded();
-    window.requestAnimationFrame(() => {
-      const trigger = refundTrigger.current;
-      if (trigger?.isConnected && !trigger.disabled) trigger.focus();
-      else headingRef.current?.focus();
-    });
   };
 
   useEffect(() => {
@@ -175,18 +174,10 @@ const UsageHistory = ({ onRefunded }: UsageHistoryProps) => {
     if (tab !== 'payment' || payments || isPaymentError) return;
     let ignore = false;
     //운영 기간이 3주라 결제 내역은 한 번에 조회
-    Promise.all([
-      getPaymentHistories(0, 20),
-      getPassHistories(0, 20).catch(() => null),
-    ])
-      .then(([data, passes]) => {
+    getPaymentHistories(0, 20)
+      .then((data) => {
         if (ignore) return;
         setPayments(data.payments);
-        setPassByPayment(
-          Object.fromEntries(
-            (passes?.passes ?? []).map((pass) => [pass.paymentId, pass])
-          )
-        );
       })
       .catch((error) => {
         console.error('결제 내역 조회 실패', error);
@@ -209,6 +200,18 @@ const UsageHistory = ({ onRefunded }: UsageHistoryProps) => {
       const current = retrying
         ? await getPaymentDetail(target.paymentId)
         : null;
+      if (!active.current) return;
+      if (
+        current &&
+        (current.status === 'COMPLETED' || current.status === 'APPROVED') &&
+        current.refundable !== true
+      ) {
+        setRefundError(
+          '현재 환불할 수 없는 결제예요. 결제 상세를 다시 확인해 주세요.'
+        );
+        setRefundPhase('refund-failed');
+        return;
+      }
       const result =
         current &&
         current.status !== 'COMPLETED' &&
@@ -225,9 +228,7 @@ const UsageHistory = ({ onRefunded }: UsageHistoryProps) => {
           ) ?? prev
       );
       if (result.status === 'REFUNDED' || result.status === 'CANCELLED') {
-        setRefundAmount(
-          'refundedAmount' in result ? result.refundedAmount : result.amount
-        );
+        setRefundAmount(result.refundedAmount ?? target.amount);
         setRefundPhase('refund-success');
       } else if (result.status === 'CANCEL_REQUESTED') {
         setRefundPhase('refund-pending');
@@ -367,7 +368,7 @@ const UsageHistory = ({ onRefunded }: UsageHistoryProps) => {
               key={payment.paymentId}
               className="flex items-start justify-between gap-3 border-b border-gray-20 py-3 last:border-b-0 lg:items-center lg:border-b-0 lg:py-2"
             >
-              <span className="flex min-w-0 items-start gap-4">
+              <span className="flex min-w-0 flex-1 items-start gap-4">
                 <span className="hidden w-12 shrink-0 text-sm leading-[1.3] font-medium text-gray-60 lg:block">
                   {formatMonthDay(paidAt)}
                   <br />
@@ -392,26 +393,22 @@ const UsageHistory = ({ onRefunded }: UsageHistoryProps) => {
                   >
                     {status.label}
                   </span>
-                  {isRefundable(payment, passByPayment[payment.paymentId]) && (
-                    <button
-                      type="button"
-                      onClick={(event) => {
-                        refundTrigger.current = event.currentTarget;
-                        setRefundPhase('refund-confirm');
-                        setRefundAmount(null);
-                        setRefundError('');
-                        setRefundTarget(payment);
-                      }}
-                      className="cursor-pointer text-xs font-semibold text-gray-40 underline underline-offset-2"
-                    >
-                      환불하기
-                    </button>
-                  )}
                 </span>
                 <strong className="text-sm font-semibold text-black lg:text-base">
                   ₩ {payment.amount.toLocaleString()}
                 </strong>
               </span>
+              <button
+                type="button"
+                onClick={(event) => {
+                  refundTrigger.current = event.currentTarget;
+                  setDetailPaymentId(payment.paymentId);
+                }}
+                aria-label={`${payment.productName} 결제 상세 보기, 주문번호 ${payment.orderNumber}`}
+                className="flex min-h-10 w-8 shrink-0 cursor-pointer items-center justify-center self-center rounded-lg text-gray-40 focus-visible:outline-2 focus-visible:outline-blue-60"
+              >
+                <ArrowIcon aria-hidden="true" className="h-6 w-3" />
+              </button>
             </li>
           );
         })}
@@ -456,12 +453,36 @@ const UsageHistory = ({ onRefunded }: UsageHistoryProps) => {
           결제 관련 문의는 고객센터 이메일로 주문번호를 알려 주세요.
         </p>
       )}
+      {detailPaymentId !== null && !refundTarget && (
+        <PaymentDetailModal
+          key={detailPaymentId}
+          paymentId={detailPaymentId}
+          onClose={() => {
+            setDetailPaymentId(null);
+          }}
+          onRefund={(payment) => {
+            if (payment.refundable !== true) return;
+            setDetailPaymentId(null);
+            setRefundPhase('refund-confirm');
+            setRefundAmount(null);
+            setRefundError('');
+            setRefundTarget(payment);
+          }}
+        />
+      )}
       {refundTarget && (
         <PaymentResultModal
           status={refundPhase}
           amount={refundAmount ?? refundTarget.amount}
           orderNumber={refundTarget.orderNumber}
-          passPeriod={passByPayment[refundTarget.paymentId] ?? null}
+          passPeriod={
+            refundTarget.passStartedAt && refundTarget.passExpiresAt
+              ? {
+                  startedAt: refundTarget.passStartedAt,
+                  expiresAt: refundTarget.passExpiresAt,
+                }
+              : null
+          }
           failureMessage={refundError}
           isRetrying={isRefunding}
           onRetry={() => {
