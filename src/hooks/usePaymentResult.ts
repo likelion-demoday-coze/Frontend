@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { isAxiosError } from 'axios';
 import { getPaymentStatus } from '../api/payment';
 import { getCurrentPass, getPassHistories } from '../api/pass';
-import type { PaymentDetail } from '../types/payment';
+import type { PaymentOrderStatus } from '../types/payment';
 
 type PaymentCheckState =
-  | { phase: 'checking'; payment: PaymentDetail | null }
-  | { phase: 'delayed'; payment: PaymentDetail | null }
-  | { phase: 'resolved'; payment: PaymentDetail }
+  | { phase: 'checking'; payment: PaymentOrderStatus | null }
+  | { phase: 'delayed'; payment: PaymentOrderStatus | null }
+  | { phase: 'resolved'; payment: PaymentOrderStatus }
   | { phase: 'error'; message: string };
 type PassPeriod = { startedAt: string; expiresAt: string };
 
@@ -42,7 +42,7 @@ export const usePaymentResult = (orderNumber: string | null) => {
     const controller = new AbortController();
     let active = true;
     let pollTimer: ReturnType<typeof setTimeout>;
-    let latest: PaymentDetail | null = null;
+    let latest: PaymentOrderStatus | null = null;
     const update = (state: PaymentCheckState) => {
       if (active && !controller.signal.aborted)
         setStored({ orderNumber, attempt, state });
