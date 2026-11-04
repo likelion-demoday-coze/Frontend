@@ -20,10 +20,11 @@ const Layout = () => {
   const [isMobile, setIsMobile] = useState(
     () => !window.matchMedia('(min-width: 1024px)').matches
   );
-  const hideMobileNavigation = isMobile && Boolean(
+  const isQuizPlayPage = Boolean(
     matchPath(ROUTES.DAILY_QUIZ_PLAY, pathname) ||
     matchPath(ROUTES.TIME_ATTACK_PLAY, pathname)
   );
+  const hideMobileNavigation = isMobile && isQuizPlayPage;
   const [passOrCash, setPassOrCash] = useState<PassOrCash>({
     hasPass: false,
     status: 'loading',
@@ -136,7 +137,8 @@ const Layout = () => {
         )}
         {/* 본문 틀: 폭 제한 + 가운데 + 공통 패딩 */}
         <div className={`relative mx-auto w-full max-w-360 px-6 pt-6 pb-10 lg:pt-16 ${isShopPage ? 'flex-1' : ''}`}>
-          <div className="hidden lg:absolute lg:top-16 lg:right-33.25 lg:block">
+          {/* 퀴즈 풀이 화면은 좁은 데스크탑에서 헤더 칩과 겹치지 않게 위젯을 오른쪽 끝으로 */}
+          <div className={`hidden lg:absolute lg:top-16 lg:block ${isQuizPlayPage ? 'lg:right-6 min-[85.375rem]:right-33.25' : 'lg:right-33.25'}`}>
             <TopBar
               streakDays={streakState.streak?.currentStreak ?? null}
               fishBalance={fishBalance}
