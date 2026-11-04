@@ -93,7 +93,7 @@ const CharacterEvolutionModal = ({
           disabled={isSubmitting}
           className="mt-8 h-15 w-40 cursor-pointer rounded-xl bg-blue-60 text-lg font-semibold text-white hover:brightness-95 disabled:cursor-wait disabled:opacity-50"
         >
-          {isSubmitting ? '확인 중...' : '확인'}
+          {isSubmitting ? '확인 중...' : errorMessage ? '닫기' : '확인'}
         </button>
       </div>
     </dialog>

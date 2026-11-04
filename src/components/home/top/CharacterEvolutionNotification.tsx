@@ -23,6 +23,7 @@ const CharacterEvolutionNotification = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmError, setConfirmError] = useState('');
   const confirmLock = useRef(false);
+  const confirmFailedMemberId = useRef<number | null>(null);
   const active = useRef(true);
   useEffect(() => {
     active.current = true;
@@ -43,6 +44,8 @@ const CharacterEvolutionNotification = () => {
     getMyCharacter({ timeout: 5000, suppressNetworkAlert: true })
       .then((character) => {
         if (active) {
+          confirmFailedMemberId.current = null;
+          setConfirmError('');
           setFailed(false);
           setResult({
             memberId,
@@ -90,6 +93,11 @@ const CharacterEvolutionNotification = () => {
           useAuthstore.getState().member?.memberId !== memberId
         )
           return;
+        // 확인 저장에 실패했다면 서버의 미확인 상태를 유지하고 화면만 닫기
+        if (confirmFailedMemberId.current === memberId) {
+          setResult({ memberId, evolution: null });
+          return;
+        }
         confirmLock.current = true;
         setIsSubmitting(true);
         setConfirmError('');
@@ -104,8 +112,12 @@ const CharacterEvolutionNotification = () => {
           if (
             active.current &&
             useAuthstore.getState().member?.memberId === memberId
-          )
-            setConfirmError('진화 확인을 저장하지 못했어요. 다시 눌러 주세요.');
+          ) {
+            confirmFailedMemberId.current = memberId;
+            setConfirmError(
+              '진화 확인을 저장하지 못했어요. 닫으면 다음 방문에 다시 안내해 드릴게요.'
+            );
+          }
         } finally {
           confirmLock.current = false;
           if (active.current) setIsSubmitting(false);

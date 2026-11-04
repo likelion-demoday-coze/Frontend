@@ -59,7 +59,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
         상승해요. 틀려도 떨어지지 않아요.
       </>,
       <>
-        아기냥에서 시작해 <strong>첫 정답에 기본냥</strong>,{' '}
+        아기냥에서 시작해 <strong>첫 정답에 초보냥</strong>,{' '}
         <strong>250방울에 큰손냥 → 1,500방울에 왕족냥</strong>으로 진화해요.
       </>,
       <>
