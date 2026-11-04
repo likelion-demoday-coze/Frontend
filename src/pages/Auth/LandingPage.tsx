@@ -62,21 +62,26 @@ const LandingPage = () => {
 
         <div className="mx-auto flex min-h-min w-full max-w-300 flex-1 flex-col items-center gap-6 px-5 lg:flex-row lg:justify-between lg:gap-8 lg:px-6">
           <section className="flex min-h-min w-full flex-1 flex-col pt-4 pb-6 lg:block lg:flex-1 lg:max-w-120 lg:pb-0 lg:pt-0">
-            <h1 className="shrink-0 text-[30px] leading-tight font-light lg:text-[clamp(40px,4vw,56px)]">
-              하루 5분,
-              <br />
-              <strong className="font-medium">경제 지식</strong>이
-              <br />
-              <strong className="font-medium">내 주가</strong>가 되는 곳
-            </h1>
-            <p className="relative z-10 mt-4 max-w-55 shrink-0 text-[13px] leading-relaxed text-gray-60 lg:mt-6 lg:max-w-none lg:text-[clamp(16px,1.5vw,20px)]">
-              경제 퀴즈를 맞힐수록 내 주가가 올라가요.
-              <br />
-              매일 5문제로 지식 수익률을 쌓고, 랭킹에서 겨뤄보세요.
-            </p>
+            <div className="relative z-20 -m-4 p-4 lg:contents">
+              <h1 className="shrink-0 text-[30px] leading-tight font-light lg:text-[clamp(40px,4vw,56px)]">
+                하루 5분,
+                <br />
+                <strong className="font-medium">경제 지식</strong>이
+                <br />
+                <strong className="font-medium">내 주가</strong>가 되는 곳
+              </h1>
+              <p className="relative z-10 mt-4 max-w-55 shrink-0 text-[13px] leading-relaxed text-gray-60 lg:mt-6 lg:max-w-none lg:text-[clamp(16px,1.5vw,20px)]">
+                경제 퀴즈를 맞힐수록 내 주가가 올라가요.
+                <br />
+                매일 5문제로 지식 수익률을 쌓고, 랭킹에서 겨뤄보세요.
+              </p>
+            </div>
 
             {/* 모바일: 차트 위로 캐릭터와 질문 말풍선을 겹쳐 배치 */}
-            <div aria-hidden className="relative mt-6 min-h-40 flex-1 lg:hidden">
+            <div
+              aria-hidden
+              className="relative z-0 mt-6 min-h-40 flex-1 lg:hidden"
+            >
               <img
                 src={chartCard}
                 alt=""
@@ -88,7 +93,7 @@ const LandingPage = () => {
               <img
                 src={catImage}
                 alt=""
-                className="pointer-events-none absolute right-0 bottom-7.5 w-[138%] max-w-179 translate-x-[30%] translate-y-[15%]"
+                className="pointer-events-none absolute right-0 -bottom-4 w-[138%] max-w-179 translate-x-[30%] translate-y-[25%] max-[380px]:w-full max-[380px]:translate-x-0"
               />
               <p className="absolute -top-4 -right-8 w-40 rounded-xl bg-white px-3 py-3 text-[9px] leading-relaxed font-medium shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
                 {BUBBLES[2].question}
