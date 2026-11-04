@@ -157,7 +157,9 @@ const DailyRewardCard = ({
           </p>
         )}
         <p className="absolute top-4 left-1/2 w-max max-w-[calc(100%-24px)] -translate-x-1/2 rounded-full bg-blue-50 px-3 py-2 text-center text-[14px] lg:top-10 xl:text-[16px] font-semibold break-keep text-white">
-          오늘의 생선 받아가라 냥
+          {status === 'CLAIMED' || status === 'PASS_ACTIVE'
+            ? '문제 풀러 가봐라 냥'
+            : '오늘의 생선 받아가라 냥'}
         </p>
       </Card>
 
