@@ -5,6 +5,7 @@ export interface RankItem {
   rank: number;
   nickname: string;
   score: string | number;
+  currentStock?: number;
   profileImage?: string | null;
 }
 

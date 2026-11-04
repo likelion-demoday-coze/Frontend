@@ -1,5 +1,6 @@
-import characterEvolution from '../../assets/onboarding/page_4/4_character_evolution.svg';
 import learningReward from '../../assets/onboarding/page_4/4_learning_reward.svg';
+import { CHARACTER_STAGES } from '../../constants/character';
+import { getStandingCharacterImage } from '../../utils/character';
 
 const GrowthRewardSection = () => {
   return (
@@ -23,12 +24,32 @@ const GrowthRewardSection = () => {
         </div>
 
         <div className="mt-[clamp(16px,6dvh,64px)] grid min-h-min flex-1 items-center justify-items-center gap-4 md:grid-cols-2 md:gap-8">
-          <img
-            src={characterEvolution}
-            alt="캐릭터 진화: 시작은 초보냥, 주가 1,000에는 큰손냥, 주가 10,000에는 왕족냥으로 진화해요."
-            loading="lazy"
-            className="h-auto max-h-[28dvh] w-[544px] max-w-full object-contain md:max-h-[calc(100dvh-260px)]"
-          />
+          <div className="w-full max-w-[544px] rounded-2xl bg-white px-4 py-6 text-center">
+            <h3 className="text-xl font-bold text-black">캐릭터 진화</h3>
+            <p className="mt-2 text-xs text-gray-60">
+              주가가 오르면 냥이가 진화해요
+            </p>
+            <ol className="mt-6 grid grid-cols-4 gap-2">
+              {CHARACTER_STAGES.map((stage) => (
+                <li key={stage.stage} className="min-w-0">
+                  <p className="text-[11px] text-gray-60">
+                    {stage.stage === 'BABY'
+                      ? '시작'
+                      : `주가 ${stage.stock.toLocaleString('ko-KR')}`}
+                  </p>
+                  <strong className="mt-1 block text-sm text-blue-60">
+                    {stage.name}
+                  </strong>
+                  <img
+                    src={getStandingCharacterImage(stage.stage)}
+                    alt={stage.name}
+                    loading="lazy"
+                    className="mt-3 h-[clamp(64px,12vw,128px)] w-full object-contain"
+                  />
+                </li>
+              ))}
+            </ol>
+          </div>
           <img
             src={learningReward}
             alt="연속학습 보상: 3일 동전, 7일 은화, 14일 금화, 21일 시크릿. 연속학습 일수에 따라 캐릭터에게 특별한 효과가 생겨요."

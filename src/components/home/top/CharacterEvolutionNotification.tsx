@@ -1,14 +1,14 @@
-import { useEffect, useState } from 'react';
-import { getMyCharacter } from '../../../api/character';
+import { useEffect, useRef, useState } from 'react';
+import {
+  confirmCharacterEvolution,
+  getMyCharacter,
+} from '../../../api/character';
 import useAuthstore from '../../../stores/useAuthStore';
 import {
   useBlockRankingReward,
   useCanShowRankingReward,
 } from '../../../hooks/useRankingRewardGate';
-import {
-  acknowledgeCharacterEvolution,
-  getUnseenCharacterEvolution,
-} from '../../../utils/characterEvolution';
+import { getPendingCharacterEvolution } from '../../../utils/characterEvolution';
 import type { CharacterEvolution } from '../../../utils/characterEvolution';
 import CharacterEvolutionModal from './CharacterEvolutionModal';
 
@@ -20,6 +20,16 @@ const CharacterEvolutionNotification = () => {
   } | null>(null);
   const [failed, setFailed] = useState(false);
   const [retry, setRetry] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [confirmError, setConfirmError] = useState('');
+  const confirmLock = useRef(false);
+  const active = useRef(true);
+  useEffect(() => {
+    active.current = true;
+    return () => {
+      active.current = false;
+    };
+  }, []);
   const evolution =
     result && result.memberId === memberId ? result.evolution : null;
   const loading =
@@ -36,9 +46,8 @@ const CharacterEvolutionNotification = () => {
           setFailed(false);
           setResult({
             memberId,
-            evolution: getUnseenCharacterEvolution(
-              memberId,
-              character.currentStock
+            evolution: getPendingCharacterEvolution(
+              character.pendingEvolutionStage
             ),
           });
         }
@@ -73,10 +82,34 @@ const CharacterEvolutionNotification = () => {
   return (
     <CharacterEvolutionModal
       evolution={evolution}
-      onClose={() => {
-        if (useAuthstore.getState().member?.memberId !== memberId) return;
-        acknowledgeCharacterEvolution(memberId, evolution);
-        setResult({ memberId, evolution: null });
+      isSubmitting={isSubmitting}
+      errorMessage={confirmError}
+      onClose={async () => {
+        if (
+          confirmLock.current ||
+          useAuthstore.getState().member?.memberId !== memberId
+        )
+          return;
+        confirmLock.current = true;
+        setIsSubmitting(true);
+        setConfirmError('');
+        try {
+          await confirmCharacterEvolution(evolution.stage);
+          if (
+            active.current &&
+            useAuthstore.getState().member?.memberId === memberId
+          )
+            setResult({ memberId, evolution: null });
+        } catch {
+          if (
+            active.current &&
+            useAuthstore.getState().member?.memberId === memberId
+          )
+            setConfirmError('진화 확인을 저장하지 못했어요. 다시 눌러 주세요.');
+        } finally {
+          confirmLock.current = false;
+          if (active.current) setIsSubmitting(false);
+        }
       }}
     />
   );

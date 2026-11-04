@@ -15,15 +15,16 @@ interface StatPillProps {
   label: string;
   value: string;
   compact?: boolean;
+  icon?: string;
 }
 
-const StatPill = ({ label, value, compact = false }: StatPillProps) => (
+const StatPill = ({ label, value, compact = false, icon }: StatPillProps) => (
   <li
     className={`flex h-14 items-center rounded-2xl border border-gray-20 py-2 ${compact ? 'gap-2 px-3' : 'gap-3 px-5'}`}
   >
-    {STAT_ICONS[label] ? (
+    {(icon ?? STAT_ICONS[label]) ? (
       <img
-        src={STAT_ICONS[label]}
+        src={icon ?? STAT_ICONS[label]}
         alt=""
         className={`${compact ? 'size-8' : 'size-11'} shrink-0 object-contain`}
       />

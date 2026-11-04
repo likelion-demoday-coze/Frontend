@@ -8,7 +8,7 @@ export interface MyRankPanelProps {
   criteria: string; //누적 주가 기준
   rank: number | null;
   lastRank: number; // 꼴찌 순위
-  stats: { label: string; value: string }[];
+  stats: { label: string; value: string; icon?: string }[];
   actionLabel: string; // 버튼 문구 (탭마다 다름)
   onAction?: () => void;
   emptyMessage?: string;

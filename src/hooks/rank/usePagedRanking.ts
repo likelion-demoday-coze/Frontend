@@ -7,8 +7,8 @@ export interface RankingPageResult {
   items: RankItem[];
   totalMemberCount: number;
   hasNext: boolean;
-  my: { rank: number; score: string | number } | null; // 오늘 미참여면 null
-  stats: { label: string; value: string }[];
+  my: { rank: number; score: string | number; currentStock?: number } | null; // 오늘 미참여면 null
+  stats: { label: string; value: string; icon?: string }[];
 }
 
 export const usePagedRanking = (
@@ -81,7 +81,7 @@ export const usePagedRanking = (
 
   // 내 순위를 MyRank로 변환
   const me: MyRank | undefined = meta?.my
-    ? { rank: meta.my.rank, nickname, score: meta.my.score }
+    ? { ...meta.my, nickname }
     : undefined;
 
   return {
