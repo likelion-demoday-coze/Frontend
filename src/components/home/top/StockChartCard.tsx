@@ -71,7 +71,7 @@ const StockChartCard = () => {
   return (
     <div className="flex h-full flex-col rounded-2xl border border-blue-15 bg-white p-3">
       <div className="@container flex flex-wrap items-center justify-between gap-3 px-1 py-4 sm:px-3 sm:py-5 xl:px-6 xl:py-6">
-        <div className="flex max-w-full flex-nowrap items-center gap-[min(10px,1.2cqi)] whitespace-nowrap">
+        <div className="@container flex min-h-11 min-w-[min(100%,280px)] max-w-full flex-1 flex-nowrap items-center gap-[min(10px,1.2cqi)] whitespace-nowrap">
           <span className="shrink-0 text-[min(16px,4.5cqi)] font-semibold text-gray-60">
             현재 주가
           </span>

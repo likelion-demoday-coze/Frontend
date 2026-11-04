@@ -1,6 +1,6 @@
 // 마이페이지 도메인 타입 - 백엔드 Swagger 스키마 기준
 
-export type CharacterStage = 'BEGINNER' | 'BIG_HAND' | 'NOBLE';
+export type CharacterStage = 'BABY' | 'BASIC' | 'BIG_HAND' | 'ROYAL';
 
 export interface MyPage {
   profile: {

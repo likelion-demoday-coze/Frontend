@@ -55,12 +55,12 @@ const TUTORIAL_STEPS: TutorialStep[] = [
     preview: 'stock',
     descriptions: [
       <>
-        모두 <strong>100냥불</strong>에서 시작, 정답마다 <strong>1~10%</strong>{' '}
+        모두 <strong>100방울</strong>에서 시작, 정답마다 <strong>1~10%</strong>{' '}
         상승해요. 틀려도 떨어지지 않아요.
       </>,
       <>
-        주가가 오르면 냥이가 <strong>초보냥 → 큰손냥 → 왕족냥</strong>으로
-        진화해요.
+        아기냥에서 시작해 <strong>첫 정답에 초보냥</strong>,{' '}
+        <strong>250방울에 큰손냥 → 1,500방울에 왕족냥</strong>으로 진화해요.
       </>,
       <>
         주가 반영은 <strong>하루 정규장 2회</strong>까지예요. (패스 회원 3회)

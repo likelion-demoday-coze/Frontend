@@ -11,6 +11,7 @@ import { getCurrentPass } from '../api/pass';
 import useAuthStore from '../stores/useAuthStore';
 import type { MyPage as MyPageData } from '../types/member';
 import type { mypass } from '../types/pass';
+import { getCharacterStage } from '../constants/character';
 
 const MyPage = () => {
   const [data, setData] = useState<MyPageData | null>(null);
@@ -60,7 +61,7 @@ const MyPage = () => {
           <ProfileCard
             nickname={profile.nickname}
             joinedDays={profile.joinedDays}
-            characterStage={profile.characterStage}
+            characterStage={getCharacterStage(data.assets.currentStock).stage}
             isPass={profile.passActive}
             onEditNickname={() => setIsNicknameOpen(true)}
           />

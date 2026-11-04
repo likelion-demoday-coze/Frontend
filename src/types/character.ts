@@ -2,13 +2,16 @@
 export interface MyCharacter {
   date: string;
   currentStock: number;
-  stage: string;
+  stage: CharacterStage;
   stageName: string;
-  nextStage: string | null;
+  nextStage: CharacterStage | null;
   nextStageStock: number | null;
   stockToNextStage: number | null;
   currentStreak: number;
   effects: string[];
   nextEffect: string | null;
   daysToNextEffect: number | null;
+  correctAnswersToNextStage: number | null;
+  pendingEvolutionStage: CharacterStage | null;
 }
+import type { CharacterStage } from './member';

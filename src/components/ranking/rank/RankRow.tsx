@@ -7,6 +7,8 @@ import thirdRank from '../../../assets/ranking/3rd_rank.svg';
 import basic1 from '../../../assets/character/basic_1.svg';
 import basic2 from '../../../assets/character/basic_2.svg';
 import basic3 from '../../../assets/character/basic_3.svg';
+import { getCharacterImageByStock } from '../../../utils/character';
+import { getCharacterStage } from '../../../constants/character';
 
 const RANK_PROFILES: Record<number, string> = {
   1: basic3,
@@ -67,6 +69,7 @@ const RankRow = ({
   rank,
   nickname,
   score,
+  currentStock,
   isMe,
   change,
   onClick,
@@ -77,7 +80,17 @@ const RankRow = ({
         <RankNumber rank={rank} isMe={isMe} change={change} />
       </div>
       <div className="shrink-0">
-        <Avatar src={RANK_PROFILES[rank] ?? basic1} />
+        <Avatar
+          zoom={
+            isStock &&
+            getCharacterStage(currentStock ?? Number(score)).stage === 'BABY'
+          }
+          src={
+            isStock
+              ? getCharacterImageByStock(currentStock ?? Number(score))
+              : (RANK_PROFILES[rank] ?? basic1)
+          }
+        />
       </div>
       <span className="min-w-0 flex-1">
         <span

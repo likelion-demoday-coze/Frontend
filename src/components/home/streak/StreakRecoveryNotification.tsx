@@ -10,14 +10,12 @@ import {
   getStreakRecovery,
 } from '../../../api/streak';
 import { ROUTES } from '../../../constants/routes';
-import basicCat from '../../../assets/character/basic_1.svg';
-import bigHandCat from '../../../assets/character/basic_2.svg';
-import nobleCat from '../../../assets/character/basic_3.svg';
 import type { StreakDayStatus } from '../../../types/streak';
 import StreakRecoveryModal from './StreakRecoveryModal';
 import { useStreakRecoveryAction } from '../../../hooks/useStreakRecoveryAction';
 import { useBlockRankingReward } from '../../../hooks/useRankingRewardGate';
-import { CHARACTER_EVOLUTIONS } from '../../../utils/characterEvolution';
+import { getCharacterStage } from '../../../constants/character';
+import { getCharacterImage } from '../../../utils/character';
 
 // 백엔드와 공통인 상품 코드로 복구권을 구분
 const RECOVERY_CODE = 'STREAK_RECOVERY';
@@ -60,19 +58,13 @@ const loadNotification = async () => {
   };
 };
 
-const STAGE_IMAGES = { BIG_HAND: bigHandCat, NOBLE: nobleCat };
-
 const getStage = (stock: number) => {
-  const evolution = [...CHARACTER_EVOLUTIONS]
-    .reverse()
-    .find((stage) => stock >= stage.stock);
-  return evolution
-    ? {
-        image: STAGE_IMAGES[evolution.stage],
-        name: evolution.name,
-        threshold: evolution.stock,
-      }
-    : { image: basicCat, name: '초보냥', threshold: 0 };
+  const stage = getCharacterStage(stock);
+  return {
+    image: getCharacterImage(stage.stage),
+    name: stage.name,
+    threshold: stage.stock,
+  };
 };
 
 const StreakRecoveryNotification = () => {

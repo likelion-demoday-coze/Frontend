@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Card } from '../../common/Card';
-import basicCat from '../../../assets/character/basic_1.svg';
-import bigHandCat from '../../../assets/character/basic_2.svg';
-import nobleCat from '../../../assets/character/basic_3.svg';
+import { getCharacterStage } from '../../../constants/character';
+import { getCharacterImage } from '../../../utils/character';
 import bronzeBackground from '../../../assets/character/background/bronze_bg.svg';
 import silverBackground from '../../../assets/character/background/silver_bg.svg';
 import goldBackground from '../../../assets/character/background/gold_bg.svg';
@@ -51,14 +50,10 @@ const DailyRewardCard = ({
     };
   }, []);
 
-  // 캐릭터 조회 응답의 현재 주가로 기본 / 큰손냥 / 귀족냥 결정
+  // 주가 100인 시작 상태도 공통 단계 기준으로 아기냥 표시
   const currentStock = character?.currentStock ?? 0;
-  const catImage =
-    currentStock >= 10000
-      ? nobleCat
-      : currentStock >= 1000
-        ? bigHandCat
-        : basicCat;
+  const currentStage = getCharacterStage(currentStock);
+  const catImage = getCharacterImage(currentStage.stage);
   // 스트릭으로 달성한 가장 높은 단계의 배경 하나만 적용
   const streakDays = character?.currentStreak ?? 0;
   const backgroundImage =
@@ -144,11 +139,13 @@ const DailyRewardCard = ({
           />
         )}
         {character ? (
-          <img
-            src={catImage}
-            alt={character.stageName}
-            className="absolute bottom-0 left-1/2 h-full max-h-48 w-48 -translate-x-1/2 object-contain lg:h-48"
-          />
+          <div className="absolute bottom-0 left-1/2 h-full max-h-48 w-48 -translate-x-1/2 overflow-hidden lg:h-48">
+            <img
+              src={catImage}
+              alt={currentStage.name}
+              className={`size-full object-contain ${currentStage.stage === 'BABY' ? 'origin-[50%_10%] scale-[1.9]' : ''}`}
+            />
+          </div>
         ) : (
           <p className="absolute bottom-6 w-full text-center text-sm text-gray-60">
             {characterError
@@ -156,8 +153,10 @@ const DailyRewardCard = ({
               : '캐릭터 불러오는 중...'}
           </p>
         )}
-        <p className="absolute top-4 left-1/2 w-max max-w-[calc(100%-24px)] -translate-x-1/2 rounded-full bg-blue-50 px-3 py-2 text-center text-[14px] lg:top-10 xl:text-[16px] font-semibold break-keep text-white">
-          오늘의 생선 받아가라 냥
+        <p className="absolute top-4 left-1/2 w-max max-w-[calc(100%-24px)] -translate-x-1/2 rounded-full bg-blue-50 px-3 py-2 text-center text-[14px] lg:top-5 xl:text-[16px] font-semibold break-keep text-white">
+          {status === 'CLAIMED' || status === 'PASS_ACTIVE'
+            ? '문제 풀러 가봐라 냥'
+            : '오늘의 생선 받아가라 냥'}
         </p>
       </Card>
 

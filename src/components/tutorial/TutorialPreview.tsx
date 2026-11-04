@@ -2,8 +2,8 @@ import completeImage from '../../assets/streak/complete.svg';
 import incompleteImage from '../../assets/streak/incomplete.svg';
 
 import basic_1 from '../../assets/character/basic_1.svg';
-import basic_2 from '../../assets/character/basic_2.svg';
-import basic_3 from '../../assets/character/basic_3.svg';
+import { CHARACTER_STAGES } from '../../constants/character';
+import { getCharacterImage } from '../../utils/character';
 import completetoday from '../../assets/streak/complete_today.svg';
 import fishImage from '../../assets/store/Fish_a.svg';
 import tutorial_cat from '../../assets/home/tutorial_cat.svg';
@@ -26,11 +26,13 @@ import { Fragment } from 'react';
 export type PreviewType =
   'welcome' | 'stock' | 'regular' | 'afterhours' | 'streak' | 'start';
 
-const STOCK_LEVELS = [
-  { name: '초보냥', stock: '100방울', image: basic_1 },
-  { name: '큰손냥', stock: '1,000방울', image: basic_2 },
-  { name: '왕족냥', stock: '10,000방울', image: basic_3 },
-];
+const STOCK_LEVELS = CHARACTER_STAGES.filter(
+  (stage) => stage.stage !== 'BABY'
+).map((stage) => ({
+  name: stage.name,
+  stock: `${stage.stock.toLocaleString('ko-KR')}방울`,
+  image: getCharacterImage(stage.stage),
+}));
 
 const STREAK_EFFECTS = [
   { days: 3, name: '동전', image: bronze },

@@ -1,5 +1,6 @@
 import { getStockRanking, getTimeAttackRanking } from '../../api/ranking';
 import type { RankingPageResult } from './usePagedRanking';
+import { getCharacterImageByStock } from '../../utils/character';
 
 const PAGE_SIZE = 20;
 
@@ -14,6 +15,7 @@ export const fetchStockPage = async (
       rank: res.rankingPosition,
       nickname: res.nickname,
       score: res.currentStock.toFixed(2), //주가는 소수 둘자리까지
+      currentStock: res.currentStock,
     })),
     totalMemberCount: response.totalMemberCount,
     hasNext: response.page.hasNext,
@@ -21,6 +23,7 @@ export const fetchStockPage = async (
       ? {
           rank: response.myRanking.rankingPosition,
           score: response.myRanking.currentStock.toFixed(2),
+          currentStock: response.myRanking.currentStock,
         }
       : null,
     stats: response.myRanking
@@ -29,6 +32,7 @@ export const fetchStockPage = async (
           {
             label: '나의 누적 주가',
             value: `${response.myRanking.currentStock.toFixed(2)} 방울`,
+            icon: getCharacterImageByStock(response.myRanking.currentStock),
           },
           {
             label: '유저 평균 주가',
