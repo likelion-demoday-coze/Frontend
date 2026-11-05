@@ -1,10 +1,13 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import PageTitle from '../../components/common/PageTitle';
 import DailyRewardModal from '../../components/home/top/DailyRewardModal';
 import ModeCard from '../../components/quiz/ModeCard';
+import QuizCatPanel from '../../components/quiz/QuizCatPanel';
+import QuizStockPanel from '../../components/quiz/QuizStockPanel';
 import ResumeQuizModal from '../../components/quiz/ResumeQuizModal';
 import StartConfirmModal from '../../components/quiz/StartConfirmModal';
+import { getStockGraph } from '../../api/stock';
 import { createTimeAttackSession } from '../../api/timeAttack';
 import {
   ROUTES,
@@ -20,6 +23,8 @@ import useFishShortAction from '../../hooks/useFishShortAction';
 import useQuizEntryStatus from '../../hooks/useQuizEntryStatus';
 
 type QuizMode = 'daily' | 'timeAttack';
+
+const RECENT_POINT_COUNT = 6;
 
 const QuizModePage = () => {
   const navigate = useNavigate();
@@ -40,6 +45,26 @@ const QuizModePage = () => {
     canClaimAttendance: !!status?.canClaimAttendance,
     onClaimed: applyAttendanceClaim,
   });
+
+  //최근 주가 변동 5번(점 6개)과 그 사이 등락률
+  const [recentStocks, setRecentStocks] = useState<number[]>([]);
+  useEffect(() => {
+    let ignore = false;
+    getStockGraph('WEEK')
+      .then((graph) => {
+        if (ignore) return;
+        const values = graph.points.map((point) => point.stockValue);
+        setRecentStocks(
+          values.length > 0
+            ? values.slice(-RECENT_POINT_COUNT)
+            : [graph.currentStock]
+        );
+      })
+      .catch((error) => console.error('주가 그래프 조회 실패', error));
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const handleCloseConfirm = useCallback(
     () => setIsTimeAttackConfirmOpen(false),
@@ -99,50 +124,73 @@ const QuizModePage = () => {
     }
   };
 
+  const recentChange =
+    recentStocks.length > 1
+      ? Math.round(
+          ((recentStocks[recentStocks.length - 1] - recentStocks[0]) /
+            recentStocks[0]) *
+            1000
+        ) / 10
+      : null;
+
   return (
     <div className="flex flex-col gap-8 lg:gap-16">
       {title}
 
-      <div className="flex flex-col items-center gap-10 lg:w-fit lg:gap-15">
-        <div
-          role="radiogroup"
-          aria-label="문제풀이 모드"
-          className="flex w-full flex-col gap-4 lg:flex-row lg:gap-5"
-        >
-          <ModeCard
-            mode="daily"
-            fishCost={DAILY_FISH_COST}
-            fishBalance={fishBalance}
-            isPass={isPass}
-            attempt={dailyAttempt}
-            isInProgress={!!activeSession}
-            isRecovering={isRecovering}
-            selected={selectedMode === 'daily'}
-            onSelect={() => setSelectedMode('daily')}
-          />
-          <ModeCard
-            mode="timeAttack"
-            fishCost={TIME_ATTACK_FISH_COST}
-            fishBalance={fishBalance}
-            isPass={isPass}
-            attempt={timeAttackAttempt}
-            selected={selectedMode === 'timeAttack'}
-            onSelect={() => setSelectedMode('timeAttack')}
-          />
+      <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-15">
+        <div className="flex flex-col items-center gap-10 lg:w-fit lg:gap-15">
+          <div
+            role="radiogroup"
+            aria-label="문제풀이 모드"
+            className="flex w-full flex-col gap-4 lg:flex-row lg:gap-5"
+          >
+            <ModeCard
+              mode="daily"
+              fishCost={DAILY_FISH_COST}
+              fishBalance={fishBalance}
+              isPass={isPass}
+              attempt={dailyAttempt}
+              isInProgress={!!activeSession}
+              isRecovering={isRecovering}
+              selected={selectedMode === 'daily'}
+              onSelect={() => setSelectedMode('daily')}
+            />
+            <ModeCard
+              mode="timeAttack"
+              fishCost={TIME_ATTACK_FISH_COST}
+              fishBalance={fishBalance}
+              isPass={isPass}
+              attempt={timeAttackAttempt}
+              selected={selectedMode === 'timeAttack'}
+              onSelect={() => setSelectedMode('timeAttack')}
+            />
+          </div>
+
+          {/*TODO: 공통 Button 컴포넌트가 생기면 교체*/}
+          <button
+            type="button"
+            onClick={handleStart}
+            disabled={
+              !selectedMode ||
+              (isFishShort ? fishShort.action.disabled : isTimeAttackExhausted)
+            }
+            className="h-14 w-full cursor-pointer rounded-xl bg-blue-60 text-lg font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-10 disabled:text-gray-60 lg:h-16 lg:w-42"
+          >
+            {isFishShort ? fishShort.action.label : '투자 시작하기'}
+          </button>
         </div>
 
-        {/*TODO: 공통 Button 컴포넌트가 생기면 교체*/}
-        <button
-          type="button"
-          onClick={handleStart}
-          disabled={
-            !selectedMode ||
-            (isFishShort ? fishShort.action.disabled : isTimeAttackExhausted)
-          }
-          className="h-14 w-full cursor-pointer rounded-xl bg-blue-60 text-lg font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-10 disabled:text-gray-60 lg:h-16 lg:w-42"
-        >
-          {isFishShort ? fishShort.action.label : '투자 시작하기'}
-        </button>
+        <aside className="hidden flex-col gap-5 lg:flex">
+          <QuizCatPanel mood="idle" message="하고싶은 모드를 골라봐 냥" />
+          {recentStocks.length > 0 && (
+            <QuizStockPanel
+              points={recentStocks}
+              slots={RECENT_POINT_COUNT}
+              lastChange={recentChange}
+              changeLabel="최근 5문제"
+            />
+          )}
+        </aside>
       </div>
 
       {isResumeOpen && activeSession && (

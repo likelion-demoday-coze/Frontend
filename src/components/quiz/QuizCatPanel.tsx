@@ -7,6 +7,7 @@ interface QuizCatPanelProps {
   mood: QuizCatMood;
   seed?: number;
   hideStockMessages?: boolean;
+  message?: string;
 }
 
 //주가에 반영되지 않는 시간외거래에서는 빼는 문구
@@ -59,12 +60,13 @@ const QuizCatPanel = ({
   mood,
   seed = 0,
   hideStockMessages = false,
+  message: fixedMessage,
 }: QuizCatPanelProps) => {
   const { bubble, image } = moods[mood];
   const messages = hideStockMessages
     ? moods[mood].messages.filter((text) => !STOCK_MESSAGES.includes(text))
     : moods[mood].messages;
-  const message = messages[seed % messages.length];
+  const message = fixedMessage ?? messages[seed % messages.length];
 
   return (
     <div className="flex w-full justify-center overflow-hidden rounded-[20px] border border-blue-15 bg-white pt-4 lg:w-86.5">
