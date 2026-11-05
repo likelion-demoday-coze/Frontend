@@ -23,7 +23,7 @@ const QuizStockPanel = ({
   label = '현재 주가',
   changeLabel = '이번문제',
 }: QuizStockPanelProps) => {
-  const base = points[0];
+  const base = Math.min(...points);
   const current = points[points.length - 1];
   const top = Math.max(base * 1.25, Math.max(...points) * 1.05);
   const toX = (index: number) => (index / (slots - 1)) * 100;
@@ -38,6 +38,7 @@ const QuizStockPanel = ({
   const line = coords.map(({ x, y }) => `${x},${y}`).join(' ');
   const last = coords[coords.length - 1];
   const isUp = lastChange !== null && lastChange > 0;
+  const isDown = lastChange !== null && lastChange < 0;
 
   return (
     <div className="flex w-full flex-col items-center gap-3 rounded-[20px] border border-blue-15 bg-white px-6 pt-3 pb-2 lg:w-86.5">
@@ -63,13 +64,17 @@ const QuizStockPanel = ({
           </p>
         ) : (
           <p
-            className={`flex items-end gap-2 rounded-sm px-2 py-1 text-sm ${isUp ? 'bg-red-05' : 'bg-gray-05'}`}
+            className={`flex items-end gap-2 rounded-sm px-2 py-1 text-sm ${isUp ? 'bg-red-05' : isDown ? 'bg-blue-05' : 'bg-gray-05'}`}
           >
             <span className="font-medium text-gray-60">{changeLabel}</span>
             <span
-              className={`font-semibold ${isUp ? 'text-red-55' : 'text-gray-60'}`}
+              className={`font-semibold ${isUp ? 'text-red-55' : isDown ? 'text-blue-60' : 'text-gray-60'}`}
             >
-              {isUp ? `▲ ${lastChange}%` : '방어 · 변동 없음'}
+              {isUp
+                ? `▲ ${lastChange}%`
+                : isDown
+                  ? `▼ ${Math.abs(lastChange)}%`
+                  : '방어 · 변동 없음'}
             </span>
           </p>
         )}
@@ -155,9 +160,13 @@ const QuizStockPanel = ({
         {!muted && coords.length > 1 && lastChange !== null && (
           <span
             style={{ left: `${last.x}%`, top: `${last.y}%` }}
-            className={`absolute -translate-x-1/2 -translate-y-[calc(100%+8px)] text-xs font-semibold whitespace-nowrap ${isUp ? 'text-red-55' : 'text-gray-60'}`}
+            className={`absolute -translate-x-1/2 -translate-y-[calc(100%+8px)] text-xs font-semibold whitespace-nowrap ${isUp ? 'text-red-55' : isDown ? 'text-blue-60' : 'text-gray-60'}`}
           >
-            {isUp ? `+ ${lastChange}%` : '방어'}
+            {isUp
+              ? `+ ${lastChange}%`
+              : isDown
+                ? `- ${Math.abs(lastChange)}%`
+                : '방어'}
           </span>
         )}
       </div>
