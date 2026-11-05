@@ -1,6 +1,7 @@
 import { isAxiosError } from 'axios';
 import api from './axiosInstance';
 import type { ApiResponse } from '../types/api';
+import { trackEventOnce } from '../lib/analytics';
 import type {
   ActiveQuizSession,
   CreateSessionRequest,
@@ -96,6 +97,9 @@ export const completeSession = async (sessionId: number) => {
   const { data } = await api.post<ApiResponse<QuizResult>>(
     `${BASE}/sessions/${sessionId}/complete`
   );
+  if (data.isSuccess) {
+    trackEventOnce('quiz_complete', `daily:${sessionId}`, { mode: 'daily' });
+  }
   return data.result;
 };
 

@@ -5,6 +5,7 @@ const productionHosts = new Set(['coze.kids', 'www.coze.kids']);
 let initialized = false;
 let previousPageLocation = '';
 let currentPageFields = { page_location: '', page_referrer: '' };
+const sentEvents = new Set<string>();
 
 type AnalyticsValue = string | number | boolean;
 type AnalyticsParams = Record<
@@ -64,14 +65,40 @@ export const trackPageView = (path: string) => {
   previousPageLocation = pageLocation;
 };
 
-export const trackEvent = (
+export const trackEvent = (name: string, params?: AnalyticsParams) => {
+  if (!canTrack() || !initialized) return false;
+
+  try {
+    ReactGA.event(name, {
+      ...params,
+      ...currentPageFields,
+    });
+    return true;
+  } catch {
+    // 분석 도구의 오류가 가입·보상·퀴즈·결제 처리를 중단하지 않도록 함
+    return false;
+  }
+};
+
+// 식별자는 브라우저의 중복 방지에만 사용하고 이벤트 매개변수에는 넣지 않음
+export const trackEventOnce = (
   name: string,
+  deduplicationId: string | number,
   params?: AnalyticsParams
 ) => {
   if (!canTrack() || !initialized) return;
-
-  ReactGA.event(name, {
-    ...params,
-    ...currentPageFields,
-  });
+  const key = `coze:analytics:${name}:${deduplicationId}`;
+  if (sentEvents.has(key)) return;
+  try {
+    if (localStorage.getItem(key)) return;
+  } catch {
+    // 저장소가 차단되어도 현재 페이지 안에서는 중복 전송을 방지
+  }
+  if (!trackEvent(name, params)) return;
+  sentEvents.add(key);
+  try {
+    localStorage.setItem(key, '1');
+  } catch {
+    // 저장소 오류는 서비스 동작에 영향을 주지 않음
+  }
 };
