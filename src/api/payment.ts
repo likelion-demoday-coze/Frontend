@@ -1,5 +1,6 @@
 import api from './axiosInstance';
 import type { ApiResponse } from '../types/api';
+import { trackEventOnce } from '../lib/analytics';
 import {
   PAYMENT_ENABLED,
   PAYMENT_DISABLED_MESSAGE,
@@ -58,6 +59,26 @@ export const getPaymentStatus = async (
     { signal }
   );
   if (!data.isSuccess) throw new Error(data.message);
+  const payment = data.result;
+  if (
+    payment?.status === 'COMPLETED' &&
+    payment.productCode === 'WEEKLY_PASS' &&
+    payment.orderNumber === orderNumber
+  ) {
+    trackEventOnce('purchase', payment.orderNumber, {
+      transaction_id: payment.orderNumber,
+      currency: 'KRW',
+      value: payment.amount,
+      items: [
+        {
+          item_id: 'WEEKLY_PASS',
+          item_name: payment.productName,
+          price: payment.amount,
+          quantity: 1,
+        },
+      ],
+    });
+  }
   return data.result;
 };
 

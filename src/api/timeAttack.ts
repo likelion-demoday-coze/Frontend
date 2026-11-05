@@ -1,5 +1,6 @@
 import api from './axiosInstance';
 import type { ApiResponse } from '../types/api';
+import { trackEventOnce } from '../lib/analytics';
 import type {
   TimeAttackAnswerResult,
   TimeAttackComplete,
@@ -51,6 +52,11 @@ export const completeTimeAttackSession = async (sessionId: number) => {
   const { data } = await api.post<ApiResponse<TimeAttackComplete>>(
     `${BASE}/sessions/${sessionId}/complete`
   );
+  if (data.isSuccess) {
+    trackEventOnce('quiz_complete', `timeAttack:${sessionId}`, {
+      mode: 'timeAttack',
+    });
+  }
   return data.result;
 };
 

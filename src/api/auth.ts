@@ -4,6 +4,7 @@ import api, {
   hasCsrfToken,
 } from './axiosInstance';
 import type { ApiResponse } from '../types/api';
+import { trackEventOnce } from '../lib/analytics';
 
 const baseURL = import.meta.env.VITE_API_URL;
 
@@ -50,6 +51,9 @@ export const signup = async (payload: SignupRequest) => {
     '/api/v1/auth/signup',
     payload
   );
+  if (data.isSuccess && data.result) {
+    trackEventOnce('sign_up', data.result.memberId, { method: 'kakao' });
+  }
   return data.result;
 };
 
