@@ -73,6 +73,7 @@ export const trackEvent = (name: string, params?: AnalyticsParams) => {
       ...params,
       ...currentPageFields,
     });
+    // true는 GA 명령 등록 여부이며, 서버 수신 완료를 의미하지 않음
     return true;
   } catch {
     // 분석 도구의 오류가 가입·보상·퀴즈·결제 처리를 중단하지 않도록 함
@@ -89,6 +90,11 @@ export const trackEventOnce = (
   if (!canTrack() || !initialized) return;
   const key = `coze:analytics:${name}:${deduplicationId}`;
   if (sentEvents.has(key)) return;
+  // 구매는 새로고침 후 재시도를 허용하고 GA4의 transaction_id로 중복 집계 방지
+  if (name === 'purchase') {
+    if (trackEvent(name, params)) sentEvents.add(key);
+    return;
+  }
   try {
     if (localStorage.getItem(key)) return;
   } catch {
