@@ -13,6 +13,7 @@ import {
 import PaymentDetailModal from '../payment/PaymentDetailModal';
 import PaymentResultModal from '../payment/PaymentResultModal';
 import { ROUTES } from '../../constants/routes';
+import { SUPPORT_URL } from '../../constants/support';
 import type { FishTransaction, FishTransactionType } from '../../types/fish';
 import type { PaymentDetail, PaymentHistory } from '../../types/payment';
 import { formatMonthDay, formatTime } from '../../utils/date';
@@ -450,7 +451,16 @@ const UsageHistory = ({ onRefunded }: UsageHistoryProps) => {
       </div>
       {tab === 'payment' && (
         <p className="text-sm text-gray-40">
-          결제 관련 문의는 고객센터 이메일로 주문번호를 알려 주세요.
+          결제·환불 문의는{' '}
+          <a
+            href={SUPPORT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-gray-60 underline underline-offset-2"
+          >
+            카카오톡 채널
+          </a>
+          로 주문번호와 함께 남겨 주세요.
         </p>
       )}
       {detailPaymentId !== null && !refundTarget && (
@@ -494,11 +504,7 @@ const UsageHistory = ({ onRefunded }: UsageHistoryProps) => {
             navigate(ROUTES.HOME);
           }}
           onContact={() =>
-            window.open(
-              'https://pf.kakao.com/_ngMWX',
-              '_blank',
-              'noopener,noreferrer'
-            )
+            window.open(SUPPORT_URL, '_blank', 'noopener,noreferrer')
           }
         />
       )}

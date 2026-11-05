@@ -64,13 +64,13 @@ const DailyQuizResultPage = () => {
                 오늘의 총 수익
               </span>
               <div className="flex flex-wrap items-center gap-2">
-                <strong className="text-[32px] font-normal text-blue-60 lg:text-[64px]">
+                <strong className="text-[32px] font-normal text-blue-60 lg:text-5xl">
                   {isUp ? '+' : ''}
                   {result.totalProfit.toFixed(2)}
                 </strong>
-                <img src={bellIcon} alt="" className="size-10 lg:size-20" />
+                <img src={bellIcon} alt="" className="size-10 lg:size-12" />
                 <span
-                  className={`rounded-sm p-1.5 text-sm font-bold lg:p-2 lg:text-base ${isUp ? 'bg-red-05 text-red-55' : 'bg-gray-05 text-gray-60'}`}
+                  className={`rounded-sm p-1.5 text-sm font-bold lg:px-2 lg:py-1 lg:text-base ${isUp ? 'bg-red-05 text-red-55' : 'bg-gray-05 text-gray-60'}`}
                 >
                   {isUp
                     ? `▲ ${result.totalReturnPercent.toFixed(2)}%`
@@ -85,7 +85,16 @@ const DailyQuizResultPage = () => {
                   {result.startStock.toFixed(2)}
                 </dd>
               </div>
-              <span aria-hidden="true" className="h-px flex-1 bg-gray-20" />
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 40 10"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                className="h-2.5 w-10 shrink-0 text-gray-20"
+              >
+                <path d="M0 5h38M34 1l4 4-4 4" />
+              </svg>
               <div className="flex flex-col items-center gap-1.5">
                 <dt className="text-sm text-gray-40">최종 주가</dt>
                 <dd className="text-xl font-bold text-blue-50">
