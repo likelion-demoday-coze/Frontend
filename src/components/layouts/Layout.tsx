@@ -24,7 +24,7 @@ const Layout = () => {
     matchPath(ROUTES.DAILY_QUIZ_PLAY, pathname) ||
     matchPath(ROUTES.TIME_ATTACK_PLAY, pathname)
   );
-  const isQuizModePage = pathname === ROUTES.QUIZ;
+  const isQuizModePage = Boolean(matchPath(ROUTES.QUIZ, pathname));
   const hideMobileNavigation = isMobile && isQuizPlayPage;
   const [passOrCash, setPassOrCash] = useState<PassOrCash>({
     hasPass: false,
