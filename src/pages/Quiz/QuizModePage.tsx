@@ -137,7 +137,7 @@ const QuizModePage = () => {
     <div className="flex flex-col gap-8 lg:gap-16">
       {title}
 
-      <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-5 min-[90rem]:mr-27.25">
+      <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-5">
         <div className="flex flex-col items-center gap-10 lg:w-fit lg:gap-15">
           <div
             role="radiogroup"
