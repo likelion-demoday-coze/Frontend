@@ -24,7 +24,6 @@ const Layout = () => {
     matchPath(ROUTES.DAILY_QUIZ_PLAY, pathname) ||
     matchPath(ROUTES.TIME_ATTACK_PLAY, pathname)
   );
-  const isQuizModePage = Boolean(matchPath(ROUTES.QUIZ, pathname));
   const hideMobileNavigation = isMobile && isQuizPlayPage;
   const [passOrCash, setPassOrCash] = useState<PassOrCash>({
     hasPass: false,
@@ -138,17 +137,19 @@ const Layout = () => {
         )}
         {/* 본문 틀: 폭 제한 + 가운데 + 공통 패딩 */}
         <div className={`relative mx-auto w-full max-w-360 px-6 pt-6 pb-10 lg:pt-16 ${isShopPage ? 'flex-1' : ''}`}>
-          {/* 퀴즈 풀이 화면은 좁은 데스크탑에서 헤더 칩과 겹치지 않게 위젯을 오른쪽 끝으로 */}
-          <div className={`hidden lg:absolute lg:top-16 lg:block ${isQuizPlayPage ? 'lg:right-6 min-[85.375rem]:right-33.25' : isQuizModePage ? 'lg:right-6 min-[90rem]:right-33.25' : 'lg:right-33.25'}`}>
-            <TopBar
-              streakDays={streakState.streak?.currentStreak ?? null}
-              fishBalance={fishBalance}
-              passOrCash={passOrCash}
-            />
+          {/* 모든 페이지가 같은 좌우 기준선을 쓰도록 본문을 1040px 박스로 묶고, 위젯은 그 오른쪽 끝에 맞춤 */}
+          <div className="relative lg:mx-auto lg:max-w-260">
+            <div className="hidden lg:absolute lg:top-0 lg:right-0 lg:block">
+              <TopBar
+                streakDays={streakState.streak?.currentStreak ?? null}
+                fishBalance={fishBalance}
+                passOrCash={passOrCash}
+              />
+            </div>
+            <main>
+              <Outlet context={{ ...streakState, updateFishBalance, isMobile }} />
+            </main>
           </div>
-          <main>
-            <Outlet context={{ ...streakState, updateFishBalance, isMobile }} />
-          </main>
         </div>
         {(pathname === ROUTES.HOME || pathname === ROUTES.RANKING) && (
           <RankingRewardNotification onBalanceChange={updateFishBalance} />
