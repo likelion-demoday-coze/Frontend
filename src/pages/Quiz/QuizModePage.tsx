@@ -137,7 +137,7 @@ const QuizModePage = () => {
     <div className="flex flex-col gap-8 lg:gap-16">
       {title}
 
-      <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-15">
+      <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-5 min-[90rem]:mr-27.25">
         <div className="flex flex-col items-center gap-10 lg:w-fit lg:gap-15">
           <div
             role="radiogroup"
@@ -180,7 +180,7 @@ const QuizModePage = () => {
           </button>
         </div>
 
-        <aside className="hidden flex-col gap-5 lg:flex">
+        <aside className="hidden flex-col gap-5 xl:flex">
           <QuizCatPanel mood="idle" message="하고싶은 모드를 골라봐 냥" />
           {recentStocks.length > 0 && (
             <QuizStockPanel
