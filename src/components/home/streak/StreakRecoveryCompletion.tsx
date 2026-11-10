@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useMatch } from 'react-router-dom';
 import {
   confirmStreakRecoveryPopup,
   getMyStreak,
@@ -18,6 +18,7 @@ import StreakRecoveryCompleteModal from './StreakRecoveryCompleteModal';
 
 const StreakRecoveryCompletion = () => {
   const { pathname } = useLocation();
+  const isHome = useMatch(ROUTES.HOME) !== null;
   const memberId = useAuthstore((state) => state.member?.memberId);
   const signupRewardPending = useAuthstore(
     (state) => state.member?.signupRewardPopupPending === true
@@ -117,7 +118,7 @@ const StreakRecoveryCompletion = () => {
   }, [pathname, memberId, checkKey, skippedKey, retryCount]);
 
   // 홈의 가입 보상·튜토리얼 안내가 끝난 뒤 복구 완료 팝업 표시
-  if (pathname === ROUTES.HOME && signupRewardPending) return null;
+  if (isHome && signupRewardPending) return null;
 
   if (failedKey === checkKey && skippedKey !== checkKey) {
     return (

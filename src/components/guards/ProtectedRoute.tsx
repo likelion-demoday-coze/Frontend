@@ -1,4 +1,4 @@
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { Navigate, Outlet, useMatch } from 'react-router-dom';
 import useAuthstore from '../../stores/useAuthStore';
 import StreakRecoveryCompletion from '../home/streak/StreakRecoveryCompletion';
 import { ROUTES } from '../../constants/routes';
@@ -6,7 +6,7 @@ import { ROUTES } from '../../constants/routes';
 //토큰 없는 상태에선 로그인 페이지로 리다이랙트
 
 function ProtectedRoute() {
-  const { pathname } = useLocation();
+  const isHome = useMatch(ROUTES.HOME) !== null;
   const member = useAuthstore((state) => state.member);
   const isInitialized = useAuthstore((state) => state.isInitialized);
 
@@ -23,7 +23,7 @@ function ProtectedRoute() {
   return (
     <>
       <Outlet />
-      {pathname === ROUTES.HOME && <StreakRecoveryCompletion />}
+      {isHome && <StreakRecoveryCompletion />}
     </>
   );
 }
