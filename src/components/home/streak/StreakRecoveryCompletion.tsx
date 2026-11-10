@@ -52,18 +52,19 @@ const StreakRecoveryCompletion = () => {
       let retryDelay: number | null = null;
       try {
         const recovery = await getStreakRecovery();
-        if (!active || !recovery) return;
+        if (!active) return;
+        if (!recovery) return;
         if (recovery.status === 'PENDING') {
           consecutiveErrors = 0;
           retryDelay = 10000;
           return;
         }
         const key = `${memberId}:${recovery.eventId}`;
-        if (
-          recovery.status !== 'RECOVERED' ||
-          seen.current.has(key) ||
-          isRecoveryCompletionSeen(memberId, recovery.eventId)
-        ) {
+        const alreadySeen =
+          recovery.status === 'RECOVERED' &&
+          (seen.current.has(key) ||
+            isRecoveryCompletionSeen(memberId, recovery.eventId));
+        if (recovery.status !== 'RECOVERED' || alreadySeen) {
           consecutiveErrors = 0;
           return;
         }

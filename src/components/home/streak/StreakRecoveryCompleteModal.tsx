@@ -92,7 +92,7 @@ const StreakRecoveryCompleteModal = ({
             </strong>
           </p>
         </div>
-        <div className="text-[12px] leading-5">
+        <div className="text-[12px] leading-5 max-[380px]:text-[11px]">
           <p className="font-semibold text-blue-60">
             떨어졌던 주가를 되돌렸어요
           </p>
