@@ -56,7 +56,7 @@ const MyPage = () => {
       <h1 className="text-xl leading-9 font-semibold text-black lg:text-[28px]">
         마이페이지
       </h1>
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex w-full min-w-0 flex-col gap-6 lg:w-172">
           <ProfileCard
             nickname={profile.nickname}
