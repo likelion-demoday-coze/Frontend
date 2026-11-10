@@ -1,4 +1,4 @@
-import api from './axiosInstance';
+import api, { fetchCsrfToken, hasCsrfToken } from './axiosInstance';
 import type { ApiResponse } from '../types/api';
 
 export interface MyStreak {
@@ -34,6 +34,7 @@ export interface StreakRecovery {
   quantityAfterRequest: number | null;
   stockAfterRecovery: number | null;
   streakAfterRecovery: number | null;
+  recoveryPopupPending: boolean;
 }
 
 export interface StreakPenaltyNotification {
@@ -90,5 +91,23 @@ export const getStreakRecovery = async () => {
   const { data } = await api.get<ApiResponse<StreakRecovery | null>>(
     '/api/v1/streaks/recovery'
   );
+  if (!data.isSuccess) throw new Error(data.message);
+  return data.result;
+};
+
+// 복구 완료 팝업 확인만 처리하며 하락 알림 확인과 별개
+export const confirmStreakRecoveryPopup = async (eventId: number) => {
+  if (!hasCsrfToken()) await fetchCsrfToken();
+  const { data } = await api.patch<ApiResponse<StreakRecovery>>(
+    `/api/v1/streaks/recoveries/${eventId}/popup`,
+    undefined,
+    { timeout: 15000, suppressNetworkAlert: true }
+  );
+  if (!data.isSuccess) throw new Error(data.message);
+  if (
+    data.result?.eventId !== eventId ||
+    data.result.recoveryPopupPending !== false
+  )
+    throw new Error('복구 완료 팝업 확인 상태를 저장하지 못했어요.');
   return data.result;
 };

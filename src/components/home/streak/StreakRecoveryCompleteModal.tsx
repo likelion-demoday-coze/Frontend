@@ -10,7 +10,8 @@ interface StreakRecoveryCompleteModalProps {
   stockBefore: number | null;
   stockAfter: number | null;
   requestedBeforeLearning: boolean;
-  onShown: () => void;
+  isSubmitting?: boolean;
+  errorMessage?: string;
   onClose: () => void;
 }
 
@@ -21,12 +22,12 @@ const StreakRecoveryCompleteModal = ({
   stockBefore,
   stockAfter,
   requestedBeforeLearning,
-  onShown,
+  isSubmitting = false,
+  errorMessage = '',
   onClose,
 }: StreakRecoveryCompleteModalProps) => {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
-  const shown = useRef(onShown);
   const dateLabel = new Date(`${restoredDate}T00:00:00Z`).toLocaleDateString(
     'ko-KR',
     { timeZone: 'UTC', weekday: 'long' }
@@ -35,7 +36,6 @@ const StreakRecoveryCompleteModal = ({
   useEffect(() => {
     const dialog = ref.current;
     dialog?.showModal();
-    if (dialog?.open) shown.current();
     const overflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
@@ -50,8 +50,9 @@ const StreakRecoveryCompleteModal = ({
       aria-labelledby={titleId}
       onCancel={(event) => {
         event.preventDefault();
-        onClose();
+        if (!isSubmitting) onClose();
       }}
+      aria-busy={isSubmitting}
       className="m-auto max-h-[calc(100dvh-32px)] w-[calc(100%-32px)] max-w-90 overflow-y-auto rounded-2xl border-0 bg-white p-6 backdrop:bg-black/30"
     >
       <span className="inline-block rounded-md border border-blue-60 px-2 py-2 text-[10px] font-semibold text-blue-60">
@@ -99,12 +100,18 @@ const StreakRecoveryCompleteModal = ({
           <p className="text-gray-60">사라졌던 효과도 돌아왔어요</p>
         </div>
       </div>
+      {errorMessage && (
+        <p role="alert" className="mt-4 text-center text-sm text-red-55">
+          {errorMessage}
+        </p>
+      )}
       <button
         type="button"
         onClick={onClose}
-        className="mx-auto mt-6 block h-12 w-32 cursor-pointer rounded-xl bg-blue-60 text-sm font-semibold text-white"
+        disabled={isSubmitting}
+        className="mx-auto mt-6 block h-12 w-32 cursor-pointer rounded-xl bg-blue-60 text-sm font-semibold text-white disabled:cursor-wait disabled:opacity-50"
       >
-        확인
+        {isSubmitting ? '확인 중...' : '확인'}
       </button>
     </dialog>
   );
