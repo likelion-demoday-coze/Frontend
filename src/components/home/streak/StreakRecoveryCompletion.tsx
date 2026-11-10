@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useMatch } from 'react-router-dom';
 import {
-  acknowledgeStreakPenaltyNotification,
+  confirmStreakRecoveryPopup,
   getMyStreak,
   getStreakRecovery,
 } from '../../../api/streak';
@@ -12,24 +12,33 @@ import { ROUTES } from '../../../constants/routes';
 import { useBlockRankingReward } from '../../../hooks/useRankingRewardGate';
 import {
   RECOVERY_STATUS_CHANGED,
-  isRecoveryCompletionSeen,
-  markRecoveryCompletionSeen,
   readRecoverySnapshot,
 } from '../../../utils/streakRecoveryCompletion';
 import StreakRecoveryCompleteModal from './StreakRecoveryCompleteModal';
 
 const StreakRecoveryCompletion = () => {
   const { pathname } = useLocation();
+  const isHome = useMatch(ROUTES.HOME) !== null;
   const memberId = useAuthstore((state) => state.member?.memberId);
   const signupRewardPending = useAuthstore(
     (state) => state.member?.signupRewardPopupPending === true
   );
   const [completion, setCompletion] = useState<{
+    memberId: number;
     recovery: StreakRecovery;
     streak: MyStreak;
   } | null>(null);
-  const seen = useRef(new Set<string>());
-  const acknowledged = useRef(new Set<string>());
+  const confirmed = useRef(new Set<string>());
+  const confirmLock = useRef(false);
+  const mounted = useRef(true);
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [confirmError, setConfirmError] = useState('');
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
   const checkKey = `${memberId}:${pathname}`;
   const [checkedKey, setCheckedKey] = useState<string | null>(null);
   const [failedKey, setFailedKey] = useState<string | null>(null);
@@ -46,13 +55,15 @@ const StreakRecoveryCompletion = () => {
     let consecutiveErrors = 0;
     let timer: ReturnType<typeof setTimeout>;
     const check = async () => {
-      if (!active || running || consecutiveErrors >= 3) return;
+      if (!active || running || confirmLock.current || consecutiveErrors >= 3)
+        return;
       running = true;
       clearTimeout(timer);
       let retryDelay: number | null = null;
       try {
         const recovery = await getStreakRecovery();
-        if (!active || !recovery) return;
+        if (!active) return;
+        if (!recovery) return;
         if (recovery.status === 'PENDING') {
           consecutiveErrors = 0;
           retryDelay = 10000;
@@ -61,15 +72,16 @@ const StreakRecoveryCompletion = () => {
         const key = `${memberId}:${recovery.eventId}`;
         if (
           recovery.status !== 'RECOVERED' ||
-          seen.current.has(key) ||
-          isRecoveryCompletionSeen(memberId, recovery.eventId)
+          recovery.recoveryPopupPending !== true ||
+          confirmed.current.has(key)
         ) {
           consecutiveErrors = 0;
           return;
         }
         const streak = await getMyStreak();
         consecutiveErrors = 0;
-        if (active && streak) setCompletion({ recovery, streak });
+        if (active && streak && !confirmed.current.has(key))
+          setCompletion({ memberId, recovery, streak });
       } catch {
         consecutiveErrors += 1;
         if (consecutiveErrors < 3) retryDelay = 30000;
@@ -106,7 +118,7 @@ const StreakRecoveryCompletion = () => {
   }, [pathname, memberId, checkKey, skippedKey, retryCount]);
 
   // 홈의 가입 보상·튜토리얼 안내가 끝난 뒤 복구 완료 팝업 표시
-  if (pathname === ROUTES.HOME && signupRewardPending) return null;
+  if (isHome && signupRewardPending) return null;
 
   if (failedKey === checkKey && skippedKey !== checkKey) {
     return (
@@ -145,7 +157,8 @@ const StreakRecoveryCompletion = () => {
     );
   }
 
-  if (!completion || memberId === undefined) return null;
+  if (!completion || memberId === undefined || completion.memberId !== memberId)
+    return null;
   const { recovery, streak } = completion;
   const key = `${memberId}:${recovery.eventId}`;
   const snapshot = readRecoverySnapshot(memberId, recovery.eventId);
@@ -178,18 +191,39 @@ const StreakRecoveryCompletion = () => {
       stockBefore={snapshot?.stockBefore ?? null}
       stockAfter={recovery.stockAfterRecovery}
       requestedBeforeLearning={snapshot?.requestedBeforeLearning ?? false}
-      onShown={() => {
-        if (acknowledged.current.has(key)) return;
-        acknowledged.current.add(key);
-        acknowledgeStreakPenaltyNotification(recovery.eventId).catch(() => {
-          acknowledged.current.delete(key);
-        });
-      }}
-      onClose={() => {
-        seen.current.add(key);
-        markRecoveryCompletionSeen(memberId, recovery.eventId);
-        setCompletion(null);
-        window.location.reload();
+      isSubmitting={isConfirming}
+      errorMessage={confirmError}
+      onClose={async () => {
+        if (
+          confirmLock.current ||
+          useAuthstore.getState().member?.memberId !== memberId
+        )
+          return;
+        confirmLock.current = true;
+        setIsConfirming(true);
+        setConfirmError('');
+        try {
+          await confirmStreakRecoveryPopup(recovery.eventId);
+          confirmed.current.add(key);
+          if (
+            !mounted.current ||
+            useAuthstore.getState().member?.memberId !== memberId
+          )
+            return;
+          setCompletion(null);
+          window.location.reload();
+        } catch {
+          if (
+            mounted.current &&
+            useAuthstore.getState().member?.memberId === memberId
+          )
+            setConfirmError(
+              '복구 완료 확인을 저장하지 못했어요. 다시 눌러 주세요.'
+            );
+        } finally {
+          confirmLock.current = false;
+          if (mounted.current) setIsConfirming(false);
+        }
       }}
     />
   );
