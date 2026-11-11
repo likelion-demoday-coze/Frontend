@@ -1,10 +1,10 @@
 //이펙트 한 단계의 활성/잠금/일시정지 표시
 import type { StreakEffectData } from '../../../types/streak';
 import qmark from '../../../assets/streak/question_mark.svg';
-import bronze from '../../../assets/home/streak/1st_bronze.svg';
-import silver from '../../../assets/home/streak/2nd_Silver.svg';
-import gold from '../../../assets/home/streak/3th_Gold.svg';
-import treasure from '../../../assets/home/streak/4th_treasure.svg';
+import bronze from '../../../assets/home/streak/2nd_bronze.svg';
+import silver from '../../../assets/home/streak/4th_silver.svg';
+import gold from '../../../assets/home/streak/6th_gold.svg';
+import treasure from '../../../assets/home/streak/8th_treasure.svg';
 
 const EFFECT_IMAGES: Record<number, string> = {
   3: bronze,

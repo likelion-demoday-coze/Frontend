@@ -3,10 +3,10 @@ import type { StreakDayData } from '../../../types/streak';
 import { STREAK_EFFECT_STEPS } from '../../../utils/streakAchievement';
 import type { StreakAchievement } from '../../../utils/streakAchievement';
 import catImage from '../../../assets/character/basic_pose_cat.svg';
-import bronze from '../../../assets/home/streak/1st_bronze.svg';
-import silver from '../../../assets/home/streak/2nd_Silver.svg';
-import gold from '../../../assets/home/streak/3th_Gold.svg';
-import treasure from '../../../assets/home/streak/4th_treasure.svg';
+import bronze from '../../../assets/home/streak/2nd_bronze.svg';
+import silver from '../../../assets/home/streak/4th_silver.svg';
+import gold from '../../../assets/home/streak/6th_gold.svg';
+import treasure from '../../../assets/home/streak/8th_treasure.svg';
 import question from '../../../assets/streak/question_mark.svg';
 import StreakWeek from './StreakWeek';
 

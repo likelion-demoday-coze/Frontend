@@ -110,7 +110,7 @@ const OpenChatModal = ({
           onClick={onHideToday}
           className="min-h-10 min-w-0 flex-1 cursor-pointer px-1 hover:text-gray-60"
         >
-          오늘 하루 보지 않기
+          3일 동안 보지 않기
         </button>
         <span aria-hidden="true" className="h-5 w-px shrink-0 bg-gray-20" />
         <button

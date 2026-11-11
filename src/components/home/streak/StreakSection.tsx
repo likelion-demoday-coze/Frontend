@@ -47,11 +47,9 @@ const StreakSection = () => {
       recovery?.status === 'PENDING'
         ? 'restorePending'
         : recovery?.status === 'AVAILABLE'
-          ? !recovery.requestable
-            ? 'recoveryUnavailable'
-            : streak?.learnedToday
-              ? 'restarted'
-              : 'broken'
+          ? streak?.learnedToday
+            ? 'restarted'
+            : 'broken'
           : recovery?.status === 'EXPIRED' && !streak?.learnedToday
             ? 'expired'
             : streak?.learnedToday
@@ -115,13 +113,8 @@ const StreakSection = () => {
           onRestore={() => {
             if (recovery) void recoveryAction.start(recovery.eventId);
           }}
-          onShop={() => navigate(ROUTES.SHOP)}
           isRestoring={recoveryAction.isSubmitting}
-          deadlineLabel={
-            recovery?.expiresAt
-              ? '오늘 오후 11:59:59'
-              : undefined
-          }
+          deadlineLabel={recovery?.expiresAt ? '오늘 오후 11:59:59' : undefined}
           onStartQuiz={() => navigate(ROUTES.QUIZ)}
         />
       ) : (
