@@ -5,7 +5,7 @@ import timeAttackTitle from '../../../assets/quiz/title_time_attack.svg';
 import CountChip from '../../../components/quiz/CountChip';
 import ReviewList from '../../../components/quiz/ReviewList';
 import { getTimeAttackResult } from '../../../api/timeAttack';
-import { toRanking } from '../../../constants/routes';
+import { toTimeAttackRanking } from '../../../constants/routes';
 import type { TimeAttackResult } from '../../../types/timeAttack';
 
 type ReviewTab = 'all' | 'wrong';
@@ -136,7 +136,7 @@ const TimeAttackResultPage = () => {
       {/*TODO: 공통 Button 컴포넌트가 생기면 교체*/}
       <button
         type="button"
-        onClick={() => navigate(toRanking('afterhours'))}
+        onClick={() => navigate(toTimeAttackRanking(sessionId))}
         className="mt-auto h-14 w-full cursor-pointer rounded-xl bg-blue-60 text-lg font-semibold text-white lg:mt-12 lg:h-16 lg:w-42"
       >
         NEXT

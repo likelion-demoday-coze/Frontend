@@ -18,6 +18,7 @@ export const ROUTES = {
   TIME_ATTACK: '/quiz/time-attack',
   TIME_ATTACK_PLAY: '/quiz/time-attack/:sessionId',
   TIME_ATTACK_RESULT: '/quiz/time-attack/:sessionId/result',
+  TIME_ATTACK_RANKING: '/quiz/time-attack/:sessionId/ranking',
 
   //랭킹 (?tab=regular | afterhours)
   RANKING: '/ranking',
@@ -45,4 +46,6 @@ export const toTimeAttackPlay = (sessionId: number) =>
   `/quiz/time-attack/${sessionId}`;
 export const toTimeAttackResult = (sessionId: number) =>
   `/quiz/time-attack/${sessionId}/result`;
+export const toTimeAttackRanking = (sessionId: number) =>
+  `/quiz/time-attack/${sessionId}/ranking`;
 export const toRanking = (tab: RankingType) => `/ranking?tab=${tab}`;
