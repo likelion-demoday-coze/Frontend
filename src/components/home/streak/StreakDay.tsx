@@ -10,6 +10,7 @@ import type { StreakDayData, StreakDayStatus } from '../../../types/streak';
 interface StreakDayProps {
   // 부모가 전달한 요일과 학습 상태
   day: StreakDayData;
+  variant?: 'default' | 'card';
 }
 
 // 각 상태에 사용할 이미지와 접근성 설명
@@ -41,18 +42,24 @@ const DAY_ICONS: Record<StreakDayStatus, { src: string; label: string }> = {
   },
 };
 
-const StreakDay = ({ day }: StreakDayProps) => {
+const StreakDay = ({ day, variant = 'default' }: StreakDayProps) => {
   const icon = DAY_ICONS[day.status];
+  const isToday =
+    day.status === 'todayCompleted' || day.status === 'todayIncomplete';
 
   return (
     <li className="flex min-w-0 flex-col items-center gap-1.5">
       <img
         src={icon.src}
         alt={`${day.label}요일: ${icon.label}`}
-        className="size-7 shrink-0 object-contain"
+        className={`shrink-0 object-contain ${variant === 'card' ? 'size-[clamp(22px,11cqi,32px)]' : 'size-7'}`}
       />
 
-      <span className="text-[11px] text-gray-40">{day.label}</span>
+      <span
+        className={`text-[11px] ${variant === 'card' && isToday ? 'font-semibold text-gray-60' : 'text-gray-40'}`}
+      >
+        {day.label}
+      </span>
     </li>
   );
 };

@@ -6,9 +6,13 @@ import right from '../../../assets/streak/right.svg';
 
 interface StreakEffectTreeProps {
   data: StreakData;
+  mobileExpanded?: boolean;
 }
 
-const StreakEffectTree = ({ data }: StreakEffectTreeProps) => {
+const StreakEffectTree = ({
+  data,
+  mobileExpanded = true,
+}: StreakEffectTreeProps) => {
   const { effects, progress, remainingDays } = data;
 
   //일시정지 상태일 때 ->
@@ -29,29 +33,37 @@ const StreakEffectTree = ({ data }: StreakEffectTreeProps) => {
       <h3 className="mb-4 hidden text-[13px] font-semibold text-gray-40 lg:block">
         이펙트 트리
       </h3>
-      <div className="relative">
-        {/* 사용 가능한 너비가 300px 이상이면 한 줄로 배치 */}
-        <ul className="grid grid-cols-2 gap-2 @[300px]:grid-cols-4">
-          {effects.map((effect) => (
-            <StreakEffectItem key={effect.id} effect={effect} />
-          ))}
-        </ul>
+      <div
+        className={`grid transition-[grid-template-rows] duration-300 motion-reduce:transition-none lg:visible lg:grid-rows-[1fr] ${mobileExpanded ? 'visible grid-rows-[1fr]' : 'invisible grid-rows-[0fr]'}`}
+      >
+        <div className="min-h-0 overflow-hidden">
+          <div className="pt-4 lg:pt-0">
+            <div className="relative">
+              {/* 사용 가능한 너비가 300px 이상이면 한 줄로 배치 */}
+              <ul className="grid grid-cols-2 gap-2 @[300px]:grid-cols-4">
+                {effects.map((effect) => (
+                  <StreakEffectItem key={effect.id} effect={effect} />
+                ))}
+              </ul>
 
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 grid grid-cols-2 gap-2 @[300px]:grid-cols-4"
-        >
-          {effects.map((effect, index) => (
-            <div key={effect.id} className="relative">
-              {index < effects.length - 1 && (
-                <span
-                  className={`absolute -right-2 top-1/2 w-2 -translate-y-1/2 justify-center ${index % 2 === 0 ? 'flex' : 'hidden @[300px]:flex'}`}
-                >
-                  <img src={right} alt="" className="h-[9px] w-[5px]" />
-                </span>
-              )}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 grid grid-cols-2 gap-2 @[300px]:grid-cols-4"
+              >
+                {effects.map((effect, index) => (
+                  <div key={effect.id} className="relative">
+                    {index < effects.length - 1 && (
+                      <span
+                        className={`absolute -right-2 top-1/2 w-2 -translate-y-1/2 justify-center ${index % 2 === 0 ? 'flex' : 'hidden @[300px]:flex'}`}
+                      >
+                        <img src={right} alt="" className="h-[9px] w-[5px]" />
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
+          </div>
         </div>
       </div>
       {isPaused ? (

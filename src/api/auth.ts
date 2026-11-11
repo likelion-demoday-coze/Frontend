@@ -40,6 +40,12 @@ export interface getMeResult {
   signupRewardPopupPending: boolean;
 }
 
+//오픈채팅 모달 노출 상태
+export interface getOpenChatResult {
+  shouldShow: boolean;
+  hiddenUntil: string | null;
+}
+
 //카카오 로그인 -> 브라우저 직접 이동
 export const startKaKaoLogin = () => {
   window.location.href = `${baseURL}/api/v1/auth/oauth2/authorization/kakao`;
@@ -104,6 +110,28 @@ export const acknowledgeSignupRewardPopup = async () => {
   if (!hasCsrfToken()) await fetchCsrfToken();
   const { data } = await api.patch<ApiResponse<getMeResult>>(
     '/api/v1/members/me/signup-reward/popup',
+    undefined,
+    { timeout: 15000, suppressNetworkAlert: true }
+  );
+  if (!data.isSuccess) throw new Error(data.message);
+  return data.result;
+};
+
+//오픈채팅 참여 모달 노출 상태 조회
+export const checkOpenChatModal = async () => {
+  const { data } = await api.get<ApiResponse<getOpenChatResult>>(
+    '/api/v1/members/me/open-chat-modal',
+    { timeout: 15000, suppressNetworkAlert: true }
+  );
+  if (!data.isSuccess) throw new Error(data.message);
+  return data.result;
+};
+
+// 오픈채팅 모달을 오늘 포함 3일간 숨김 ('3일 동안 보지 않기'에서만 호출)
+export const acknowledgeOpenChatModal = async () => {
+  if (!hasCsrfToken()) await fetchCsrfToken();
+  const { data } = await api.patch<ApiResponse<getOpenChatResult>>(
+    '/api/v1/members/me/open-chat-modal',
     undefined,
     { timeout: 15000, suppressNetworkAlert: true }
   );

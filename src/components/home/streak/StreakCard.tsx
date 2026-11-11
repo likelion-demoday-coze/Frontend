@@ -1,5 +1,6 @@
 import { useId, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import streakIcon from '../../../assets/navbar/streak_icon.svg';
 import type { StreakData } from '../../../types/streak';
 import { Card } from '../../common/Card';
 import StreakWeek from './StreakWeek';
@@ -12,7 +13,6 @@ interface StreakCardProps {
 
   // 복구하기 클릭 시 부모가 실행할 함수
   onRestore: () => void;
-  onShop: () => void;
 
   // 퀴즈 풀러가기 클릭 시 부모가 실행할 함수
   onStartQuiz: () => void;
@@ -25,21 +25,9 @@ interface StreakCardProps {
   showWeek?: boolean;
 }
 
-// 상태별 헤더 설명
-const HEADER_MESSAGES = {
-  learning: '연속 학습 중!',
-  broken: '연속 학습 끊김',
-  recoveryUnavailable: '복구 신청 불가',
-  restorePending: '복구 대기중',
-  completed: '연속 학습 중!',
-  restarted: '새로 시작했어요',
-  expired: '연속 학습 끊김',
-};
-
 const StreakCard = ({
   data,
   onRestore,
-  onShop,
   onStartQuiz,
   isRestoring = false,
   deadlineLabel,
@@ -56,50 +44,38 @@ const StreakCard = ({
   const isPending = view === 'restorePending';
 
   // 끊김·만료 화면에서는 일수를 회색으로 표시해.
-  const isBroken =
-    view === 'broken' || view === 'recoveryUnavailable' || view === 'expired';
+  const isBroken = view === 'broken' || view === 'expired';
 
-  const countClass = isPending
-    ? 'text-purple-45'
-    : isBroken
+  const countClass =
+    isPending || isBroken || currentDays === 0
       ? 'text-gray-40'
       : 'text-yellow-45';
+  const showBrokenLabel = view === 'broken';
 
   return (
-    <Card className="lg:min-h-[450px] mt-4 flex w-full flex-col bg-white p-5">
+    <Card className="lg:min-h-112.5 mt-4 flex w-full flex-col bg-white p-5">
       {/* 상단: 일수 + 설명 + 버튼 또는 최고 기록 */}
       <div className="mb-5 flex items-center justify-between gap-2">
-        <div className="flex min-w-0 items-center gap-2">
+        <div className="flex min-w-0 items-center gap-1.5">
+          <img
+            src={streakIcon}
+            alt=""
+            className={`size-10 shrink-0 object-contain ${isBroken ? 'opacity-50' : ''}`}
+          />
           <span
-            className={`shrink-0 text-[28px] leading-none font-bold ${countClass}`}
+            className={`font-bold ${countClass} ${showBrokenLabel ? 'text-base leading-snug break-keep' : 'shrink-0 text-[28px] leading-none whitespace-nowrap'}`}
           >
-            {currentDays}일
-          </span>
-
-          <span
-            className={`text-[16px] font-semibold ${
-              isPending ? 'text-purple-30' : 'text-gray-60'
-            }`}
-          >
-            {HEADER_MESSAGES[view]}
+            {showBrokenLabel ? '연속학습 끊김' : `${currentDays}일`}
           </span>
         </div>
 
-        {view === 'recoveryUnavailable' ? (
-          <button
-            type="button"
-            onClick={onShop}
-            className="shrink-0 cursor-pointer rounded-lg bg-blue-60 px-3 py-1 h-11 text-[16px] font-semibold text-white"
-          >
-            상점가기
-          </button>
-        ) : canRestore ? (
+        {canRestore ? (
           // 복구 가능한 상태: 복구하기 버튼
           <button
             type="button"
             onClick={onRestore}
             disabled={isRestoring}
-            className="shrink-0 cursor-pointer rounded-lg bg-blue-60 px-3 py-1 h-11 text-[16px] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+            className="min-h-9 shrink-0 cursor-pointer rounded-full bg-blue-60 px-3 py-2 text-xs font-semibold whitespace-nowrap text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isRestoring ? '복구 중...' : '복구하기'}
           </button>
@@ -108,23 +84,28 @@ const StreakCard = ({
           <button
             type="button"
             onClick={onStartQuiz}
-            className="shrink-0 cursor-pointer rounded-lg bg-blue-60 px-3 py-1 h-11 text-[12px] font-semibold text-white"
+            aria-label="복구 대기 중, 정규장 풀러 가기"
+            className="min-h-9 shrink-0 cursor-pointer rounded-full bg-gray-40 px-3 py-2 text-xs font-semibold whitespace-nowrap text-white"
           >
-            퀴즈 풀러가기
+            복구 대기중
           </button>
         ) : bestDays !== null ? (
-          <span className="shrink-0 rounded-lg border border-yellow-45 px-2.5 py-2 text-[16px] font-semibold text-yellow-45">
+          <span className="shrink-0 rounded-full bg-[#FFC66B] px-3 py-2.5 text-xs font-semibold whitespace-nowrap text-white">
             최고기록 {bestDays}일
           </span>
         ) : null}
       </div>
 
       {/* 월~일 학습 기록 */}
-      {showWeek && <StreakWeek days={data.days} />}
-
-      {/* 상태별 안내 문구 */}
-      <div className="mt-5">
-        <StreakNotice view={view} deadlineLabel={deadlineLabel} />
+      <div className="@container rounded-xl bg-white px-3 py-4 shadow-[0_8px_24px_rgba(0,0,0,0.10)]">
+        {showWeek && <StreakWeek days={data.days} variant="card" />}
+        <div className={showWeek ? 'mt-4' : ''}>
+          <StreakNotice
+            view={view}
+            currentDays={currentDays}
+            deadlineLabel={deadlineLabel}
+          />
+        </div>
       </div>
 
       {/* 이펙트 단계와 진행 상태 */}
@@ -142,15 +123,8 @@ const StreakCard = ({
             className={`size-4 transition-transform duration-300 motion-reduce:transition-none ${isEffectOpen ? 'rotate-180' : ''}`}
           />
         </button>
-        <div
-          id={effectPanelId}
-          className={`grid transition-[grid-template-rows] duration-300 motion-reduce:transition-none lg:grid-rows-[1fr] ${isEffectOpen ? 'grid-rows-[1fr] visible' : 'grid-rows-[0fr] invisible lg:visible'}`}
-        >
-          <div className="min-h-0 overflow-hidden">
-            <div className="pt-4 lg:pt-0">
-              <StreakEffectTree data={data} />
-            </div>
-          </div>
+        <div id={effectPanelId}>
+          <StreakEffectTree data={data} mobileExpanded={isEffectOpen} />
         </div>
       </div>
     </Card>

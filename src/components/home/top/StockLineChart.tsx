@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import {
   LineChart,
   Line,
@@ -6,6 +7,7 @@ import {
   ReferenceLine,
   ResponsiveContainer,
 } from 'recharts';
+import './StockLineChart.css';
 
 export interface ChartPoint {
   label: string;
@@ -21,6 +23,9 @@ interface StockLineChartProps {
 
 const LINE_COLOR = '#276AD8';
 const GRID_COLOR = '#CCD1D5';
+const CHART_HEIGHT = 260;
+const BOTTOM_MARGIN = 8;
+const X_AXIS_HEIGHT = 30;
 
 const StockLineChart = ({
   data,
@@ -40,10 +45,23 @@ const StockLineChart = ({
   return (
     // ResponsiveContainer: 부모 폭에 맞춰 차트 크기를 자동으로 조절
     // (부모에 폭이 있어야 동작 -> 카드 내에 작성
-    <ResponsiveContainer width="100%" height={260}>
-      <LineChart data={data} margin={{ top: 16, right: 12, bottom: 8, left: 24 }}>
+    <ResponsiveContainer
+      width="100%"
+      height={CHART_HEIGHT}
+      className="home-stock-chart"
+      style={
+        {
+          '--stock-line-baseline': `${CHART_HEIGHT - BOTTOM_MARGIN - X_AXIS_HEIGHT}px`,
+        } as CSSProperties
+      }
+    >
+      <LineChart
+        data={data}
+        margin={{ top: 16, right: 12, bottom: BOTTOM_MARGIN, left: 24 }}
+      >
         {/* 아래 x축: 모든 점의 라벨을 찍지 않고 맨 앞/맨 뒤 두 개만 보여줌 */}
         <XAxis
+          height={X_AXIS_HEIGHT}
           dataKey="label" // x축 기준
           ticks={[data[0].label, data[lastIndex].label]} // 라벨을 찍을 위치: 첫 점, 마지막 점
           interval={0} // 라벨을 건너뛰지 않고 위 두 개를 전부 표시
@@ -82,11 +100,12 @@ const StockLineChart = ({
 
         {/* 파란 꺾은선 */}
         <Line
+          className="home-stock-line-rise"
           type="linear" // 점 사이를 직선으로 연결
           dataKey="value" // data의 어떤 값을 y축 높이로 쓸지
           stroke={LINE_COLOR}
           strokeWidth={2}
-          isAnimationActive={false} // 처음 그릴 때 움직이는 효과 끔
+          isAnimationActive={false} // 선과 마지막 점은 CSS로 함께 아래에서 위로 표시
           // 점(dot)을 그리는 방법을 직접 정함: 마지막 점에만 동그라미를 찍음
           dot={({ cx, cy, index }) =>
             index === lastIndex ? (

@@ -4,13 +4,17 @@ import catImage from '../../../assets/character/basic_pose_cat.svg';
 interface OpenChatModalProps {
   openChatUrl?: string;
   onClose: () => void;
-  onHideToday: () => void;
+  onHideForThreeDays: () => void;
+  isSubmitting?: boolean;
+  errorMessage?: string;
 }
 
 const OpenChatModal = ({
   openChatUrl = 'https://open.kakao.com/o/giNIFlWi',
   onClose,
-  onHideToday,
+  onHideForThreeDays,
+  isSubmitting = false,
+  errorMessage = '',
 }: OpenChatModalProps) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
@@ -37,8 +41,9 @@ const OpenChatModal = ({
       aria-describedby={descriptionId}
       onCancel={(event) => {
         event.preventDefault();
-        onClose();
+        if (!isSubmitting) onClose();
       }}
+      aria-busy={isSubmitting}
       className="m-auto max-h-[calc(100dvh-32px)] w-[calc(100%-32px)] max-w-103 overflow-y-auto rounded-3xl border-0 bg-white px-6 pt-6 pb-5 backdrop:bg-black/30 sm:px-8"
     >
       <div className="flex flex-col items-center text-center">
@@ -104,19 +109,26 @@ const OpenChatModal = ({
           익명 프로필로 참여할 수 있어요
         </p>
       </div>
+      {errorMessage && (
+        <p role="alert" className="mt-4 text-center text-sm text-red-55">
+          {errorMessage}
+        </p>
+      )}
       <div className="mt-7 flex items-center border-t border-gray-20 pt-4 text-sm text-gray-40">
         <button
           type="button"
-          onClick={onHideToday}
-          className="min-h-10 min-w-0 flex-1 cursor-pointer px-1 hover:text-gray-60"
+          onClick={onHideForThreeDays}
+          disabled={isSubmitting}
+          className="min-h-10 min-w-0 flex-1 cursor-pointer px-1 hover:text-gray-60 disabled:cursor-wait disabled:opacity-50"
         >
-          오늘 하루 보지 않기
+          {isSubmitting ? '저장 중...' : '3일 동안 보지 않기'}
         </button>
         <span aria-hidden="true" className="h-5 w-px shrink-0 bg-gray-20" />
         <button
           type="button"
           onClick={onClose}
-          className="min-h-10 min-w-0 flex-1 cursor-pointer px-1 hover:text-gray-60"
+          disabled={isSubmitting}
+          className="min-h-10 min-w-0 flex-1 cursor-pointer px-1 hover:text-gray-60 disabled:cursor-wait disabled:opacity-50"
         >
           닫기
         </button>

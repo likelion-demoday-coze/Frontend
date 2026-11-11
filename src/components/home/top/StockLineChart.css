@@ -1,0 +1,17 @@
+@keyframes home-stock-line-rise {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .home-stock-chart .home-stock-line-rise,
+  .home-stock-chart .recharts-line-dots {
+    transform-box: view-box;
+    transform-origin: 0 var(--stock-line-baseline);
+    animation: home-stock-line-rise 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}

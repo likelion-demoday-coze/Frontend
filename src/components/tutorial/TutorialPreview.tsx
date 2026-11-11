@@ -16,9 +16,9 @@ import {
   TIME_ATTACK_FISH_COST,
 } from '../../constants/quizCost';
 
-import gold from '../../assets/home/streak/3th_Gold.svg';
-import silver from '../../assets/home/streak/2nd_Silver.svg';
-import bronze from '../../assets/home/streak/1st_bronze.svg';
+import gold from '../../assets/home/streak/6th_gold.svg';
+import silver from '../../assets/home/streak/4th_silver.svg';
+import bronze from '../../assets/home/streak/2nd_bronze.svg';
 
 //카드와 카드 사이를 묶음
 import { Fragment } from 'react';
