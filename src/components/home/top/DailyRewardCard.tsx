@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { Card } from '../../common/Card';
 import { getCharacterStage } from '../../../constants/character';
-import { getCharacterImage } from '../../../utils/character';
+import { getStandingCharacterImage } from '../../../utils/character';
 import bronzeBackground from '../../../assets/character/background/bronze_bg.svg';
 import silverBackground from '../../../assets/character/background/silver_bg.svg';
 import goldBackground from '../../../assets/character/background/gold_bg.svg';
@@ -53,7 +53,7 @@ const DailyRewardCard = ({
   // 주가 100인 시작 상태도 공통 단계 기준으로 아기냥 표시
   const currentStock = character?.currentStock ?? 0;
   const currentStage = getCharacterStage(currentStock);
-  const catImage = getCharacterImage(currentStage.stage);
+  const catImage = getStandingCharacterImage(currentStage.stage);
   // 스트릭으로 달성한 가장 높은 단계의 배경 하나만 적용
   const streakDays = character?.currentStreak ?? 0;
   const backgroundImage =
@@ -139,11 +139,11 @@ const DailyRewardCard = ({
           />
         )}
         {character ? (
-          <div className="absolute bottom-0 left-1/2 h-full max-h-48 w-48 -translate-x-1/2 overflow-hidden lg:h-48">
+          <div className="absolute bottom-0 left-1/2 h-full max-h-48 w-48 -translate-x-1/2 lg:h-48">
             <img
               src={catImage}
               alt={currentStage.name}
-              className={`size-full object-contain ${currentStage.stage === 'BABY' ? 'origin-[50%_10%] scale-[1.9]' : ''}`}
+              className={`size-full object-contain ${currentStage.stage === 'BABY' ? 'origin-[50%_10%] scale-[1.9]' : 'origin-[50%_13.636%] scale-[1.785714]'}`}
             />
           </div>
         ) : (

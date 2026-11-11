@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import useAuthstore from '../stores/useAuthStore';
 import {
@@ -20,6 +20,8 @@ import StreakSection from '../components/home/streak/StreakSection';
 import StreakRecoveryNotification from '../components/home/streak/StreakRecoveryNotification';
 import DailyRewardModal from '../components/home/top/DailyRewardModal';
 import CharacterEvolutionNotification from '../components/home/top/CharacterEvolutionNotification';
+import OpenChatNotification from '../components/home/top/OpenChatNotification';
+import StreakRecoveryCompletion from '../components/home/streak/StreakRecoveryCompletion';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -30,6 +32,15 @@ const HomePage = () => {
   const member = useAuthstore((state) => state.member);
   const isInitialized = useAuthstore((state) => state.isInitialized);
   const [isTutorialDismissed, setIsTutorialDismissed] = useState(false);
+  const [openChatFinishedFor, setOpenChatFinishedFor] = useState<number | null>(
+    null
+  );
+  const memberId = member?.memberId;
+  const isOpenChatPending =
+    isInitialized && memberId !== undefined && openChatFinishedFor !== memberId;
+  const finishOpenChat = useCallback(() => {
+    if (memberId !== undefined) setOpenChatFinishedFor(memberId);
+  }, [memberId]);
 
   const completingRef = useRef(false);
   const acknowledgingRef = useRef(false);
@@ -57,7 +68,9 @@ const HomePage = () => {
     member?.tutorialCompleted === true &&
     member.signupRewardPopupPending === true;
 
-  useBlockRankingReward(isTutorialOpen || isSignupRewardOpen);
+  const popupBlocker = useBlockRankingReward(
+    isOpenChatPending || isTutorialOpen || isSignupRewardOpen
+  );
 
   const closeSignupReward = async (goToQuiz: boolean) => {
     if (!isSignupRewardOpen || acknowledgingRef.current || !member) return;
@@ -125,12 +138,23 @@ const HomePage = () => {
       ) : (
         <HeroSection onBalanceChange={updateFishBalance} />
       )}
-      {!isTutorialOpen && !isSignupRewardOpen && (
+      {!isOpenChatPending && !isTutorialOpen && !isSignupRewardOpen && (
         <>
+          <StreakRecoveryCompletion />
           <StreakRecoveryNotification />
           <CharacterEvolutionNotification />
         </>
       )}
+      {isInitialized &&
+        memberId !== undefined &&
+        !isTutorialOpen &&
+        !isSignupRewardOpen && (
+          <OpenChatNotification
+            key={memberId}
+            blocker={popupBlocker}
+            onFinished={finishOpenChat}
+          />
+        )}
       <div className="mt-12 flex flex-col gap-6 lg:flex-row">
         <div className="order-2 flex min-w-0 flex-col gap-10 lg:order-1 lg:flex-2 xl:flex-1">
           <TrendSection />
