@@ -94,10 +94,10 @@ const TrendModal = ({ items, initialIndex, onClose }: TrendModalProps) => {
     >
       <div className="flex max-h-[calc(100svh-24px)] min-h-0 flex-col p-4 md:block md:max-h-none md:p-0">
         <div className="mb-4 flex shrink-0 items-center gap-3 md:mb-8 md:gap-4">
-          <span className="flex h-7 w-12 shrink-0 items-center justify-center rounded-xl border border-blue-60 bg-blue-05 text-sm text-blue-60 md:h-8 md:w-14 md:px-3 md:py-2 md:text-base">
+          <span className="flex h-7 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-15 text-sm text-white md:h-8 md:w-14 md:px-3 md:py-2 md:text-base">
             {index + 1}/{items.length}
           </span>
-          <span className="min-w-0 break-words text-sm font-semibold md:text-base">
+          <span className="min-w-0 break-words text-sm font-semibold text-blue-30 md:text-base">
             {items[index].categoryName}
           </span>
 
