@@ -7,6 +7,7 @@ import QuizCatPanel from '../../components/quiz/QuizCatPanel';
 import QuizStockPanel from '../../components/quiz/QuizStockPanel';
 import ResumeQuizModal from '../../components/quiz/ResumeQuizModal';
 import StartConfirmModal from '../../components/quiz/StartConfirmModal';
+import { getTimeAttackRanking } from '../../api/ranking';
 import { getStockGraph } from '../../api/stock';
 import { createTimeAttackSession } from '../../api/timeAttack';
 import {
@@ -61,6 +62,29 @@ const QuizModePage = () => {
         );
       })
       .catch((error) => console.error('주가 그래프 조회 실패', error));
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  //시간외거래 카드 하단에 오늘 1위 기록과 내 기록 비교 문구
+  const [timeAttackRanking, setTimeAttackRanking] = useState<{
+    top: number | null;
+    myPosition: number | null;
+    myBest: number | null;
+  } | null>(null);
+  useEffect(() => {
+    let ignore = false;
+    getTimeAttackRanking(0, 1, { suppressNetworkAlert: true })
+      .then((ranking) => {
+        if (ignore) return;
+        setTimeAttackRanking({
+          top: ranking.rankings[0]?.correctCount ?? null,
+          myPosition: ranking.myRanking?.rankingPosition ?? null,
+          myBest: ranking.myRanking?.correctCount ?? null,
+        });
+      })
+      .catch((error) => console.error('시간외거래 랭킹 조회 실패', error));
     return () => {
       ignore = true;
     };
@@ -124,6 +148,16 @@ const QuizModePage = () => {
     }
   };
 
+  const timeAttackFootnote = (() => {
+    if (!timeAttackRanking) return null;
+    if (timeAttackAttempt.used >= timeAttackAttempt.limit) return null;
+    const { top, myPosition, myBest } = timeAttackRanking;
+    if (top === null) return '첫 기록의 주인공이 되어보세요!';
+    if (myPosition === null) return `오늘 1위 ${top}문제 · 내 기록 없음`;
+    if (myPosition === 1) return '오늘의 랭킹 1위 유지중';
+    return `오늘 1위 ${top}문제 · 내 최고 ${myBest}문제`;
+  })();
+
   const recentChange =
     recentStocks.length > 1
       ? Math.round(
@@ -161,6 +195,7 @@ const QuizModePage = () => {
               fishBalance={fishBalance}
               isPass={isPass}
               attempt={timeAttackAttempt}
+              footnote={timeAttackFootnote}
               selected={selectedMode === 'timeAttack'}
               onSelect={() => setSelectedMode('timeAttack')}
             />

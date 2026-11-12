@@ -32,6 +32,7 @@ import DailyQuizResultPage from './pages/Quiz/Daily/DailyQuizResultPage';
 import TimeAttackEntryPage from './pages/Quiz/TimeAttack/TimeAttackEntryPage';
 import TimeAttackPlayPage from './pages/Quiz/TimeAttack/TimeAttackPlayPage';
 import TimeAttackResultPage from './pages/Quiz/TimeAttack/TimeAttackResultPage';
+import TimeAttackRankingPage from './pages/Quiz/TimeAttack/TimeAttackRankingPage';
 import PaymentResultPage from './pages/payment/PaymentResultPage';
 
 function App() {
@@ -126,6 +127,10 @@ function App() {
             <Route
               path={ROUTES.TIME_ATTACK_RESULT}
               element={<TimeAttackResultPage />}
+            />
+            <Route
+              path={ROUTES.TIME_ATTACK_RANKING}
+              element={<TimeAttackRankingPage />}
             />
           </Route>
         </Route>
