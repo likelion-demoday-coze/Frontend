@@ -1,12 +1,7 @@
 import type { MyStreak } from '../api/streak';
 import type { MyCharacter } from '../types/character';
-
-export const STREAK_EFFECT_STEPS = [
-  { days: 3, name: '동전' },
-  { days: 7, name: '은화' },
-  { days: 14, name: '금화' },
-  { days: 21, name: '금은보화' },
-] as const;
+import { STREAK_EFFECT_STEPS } from '../constants/streakEffects';
+export { STREAK_EFFECT_STEPS } from '../constants/streakEffects';
 
 export interface StreakAchievementStart {
   date: string;
@@ -123,6 +118,8 @@ export const getStreakAchievement = (
     character !== null &&
     character.date === after.date &&
     character.currentStreak === after.currentStreak &&
+    step !== undefined &&
+    character.effects.includes(step.effect) &&
     character.effects.some((effect) => !before.effects!.includes(effect));
   const newEffect =
     step && hasNewEffect && before.currentStreak < after.currentStreak

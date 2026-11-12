@@ -6,7 +6,7 @@ import {
   getStreakRecovery,
 } from '../../../api/streak';
 import type { MyStreak, StreakRecovery } from '../../../api/streak';
-import type { StreakDayStatus } from '../../../types/streak';
+import { toStreakDays } from '../../../utils/streakDays';
 import useAuthstore from '../../../stores/useAuthStore';
 import { ROUTES } from '../../../constants/routes';
 import { useBlockRankingReward } from '../../../hooks/useRankingRewardGate';
@@ -162,25 +162,7 @@ const StreakRecoveryCompletion = () => {
   const { recovery, streak } = completion;
   const key = `${memberId}:${recovery.eventId}`;
   const snapshot = readRecoverySnapshot(memberId, recovery.eventId);
-  const days = streak.days.map((day) => {
-    const status: StreakDayStatus =
-      day.date === recovery.missedDate
-        ? 'restored'
-        : day.today
-          ? day.status === 'COMPLETED'
-            ? 'todayCompleted'
-            : 'todayIncomplete'
-          : !day.future && day.status === 'COMPLETED'
-            ? 'completed'
-            : 'incomplete';
-    return {
-      id: day.date,
-      label: ['일', '월', '화', '수', '목', '금', '토'][
-        new Date(`${day.date}T00:00:00Z`).getUTCDay()
-      ],
-      status,
-    };
-  });
+  const days = toStreakDays(streak.days);
 
   return (
     <StreakRecoveryCompleteModal

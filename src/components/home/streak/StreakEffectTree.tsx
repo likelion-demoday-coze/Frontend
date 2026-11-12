@@ -39,8 +39,8 @@ const StreakEffectTree = ({
         <div className="min-h-0 overflow-hidden">
           <div className="pt-4 lg:pt-0">
             <div className="relative">
-              {/* 사용 가능한 너비가 300px 이상이면 한 줄로 배치 */}
-              <ul className="grid grid-cols-2 gap-2 @[300px]:grid-cols-4">
+              {/* 화면이 좁아져도 4개씩 두 줄로 배치 */}
+              <ul className="grid grid-cols-4 gap-x-3 gap-y-6">
                 {effects.map((effect) => (
                   <StreakEffectItem key={effect.id} effect={effect} />
                 ))}
@@ -48,15 +48,17 @@ const StreakEffectTree = ({
 
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 grid grid-cols-2 gap-2 @[300px]:grid-cols-4"
+                className="pointer-events-none absolute inset-0 grid grid-cols-4 gap-x-3 gap-y-6"
               >
                 {effects.map((effect, index) => (
                   <div key={effect.id} className="relative">
-                    {index < effects.length - 1 && (
-                      <span
-                        className={`absolute -right-2 top-1/2 w-2 -translate-y-1/2 justify-center ${index % 2 === 0 ? 'flex' : 'hidden @[300px]:flex'}`}
-                      >
-                        <img src={right} alt="" className="h-[9px] w-[5px]" />
+                    {index < effects.length - 1 && (index + 1) % 4 !== 0 && (
+                      <span className="absolute top-1/2 -right-3 flex w-3 -translate-y-1/2 justify-center">
+                        <img
+                          src={right}
+                          alt=""
+                          className="h-[clamp(9px,2.6cqi,16px)] w-auto"
+                        />
                       </span>
                     )}
                   </div>
