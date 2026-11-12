@@ -8,13 +8,13 @@ import { useStreakContext } from '../../../hooks/useMyStreak';
 import StreakCard from './StreakCard';
 import SectionTitle from '../../common/SectionTitle';
 import { useStreakRecoveryAction } from '../../../hooks/useStreakRecoveryAction';
+import { STREAK_EFFECT_STEPS } from '../../../constants/streakEffects';
 
-const EFFECT_STEPS = [
-  { id: 'effect-3', requiredDays: 3, name: '동전' },
-  { id: 'effect-7', requiredDays: 7, name: '은화' },
-  { id: 'effect-14', requiredDays: 14, name: '금화' },
-  { id: 'effect-21', requiredDays: 21, name: '시크릿' },
-];
+const EFFECT_STEPS = STREAK_EFFECT_STEPS.map((step) => ({
+  id: `effect-${step.days}`,
+  requiredDays: step.days,
+  name: step.name,
+}));
 
 const StreakSection = () => {
   const navigate = useNavigate();

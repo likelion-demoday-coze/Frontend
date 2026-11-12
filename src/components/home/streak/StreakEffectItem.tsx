@@ -1,16 +1,7 @@
 //이펙트 한 단계의 활성/잠금/일시정지 표시
 import type { StreakEffectData } from '../../../types/streak';
 import qmark from '../../../assets/streak/question_mark.svg';
-import bronze from '../../../assets/home/streak/2nd_bronze.svg';
-import silver from '../../../assets/home/streak/4th_silver.svg';
-import gold from '../../../assets/home/streak/6th_gold.svg';
-import treasure from '../../../assets/home/streak/8th_treasure.svg';
-
-const EFFECT_IMAGES: Record<number, string> = {
-  3: bronze,
-  7: silver,
-  14: gold,
-};
+import { STREAK_EFFECT_IMAGES } from '../../../constants/streakEffects';
 
 interface StreakEffectItemProps {
   // 이펙트 한 단계의 데이터
@@ -19,45 +10,49 @@ interface StreakEffectItemProps {
 
 // 상태별 카드 스타일
 const STATUS_CLASSES = {
-  active: 'border-yellow-45 bg-yellow-05',
+  active: 'border-transparent bg-gray-05',
   upcoming: 'border-dashed border-yellow-45 bg-white',
-  locked: 'border-gray-20 bg-gray-05',
-  paused: 'border-dashed border-gray-20 bg-gray-05',
+  locked: 'border-transparent bg-transparent',
+  paused: 'border-transparent bg-gray-05',
 };
 
 const StreakEffectItem = ({ effect }: StreakEffectItemProps) => {
   const isPaused = effect.status === 'paused';
+  const textClass =
+    effect.status === 'upcoming'
+      ? 'text-yellow-45'
+      : effect.status === 'active' || isPaused
+        ? 'text-gray-40'
+        : 'text-gray-60';
   const image =
     effect.requiredDays === 21
       ? effect.status === 'active' || isPaused
-        ? treasure
+        ? STREAK_EFFECT_IMAGES[21]
         : undefined
-      : EFFECT_IMAGES[effect.requiredDays];
+      : STREAK_EFFECT_IMAGES[effect.requiredDays];
 
   return (
     <li
-      className={`relative flex h-20 w-full min-w-0 flex-col items-center justify-end rounded-lg border px-1 py-1 text-center ${STATUS_CLASSES[effect.status]}`}
+      aria-current={effect.status === 'upcoming' ? 'step' : undefined}
+      className={`flex h-[clamp(88px,27cqi,160px)] w-full min-w-0 flex-col items-center justify-center gap-0.5 rounded-xl border px-1 py-2 text-center ${STATUS_CLASSES[effect.status]}`}
     >
-      {image ? (
-        <img
-          src={image}
-          alt=""
-          className={`absolute top-0 left-1/2 -translate-x-1/2 object-contain ${effect.requiredDays === 21 ? 'size-13' : 'size-11.5'}`}
-        />
-      ) : (
-        <span
-          aria-hidden="true"
-          className="absolute top-2 text-xl font-semibold text-gray-40"
-        >
-          <img src={qmark} alt="?" className="size-6" />
-        </span>
-      )}
+      <div className="flex size-[clamp(40px,14cqi,80px)] shrink-0 items-center justify-center">
+        {image ? (
+          <img src={image} alt="" className="size-full object-contain" />
+        ) : (
+          <img src={qmark} alt="" className="size-[clamp(18px,6cqi,32px)]" />
+        )}
+      </div>
 
-      <span className="relative text-[12px] leading-4 text-gray-40">
+      <span
+        className={`text-[clamp(11px,3.4cqi,22px)] leading-tight ${textClass}`}
+      >
         {isPaused ? '일시정지' : `${effect.requiredDays}일`}
       </span>
 
-      <span className="relative text-[12px] leading-4 text-gray-80">
+      <span
+        className={`text-[clamp(11px,3.4cqi,22px)] leading-tight font-semibold whitespace-nowrap ${effect.status === 'locked' ? 'text-gray-80' : textClass}`}
+      >
         {effect.name}
       </span>
     </li>
