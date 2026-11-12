@@ -10,7 +10,7 @@ import {
   getStreakRecovery,
 } from '../../../api/streak';
 import { ROUTES } from '../../../constants/routes';
-import type { StreakDayStatus } from '../../../types/streak';
+import { toStreakDays } from '../../../utils/streakDays';
 import StreakRecoveryModal from './StreakRecoveryModal';
 import { useStreakRecoveryAction } from '../../../hooks/useStreakRecoveryAction';
 import { useBlockRankingReward } from '../../../hooks/useRankingRewardGate';
@@ -137,26 +137,7 @@ const StreakRecoveryNotification = () => {
         deadlineLabel: state.recovery.expiresAt
           ? `${new Date(state.recovery.expiresAt).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}까지`
           : '-',
-        days: state.streak.days.map((day) => {
-          let status: StreakDayStatus = day.today
-            ? day.status === 'COMPLETED'
-              ? 'todayCompleted'
-              : 'todayIncomplete'
-            : !day.future && day.status === 'COMPLETED'
-              ? 'completed'
-              : 'incomplete';
-          if (day.date === state.recovery.missedDate && !day.today) {
-            if (state.recovery.status === 'RECOVERED') status = 'restored';
-            else if (state.recovery.status !== 'EXPIRED') status = 'pending';
-          }
-          return {
-            id: day.date,
-            label: ['일', '월', '화', '수', '목', '금', '토'][
-              new Date(`${day.date}T00:00:00Z`).getUTCDay()
-            ],
-            status,
-          };
-        }),
+        days: toStreakDays(state.streak.days),
         stageDrop:
           before.threshold > after.threshold
             ? {

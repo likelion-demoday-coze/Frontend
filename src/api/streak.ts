@@ -11,7 +11,11 @@ export interface MyStreak {
   weekEnd: string;
   days: {
     date: string;
-    status: string;
+    status:
+      | 'COMPLETED'
+      | 'INCOMPLETE'
+      | 'RECOVERY_PENDING'
+      | 'RECOVERY_COMPLETED';
     today: boolean;
     future: boolean;
   }[];

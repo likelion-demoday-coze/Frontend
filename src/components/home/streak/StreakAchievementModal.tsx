@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef } from 'react';
-import type { StreakDayData } from '../../../types/streak';
+import { toStreakDays } from '../../../utils/streakDays';
 import { STREAK_EFFECT_STEPS } from '../../../utils/streakAchievement';
 import type { StreakAchievement } from '../../../utils/streakAchievement';
 import catImage from '../../../assets/character/basic_pose_cat.svg';
@@ -35,19 +35,7 @@ const StreakAchievementModal = ({
         )
       )
     : 100;
-  const days: StreakDayData[] = streak.days.map((day) => ({
-    id: day.date,
-    label: ['일', '월', '화', '수', '목', '금', '토'][
-      new Date(`${day.date}T00:00:00Z`).getUTCDay()
-    ],
-    status: day.today
-      ? day.status === 'COMPLETED'
-        ? 'todayCompleted'
-        : 'todayIncomplete'
-      : !day.future && day.status === 'COMPLETED'
-        ? 'completed'
-        : 'incomplete',
-  }));
+  const days = toStreakDays(streak.days);
 
   useEffect(() => {
     const dialog = dialogRef.current;
