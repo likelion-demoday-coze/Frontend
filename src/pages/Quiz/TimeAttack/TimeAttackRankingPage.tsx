@@ -27,7 +27,7 @@ const loadRankingWindow = async (
 
   const startPage = Math.max(
     0,
-    Math.floor((my.rankingPosition - 1 - AROUND) / PAGE_SIZE)
+    Math.floor((my.rankingPosition - 1 - AROUND * 2) / PAGE_SIZE)
   );
   const entries: TimeAttackRankingEntry[] = [];
   let page = startPage;
