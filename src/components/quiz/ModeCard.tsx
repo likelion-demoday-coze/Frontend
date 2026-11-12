@@ -13,6 +13,7 @@ interface ModeCardProps {
   attempt: QuizAttempt;
   isInProgress?: boolean;
   isRecovering?: boolean;
+  footnote?: string | null;
   selected: boolean;
   onSelect: () => void;
 }
@@ -52,6 +53,7 @@ const ModeCard = ({
   attempt,
   isInProgress = false,
   isRecovering = false,
+  footnote = null,
   selected,
   onSelect,
 }: ModeCardProps) => {
@@ -177,6 +179,11 @@ const ModeCard = ({
             ))}
           </div>
         </div>
+        {footnote && (
+          <p className="w-full text-center text-sm leading-4.5 font-medium break-keep text-gray-60">
+            {footnote}
+          </p>
+        )}
       </div>
     </div>
   );
