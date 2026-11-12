@@ -4,9 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from '../../common/Card';
 import { getCharacterStage } from '../../../constants/character';
 import { getStandingCharacterImage } from '../../../utils/character';
+import { STREAK_EFFECT_STEPS } from '../../../constants/streakEffects';
+import footprintBackground from '../../../assets/character/background/footprint_bg.svg';
 import bronzeBackground from '../../../assets/character/background/bronze_bg.svg';
+import featherBackground from '../../../assets/character/background/feather_bg.svg';
 import silverBackground from '../../../assets/character/background/silver_bg.svg';
+import leafBackground from '../../../assets/character/background/leaf_bg.svg';
 import goldBackground from '../../../assets/character/background/gold_bg.svg';
+import flowerBackground from '../../../assets/character/background/flower_bg.svg';
 import diamondBackground from '../../../assets/character/background/diamond_bg.svg';
 import { getMyCharacter } from '../../../api/character';
 import type { MyCharacter } from '../../../types/character';
@@ -20,6 +25,20 @@ import DailyRewardModal from './DailyRewardModal';
 import fishImage from '../../../assets/store/Fish_a.svg';
 
 type ViewStatus = AttendanceStatus | 'loading' | 'error';
+
+const EFFECT_BACKGROUNDS: Record<
+  (typeof STREAK_EFFECT_STEPS)[number]['effect'],
+  string
+> = {
+  PAW_PRINT: footprintBackground,
+  GLOWING_BASE: bronzeBackground,
+  FEATHER: featherBackground,
+  AURA: silverBackground,
+  GINKGO_LEAF: leafBackground,
+  GOLDEN_HALO: goldBackground,
+  GOLDEN_FLOWER: flowerBackground,
+  COIN_BACKGROUND: diamondBackground,
+};
 
 const DailyRewardCard = ({
   onBalanceChange,
@@ -54,18 +73,13 @@ const DailyRewardCard = ({
   const currentStock = character?.currentStock ?? 0;
   const currentStage = getCharacterStage(currentStock);
   const catImage = getStandingCharacterImage(currentStage.stage);
-  // 스트릭으로 달성한 가장 높은 단계의 배경 하나만 적용
-  const streakDays = character?.currentStreak ?? 0;
-  const backgroundImage =
-    streakDays >= 21
-      ? diamondBackground
-      : streakDays >= 14
-        ? goldBackground
-        : streakDays >= 7
-          ? silverBackground
-          : streakDays >= 3
-            ? bronzeBackground
-            : undefined;
+  // 서버가 반환한 활성 효과만 적용하고, 여러 개라면 최고 단계 하나를 표시
+  const currentEffect = [...STREAK_EFFECT_STEPS]
+    .reverse()
+    .find((step) => character?.effects.includes(step.effect));
+  const backgroundImage = currentEffect
+    ? EFFECT_BACKGROUNDS[currentEffect.effect]
+    : undefined;
 
   useEffect(() => {
     let ignore = false;

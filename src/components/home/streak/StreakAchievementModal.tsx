@@ -107,7 +107,7 @@ const StreakAchievementModal = ({
         <StreakWeek days={days} />
       </div>
       {newEffect ? (
-        <div className="mt-5 flex items-center gap-4 rounded-2xl border border-blue-15 px-4 py-4">
+        <div className="mt-5 flex min-h-24 items-center gap-5 rounded-2xl border border-blue-15 px-5 py-4">
           <span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] border border-yellow-45 bg-white p-0.5">
             <img
               src={EFFECT_IMAGES[newEffect.days]}
@@ -115,17 +115,24 @@ const StreakAchievementModal = ({
               className="size-full object-contain"
             />
           </span>
-          <div className="text-xs leading-5">
+          <div className="min-w-0 text-[13px] leading-6">
             <p className="font-semibold text-black">
-              <span className="text-blue-60">NEW!</span> {newEffect.name}
+              <span className="text-blue-60">NEW!</span>{' '}
+              {newEffect.days === 2
+                ? '발도장'
+                : newEffect.days === 21
+                  ? '금은보화'
+                  : newEffect.name}
             </p>
-            <p className="text-gray-60">홈과 모드 선택 화면에서 보여요</p>
+            <p className="break-keep text-gray-60">
+              홈화면에서 확인할 수 있어요
+            </p>
           </div>
         </div>
       ) : nextEffect ? (
-        <div className="mt-5 rounded-2xl border border-blue-15 px-4 py-3">
+        <div className="mt-5 min-h-24 rounded-2xl border border-blue-15 px-4 py-4">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-xs text-gray-60">
+            <p className="text-[13px] break-keep text-gray-60">
               <strong className="font-semibold text-blue-60">
                 다음 효과까지 {nextEffect.days - streak.currentStreak}일
               </strong>{' '}
