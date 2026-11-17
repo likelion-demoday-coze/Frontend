@@ -93,6 +93,7 @@ export const usePaymentResult = (orderNumber: string | null) => {
       } catch (error) {
         if (!active || controller.signal.aborted) return;
         if (!isAxiosError(error) && error instanceof Error) {
+          //자바스크립트의 Error객체인지 확인
           stop();
           update({ phase: 'error', message: error.message });
           return;

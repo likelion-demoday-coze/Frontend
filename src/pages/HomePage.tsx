@@ -23,6 +23,9 @@ import CharacterEvolutionNotification from '../components/home/top/CharacterEvol
 import OpenChatNotification from '../components/home/top/OpenChatNotification';
 import StreakRecoveryCompletion from '../components/home/streak/StreakRecoveryCompletion';
 
+// 오픈채팅 팝업을 다시 표시하려면 true로 변경
+const OPEN_CHAT_POPUP_ENABLED = false;
+
 const HomePage = () => {
   const navigate = useNavigate();
   const { isMobile, updateFishBalance } = useOutletContext<{
@@ -37,6 +40,7 @@ const HomePage = () => {
   );
   const memberId = member?.memberId;
   const isOpenChatPending =
+    OPEN_CHAT_POPUP_ENABLED &&
     isInitialized && memberId !== undefined && openChatFinishedFor !== memberId;
   const finishOpenChat = useCallback(() => {
     if (memberId !== undefined) setOpenChatFinishedFor(memberId);
@@ -145,7 +149,8 @@ const HomePage = () => {
           <CharacterEvolutionNotification />
         </>
       )}
-      {isInitialized &&
+      {OPEN_CHAT_POPUP_ENABLED &&
+        isInitialized &&
         memberId !== undefined &&
         !isTutorialOpen &&
         !isSignupRewardOpen && (
