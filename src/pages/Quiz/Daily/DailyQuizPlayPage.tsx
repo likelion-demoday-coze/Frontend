@@ -352,6 +352,9 @@ const DailyQuizPlayPage = () => {
     result && 'stockIncreasePercent' in result
       ? result.stockIncreasePercent
       : null;
+  //오늘 주가 반영 횟수를 다 쓴 뒤 맞힌 문제는 주가가 그대로라 반영 안 됨으로 표시
+  const isUnreflected =
+    !!result && 'stockIncreasePercent' in result && lastChange === null;
   const categoryLabel = QUIZ_CATEGORY_INFO[session.category].label;
   const progress = isRetry
     ? { current: retryPos + 1, total: retryQueue.length }
@@ -408,6 +411,7 @@ const DailyQuizPlayPage = () => {
               points={stockPoints}
               slots={total - startSlot + 1}
               lastChange={lastChange}
+              muted={isUnreflected}
             />
           )}
         </aside>

@@ -84,7 +84,8 @@ interface AnswerResultBase {
 
 // 처음 풀이 제출 결과
 export interface OriginalAnswerResult extends AnswerResultBase {
-  stockIncreasePercent: number;
+  //오늘 주가 반영 횟수를 다 쓴 뒤 푼 문제는 null
+  stockIncreasePercent: number | null;
   currentStock: number;
   answeredCount: number;
   totalQuestionCount: number;
@@ -107,7 +108,8 @@ export interface QuizResultQuestion {
   explanation: string;
   retryAnswered: boolean;
   retryCorrect: boolean;
-  stockIncreasePercent: number;
+  //오늘 주가 반영 횟수를 다 쓴 뒤 푼 문제는 null
+  stockIncreasePercent: number | null;
   stockAfter: number;
 }
 

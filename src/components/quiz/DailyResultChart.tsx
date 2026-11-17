@@ -2,7 +2,7 @@ import CorrectIcon from '../../assets/quiz/correct.svg?react';
 
 interface DailyResultChartProps {
   startStock: number;
-  points: { stock: number; percent: number; correct: boolean }[];
+  points: { stock: number; percent: number | null; correct: boolean }[];
   correctCount: number;
 }
 
@@ -81,17 +81,22 @@ const DailyResultChart = ({
 
         {points.map((point, index) => {
           const { x, y } = coords[index + 1];
+          const isRise = point.correct && point.percent !== null;
           return (
             <span
               key={index}
               style={{ left: `${x}%`, top: `${y}%` }}
               className={`absolute -translate-x-1/2 -translate-y-[calc(100%+10px)] whitespace-nowrap ${
-                point.correct
+                isRise
                   ? 'rounded-xl bg-blue-60 px-2 py-1 text-xs font-bold text-white lg:px-3 lg:py-2 lg:text-sm'
                   : 'text-sm font-bold text-gray-60 lg:text-base'
               }`}
             >
-              {point.correct ? `▲ ${point.percent.toFixed(1)}%` : '방어'}
+              {isRise
+                ? `▲ ${point.percent?.toFixed(1)}%`
+                : point.correct
+                  ? '학습'
+                  : '방어'}
             </span>
           );
         })}
