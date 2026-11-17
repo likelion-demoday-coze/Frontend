@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Timer } from 'lucide-react';
+import timerIcon from '../../assets/icons/timer.svg';
 import fishImage from '../../assets/store/Fish_a.svg';
 
 const getRemainingTime = () => {
@@ -46,7 +46,7 @@ const RankingRewardBanner = () => {
         </div>
       </div>
       <div className="hidden items-center gap-1 rounded-lg border border-blue-60 bg-white px-3 py-2 text-xs font-semibold text-blue-60 lg:flex">
-        <Timer aria-hidden="true" className="size-4" />
+        <img src={timerIcon} alt="" className="size-5 shrink-0" />
         <span className="tabular-nums">마감까지 {remainingTime}</span>
       </div>
     </div>

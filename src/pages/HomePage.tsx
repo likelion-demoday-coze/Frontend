@@ -23,6 +23,9 @@ import CharacterEvolutionNotification from '../components/home/top/CharacterEvol
 import OpenChatNotification from '../components/home/top/OpenChatNotification';
 import StreakRecoveryCompletion from '../components/home/streak/StreakRecoveryCompletion';
 
+// 기존 안내 API를 패스 판매 안내에 사용
+const PASS_POPUP_ENABLED = true;
+
 const HomePage = () => {
   const navigate = useNavigate();
   const { isMobile, updateFishBalance } = useOutletContext<{
@@ -32,14 +35,17 @@ const HomePage = () => {
   const member = useAuthstore((state) => state.member);
   const isInitialized = useAuthstore((state) => state.isInitialized);
   const [isTutorialDismissed, setIsTutorialDismissed] = useState(false);
-  const [openChatFinishedFor, setOpenChatFinishedFor] = useState<number | null>(
-    null
-  );
+  const [announcementFinishedFor, setAnnouncementFinishedFor] = useState<
+    number | null
+  >(null);
   const memberId = member?.memberId;
-  const isOpenChatPending =
-    isInitialized && memberId !== undefined && openChatFinishedFor !== memberId;
-  const finishOpenChat = useCallback(() => {
-    if (memberId !== undefined) setOpenChatFinishedFor(memberId);
+  const isAnnouncementPending =
+    PASS_POPUP_ENABLED &&
+    isInitialized &&
+    memberId !== undefined &&
+    announcementFinishedFor !== memberId;
+  const finishAnnouncement = useCallback(() => {
+    if (memberId !== undefined) setAnnouncementFinishedFor(memberId);
   }, [memberId]);
 
   const completingRef = useRef(false);
@@ -69,7 +75,7 @@ const HomePage = () => {
     member.signupRewardPopupPending === true;
 
   const popupBlocker = useBlockRankingReward(
-    isOpenChatPending || isTutorialOpen || isSignupRewardOpen
+    isAnnouncementPending || isTutorialOpen || isSignupRewardOpen
   );
 
   const closeSignupReward = async (goToQuiz: boolean) => {
@@ -138,21 +144,23 @@ const HomePage = () => {
       ) : (
         <HeroSection onBalanceChange={updateFishBalance} />
       )}
-      {!isOpenChatPending && !isTutorialOpen && !isSignupRewardOpen && (
+      {!isAnnouncementPending && !isTutorialOpen && !isSignupRewardOpen && (
         <>
           <StreakRecoveryCompletion />
           <StreakRecoveryNotification />
           <CharacterEvolutionNotification />
         </>
       )}
-      {isInitialized &&
+      {PASS_POPUP_ENABLED &&
+        isInitialized &&
         memberId !== undefined &&
         !isTutorialOpen &&
         !isSignupRewardOpen && (
           <OpenChatNotification
             key={memberId}
+            variant="pass"
             blocker={popupBlocker}
-            onFinished={finishOpenChat}
+            onFinished={finishAnnouncement}
           />
         )}
       <div className="mt-12 flex flex-col gap-6 lg:flex-row">
