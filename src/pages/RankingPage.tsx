@@ -11,6 +11,8 @@ import RankList from '../components/ranking/rank/RankList'; //랭킹
 import MyRankPanel from '../components/ranking/MyRankPanel';
 import MyRankModal from '../components/ranking/MyRankModal';
 import RankingRewardBanner from '../components/ranking/RankingRewardBanner';
+import RankingPassBanner from '../components/ranking/RankingPassBanner';
+import type { PassOrCash } from '../types/PassOrCash';
 import { ROUTES } from '../constants/routes';
 import {
   fetchStockPage,
@@ -63,7 +65,10 @@ const RankingPage = () => {
   const c = CONFIG[type];
 
   const navigate = useNavigate();
-  const { isMobile } = useOutletContext<{ isMobile: boolean }>();
+  const { isMobile, passOrCash } = useOutletContext<{
+    isMobile: boolean;
+    passOrCash: PassOrCash;
+  }>();
   const [panelType, setPanelType] = useState<RankingType | null>(null);
   useEffect(() => {
     const query = window.matchMedia('(min-width: 1024px)');
@@ -133,8 +138,9 @@ const RankingPage = () => {
 
       <div className="mt-6 flex flex-col gap-10 lg:mt-10 lg:flex-row lg:gap-18">
         <div className="min-w-0 flex-1">
-          <div className="px-5 lg:px-0">
+          <div className="grid auto-rows-fr px-5 lg:px-0">
             <RankingRewardBanner />
+            <RankingPassBanner pass={passOrCash} />
           </div>
           <div
             ref={scrollRef}

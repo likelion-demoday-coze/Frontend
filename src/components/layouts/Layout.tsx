@@ -147,7 +147,7 @@ const Layout = () => {
               />
             </div>
             <main>
-              <Outlet context={{ ...streakState, updateFishBalance, isMobile }} />
+              <Outlet context={{ ...streakState, updateFishBalance, isMobile, passOrCash }} />
             </main>
           </div>
         </div>
