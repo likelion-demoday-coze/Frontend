@@ -40,8 +40,8 @@ export interface getMeResult {
   signupRewardPopupPending: boolean;
 }
 
-//오픈채팅 모달 노출 상태
-export interface getOpenChatResult {
+// 안내 팝업 노출 상태 (서버 명세 변경 시 응답 필드는 여기서 수정)
+export interface AnnouncementPopupStatus {
   shouldShow: boolean;
   hiddenUntil: string | null;
 }
@@ -117,21 +117,24 @@ export const acknowledgeSignupRewardPopup = async () => {
   return data.result;
 };
 
-//오픈채팅 참여 모달 노출 상태 조회
-export const checkOpenChatModal = async () => {
-  const { data } = await api.get<ApiResponse<getOpenChatResult>>(
-    '/api/v1/members/me/open-chat-modal',
+// 서버의 안내 팝업 API (현재 주소는 오픈채팅 명칭을 유지)
+const ANNOUNCEMENT_POPUP_PATH = '/api/v1/members/me/open-chat-modal';
+
+// 안내 팝업 노출 상태 조회
+export const getAnnouncementPopupStatus = async () => {
+  const { data } = await api.get<ApiResponse<AnnouncementPopupStatus>>(
+    ANNOUNCEMENT_POPUP_PATH,
     { timeout: 15000, suppressNetworkAlert: true }
   );
   if (!data.isSuccess) throw new Error(data.message);
   return data.result;
 };
 
-// 오픈채팅 모달을 오늘 포함 3일간 숨김 ('3일 동안 보지 않기'에서만 호출)
-export const acknowledgeOpenChatModal = async () => {
+// 안내 팝업을 오늘 하루 숨김. 다음 날 00:00부터 다시 노출 가능
+export const hideAnnouncementPopup = async () => {
   if (!hasCsrfToken()) await fetchCsrfToken();
-  const { data } = await api.patch<ApiResponse<getOpenChatResult>>(
-    '/api/v1/members/me/open-chat-modal',
+  const { data } = await api.patch<ApiResponse<AnnouncementPopupStatus>>(
+    ANNOUNCEMENT_POPUP_PATH,
     undefined,
     { timeout: 15000, suppressNetworkAlert: true }
   );

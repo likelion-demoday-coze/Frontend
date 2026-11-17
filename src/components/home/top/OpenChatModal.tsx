@@ -4,7 +4,7 @@ import catImage from '../../../assets/character/basic_pose_cat.svg';
 interface OpenChatModalProps {
   openChatUrl?: string;
   onClose: () => void;
-  onHideForThreeDays: () => void;
+  onHideToday: () => void;
   isSubmitting?: boolean;
   errorMessage?: string;
 }
@@ -12,7 +12,7 @@ interface OpenChatModalProps {
 const OpenChatModal = ({
   openChatUrl = 'https://open.kakao.com/o/giNIFlWi',
   onClose,
-  onHideForThreeDays,
+  onHideToday,
   isSubmitting = false,
   errorMessage = '',
 }: OpenChatModalProps) => {
@@ -117,11 +117,11 @@ const OpenChatModal = ({
       <div className="mt-7 flex items-center border-t border-gray-20 pt-4 text-sm text-gray-40">
         <button
           type="button"
-          onClick={onHideForThreeDays}
+          onClick={onHideToday}
           disabled={isSubmitting}
           className="min-h-10 min-w-0 flex-1 cursor-pointer px-1 hover:text-gray-60 disabled:cursor-wait disabled:opacity-50"
         >
-          {isSubmitting ? '저장 중...' : '3일 동안 보지 않기'}
+          {isSubmitting ? '저장 중...' : '오늘 하루 보지 않기'}
         </button>
         <span aria-hidden="true" className="h-5 w-px shrink-0 bg-gray-20" />
         <button
