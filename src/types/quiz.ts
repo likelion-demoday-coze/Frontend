@@ -44,6 +44,8 @@ export interface QuizSessionSummary {
   startedAt: string;
   expiresAt: string;
   passApplied: boolean;
+  //세션 생성 시 오늘 남은 주가 반영 횟수로 확정 (false면 맞혀도 주가 미반영)
+  stockReflectionApplied: boolean;
 }
 
 export interface ActiveQuizSession extends QuizSessionSummary {
@@ -84,7 +86,8 @@ interface AnswerResultBase {
 
 // 처음 풀이 제출 결과
 export interface OriginalAnswerResult extends AnswerResultBase {
-  stockIncreasePercent: number;
+  //오늘 주가 반영 횟수를 다 쓴 뒤 푼 문제는 null
+  stockIncreasePercent: number | null;
   currentStock: number;
   answeredCount: number;
   totalQuestionCount: number;
@@ -107,7 +110,8 @@ export interface QuizResultQuestion {
   explanation: string;
   retryAnswered: boolean;
   retryCorrect: boolean;
-  stockIncreasePercent: number;
+  //오늘 주가 반영 횟수를 다 쓴 뒤 푼 문제는 null
+  stockIncreasePercent: number | null;
   stockAfter: number;
 }
 
@@ -123,5 +127,6 @@ export interface QuizResult {
   totalProfit: number;
   totalReturnPercent: number;
   currentStreak: number;
+  stockReflectionApplied: boolean;
   questions: QuizResultQuestion[];
 }

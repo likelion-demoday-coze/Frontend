@@ -4,7 +4,7 @@ import dailyQuizTitle from '../../../assets/quiz/title_daily_quiz.svg';
 import CountChip from '../../../components/quiz/CountChip';
 import ReviewList from '../../../components/quiz/ReviewList';
 import { getSessionResult } from '../../../api/dailyQuiz';
-import { toDailyQuizResult } from '../../../constants/routes';
+import { ROUTES, toDailyQuizResult } from '../../../constants/routes';
 import type { QuizResult } from '../../../types/quiz';
 
 const DailyQuizReviewPage = () => {
@@ -40,6 +40,8 @@ const DailyQuizReviewPage = () => {
   }
 
   const total = result.questions.length;
+  //오늘 주가 반영 횟수를 다 쓴 뒤 시작한 세션은 결과 화면을 생략
+  const isUnreflected = !result.stockReflectionApplied;
 
   return (
     <div className="flex flex-1 flex-col items-center bg-white px-4 py-8 lg:py-10">
@@ -60,6 +62,18 @@ const DailyQuizReviewPage = () => {
               {total}문제 중 {result.correctCount}문제를 맞혔어요. 틀린 문제의
               해설을 확인해 보세요.
             </p>
+            {isUnreflected && (
+              <p className="flex items-center gap-1.5 text-sm font-medium break-keep text-red-55">
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 16 16"
+                  className="size-4.5 shrink-0 fill-current"
+                >
+                  <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm.9 12H7.1V7h1.8v5Zm0-6.5H7.1V3.8h1.8v1.7Z" />
+                </svg>
+                오늘 반영 횟수를 다 써서 결과 화면은 생략돼요
+              </p>
+            )}
           </div>
           <div className="flex gap-3 lg:gap-6">
             <CountChip
@@ -90,10 +104,12 @@ const DailyQuizReviewPage = () => {
       {/*TODO: 공통 Button 컴포넌트가 생기면 교체*/}
       <button
         type="button"
-        onClick={() => navigate(toDailyQuizResult(sessionId))}
+        onClick={() =>
+          navigate(isUnreflected ? ROUTES.HOME : toDailyQuizResult(sessionId))
+        }
         className="mt-auto h-14 w-full cursor-pointer rounded-xl bg-blue-60 text-lg font-semibold text-white lg:mt-20 lg:h-16 lg:w-42"
       >
-        NEXT
+        {isUnreflected ? '홈으로' : 'NEXT'}
       </button>
     </div>
   );
