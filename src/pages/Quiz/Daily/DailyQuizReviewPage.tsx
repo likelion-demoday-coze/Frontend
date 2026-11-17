@@ -40,15 +40,8 @@ const DailyQuizReviewPage = () => {
   }
 
   const total = result.questions.length;
-  //오늘 주가 반영 횟수를 다 쓴 뒤 푼 세션은 맞힌 문제도 등락률이 null이라 결과 화면을 생략
-  const correctQuestions = result.questions.filter(
-    (question) => question.correct
-  );
-  const isUnreflected =
-    correctQuestions.length > 0 &&
-    correctQuestions.every(
-      (question) => question.stockIncreasePercent === null
-    );
+  //오늘 주가 반영 횟수를 다 쓴 뒤 시작한 세션은 결과 화면을 생략
+  const isUnreflected = !result.stockReflectionApplied;
 
   return (
     <div className="flex flex-1 flex-col items-center bg-white px-4 py-8 lg:py-10">

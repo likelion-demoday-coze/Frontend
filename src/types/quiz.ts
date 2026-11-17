@@ -44,6 +44,8 @@ export interface QuizSessionSummary {
   startedAt: string;
   expiresAt: string;
   passApplied: boolean;
+  //세션 생성 시 오늘 남은 주가 반영 횟수로 확정 (false면 맞혀도 주가 미반영)
+  stockReflectionApplied: boolean;
 }
 
 export interface ActiveQuizSession extends QuizSessionSummary {
@@ -125,5 +127,6 @@ export interface QuizResult {
   totalProfit: number;
   totalReturnPercent: number;
   currentStreak: number;
+  stockReflectionApplied: boolean;
   questions: QuizResultQuestion[];
 }
