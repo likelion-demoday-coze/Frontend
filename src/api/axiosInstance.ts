@@ -1,5 +1,6 @@
 //공통 통신 설정
 import axios from 'axios';
+import useAuthstore from '../stores/useAuthStore';
 
 declare module 'axios' {
   interface AxiosRequestConfig {
@@ -65,10 +66,11 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    //임시 401에러 처리
+    // 세션이 만료되면 회원 상태도 비워 라우트 가드가 즉시 이동하도록 함
     if (error.response?.status === 401) {
-      console.warn('인증 만료 (401) - 재로그인 필요');
       clearCsrfToken();
+      useAuthstore.getState().clearAuth();
+      return Promise.reject(error);
     }
     //이외 에러 처리
     if (error.response) {
