@@ -4,7 +4,7 @@ import type { QuizOption } from './quiz';
 export interface TimeAttackToday {
   dailyAttemptLimit: number;
   usedAttemptCount: number;
-  remainingAttemptCount: number;
+  remainingAttemptCount: number | null; // null이면 도전 횟수 무제한
 }
 
 export interface TimeAttackSession {

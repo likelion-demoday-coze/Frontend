@@ -125,6 +125,7 @@ const QuizModePage = () => {
     !!selectedMode && !isResumable && !isPass && fishBalance < fishCost;
   const isTimeAttackExhausted =
     selectedMode === 'timeAttack' &&
+    timeAttackAttempt.limit !== null &&
     timeAttackAttempt.used >= timeAttackAttempt.limit;
 
   //정규장은 이어 풀기 또는 카테고리 선택으로, 시간외거래는 바로 시작 팝업
@@ -150,7 +151,11 @@ const QuizModePage = () => {
 
   const timeAttackFootnote = (() => {
     if (!timeAttackRanking) return null;
-    if (timeAttackAttempt.used >= timeAttackAttempt.limit) return null;
+    if (
+      timeAttackAttempt.limit !== null &&
+      timeAttackAttempt.used >= timeAttackAttempt.limit
+    )
+      return null;
     const { top, myPosition, myBest } = timeAttackRanking;
     if (top === null) return '첫 기록의 주인공이 되어보세요!';
     if (myPosition === null) return `오늘 1위 ${top}문제 · 내 기록 없음`;
@@ -237,7 +242,8 @@ const QuizModePage = () => {
       )}
 
       {isTimeAttackConfirmOpen &&
-        timeAttackAttempt.used < timeAttackAttempt.limit && (
+        (timeAttackAttempt.limit === null ||
+          timeAttackAttempt.used < timeAttackAttempt.limit) && (
           <StartConfirmModal
             mode="timeAttack"
             fishCost={TIME_ATTACK_FISH_COST}

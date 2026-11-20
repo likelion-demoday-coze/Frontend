@@ -59,22 +59,22 @@ const MyAssets = ({ assets, isPass }: MyAssetsProps) => {
         {items.map(({ label, image, value, unit, footer }) => (
           <li
             key={label}
-            className="flex w-48 shrink-0 flex-col items-end gap-4 rounded-[20px] border border-gray-20 bg-white p-4 lg:w-auto lg:h-35"
+            className="flex min-w-0 w-48 shrink-0 flex-col items-end gap-4 rounded-[20px] border border-gray-20 bg-white p-4 lg:w-auto lg:min-h-35"
           >
             <div className="flex w-full items-center justify-between gap-2">
               <span className="flex h-15 w-18 shrink-0 items-center justify-center rounded-[20px] bg-blue-05">
                 <img src={image} alt="" className="size-15 object-contain" />
               </span>
-              <div className="flex flex-col items-end gap-3">
-                <span className="text-xs font-semibold whitespace-nowrap text-gray-60 lg:text-sm">
+              <div className="flex min-w-0 flex-1 flex-col items-end gap-3 text-right">
+                <span className="max-w-full text-xs font-semibold break-keep text-gray-60 lg:text-sm">
                   {label}
                 </span>
-                <span className="flex items-end gap-1">
-                  <strong className="text-xl leading-3.5 font-medium text-blue-60 lg:text-2xl">
+                <span className="flex max-w-full flex-wrap items-end justify-end gap-1">
+                  <strong className="min-w-0 max-w-full text-xl leading-tight font-medium text-blue-60 [overflow-wrap:anywhere] lg:text-2xl">
                     {value}
                   </strong>
                   {unit && (
-                    <span className="text-sm leading-3.5 font-medium text-gray-60">
+                    <span className="shrink-0 text-sm leading-tight font-medium text-gray-60">
                       {unit}
                     </span>
                   )}

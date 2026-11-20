@@ -58,7 +58,7 @@ const ModeCard = ({
   onSelect,
 }: ModeCardProps) => {
   const { title, subtitle, description, attemptLabel, icon } = content[mode];
-  const isExhausted = attempt.used >= attempt.limit;
+  const isExhausted = attempt.limit !== null && attempt.used >= attempt.limit;
   //시간외거래는 횟수를 다 쓰면 선택 불가, 정규장은 학습만 가능
   const isDisabled = mode === 'timeAttack' && isExhausted;
   const isFishShort =
@@ -167,17 +167,21 @@ const ModeCard = ({
             <span
               className={`text-sm leading-4.5 ${isExhausted ? 'font-bold text-red-55' : 'font-semibold text-gray-60'}`}
             >
-              {attempt.used}/{attempt.limit}회 사용
+              {attempt.limit === null
+                ? `무제한 · ${attempt.used}회 사용`
+                : `${attempt.used}/${attempt.limit}회 사용`}
             </span>
           </div>
-          <div aria-hidden="true" className="flex gap-1">
-            {Array.from({ length: attempt.limit }, (_, index) => (
-              <span
-                key={index}
-                className={`h-2 w-4.5 rounded-sm ${index < attempt.used ? 'bg-blue-60' : 'bg-gray-10'}`}
-              />
-            ))}
-          </div>
+          {attempt.limit !== null && (
+            <div aria-hidden="true" className="flex gap-1">
+              {Array.from({ length: attempt.limit }, (_, index) => (
+                <span
+                  key={index}
+                  className={`h-2 w-4.5 rounded-sm ${index < attempt.used ? 'bg-blue-60' : 'bg-gray-10'}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
         {footnote && (
           <p className="w-full text-center text-sm leading-4.5 font-medium break-keep text-gray-60">

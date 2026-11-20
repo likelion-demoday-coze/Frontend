@@ -2,6 +2,7 @@ import ReactGA from 'react-ga4';
 
 const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
 const productionHosts = new Set(['coze.kids', 'www.coze.kids']);
+const localHosts = new Set(['localhost', '127.0.0.1', '[::1]', '0.0.0.0']);
 let initialized = false;
 let previousPageLocation = '';
 let currentPageFields = { page_location: '', page_referrer: '' };
@@ -32,7 +33,10 @@ const withoutQuery = (value: string) => {
 export const initializeAnalytics = () => {
   if (!canTrack() || initialized) return;
 
-  previousPageLocation = withoutQuery(document.referrer);
+  const referrer = withoutQuery(document.referrer);
+  const isLocalReferrer =
+    Boolean(referrer) && localHosts.has(new URL(referrer).hostname);
+  previousPageLocation = isLocalReferrer ? '' : referrer;
   currentPageFields = {
     page_location: withoutQuery(window.location.href),
     page_referrer: previousPageLocation,
@@ -41,6 +45,8 @@ export const initializeAnalytics = () => {
     gtagOptions: {
       send_page_view: false,
       ...currentPageFields,
+      // 로컬에서 운영 사이트로 이동한 경우에도 로컬 주소를 유입 출처로 사용하지 않음
+      ...(isLocalReferrer ? { ignore_referrer: true } : {}),
     },
   });
   initialized = true;
