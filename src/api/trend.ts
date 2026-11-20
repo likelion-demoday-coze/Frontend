@@ -32,7 +32,32 @@ export const getEconomicTrendDetail = async (trendId: number) => {
   const request = api
     .get<ApiResponse<EconomicTrendDetail>>(`/api/v1/economic-trends/${trendId}`)
     .then(({ data }) => {
-      if (!data.isSuccess || !data.result || data.result.trendId !== trendId)
+      const detail = data.result;
+      // 모달에서 문자열·배열로 사용하는 필드를 캐시 저장 전에 확인
+      if (
+        !data.isSuccess ||
+        !detail ||
+        detail.trendId !== trendId ||
+        typeof detail.contentDate !== 'string' ||
+        (detail.summary != null && typeof detail.summary !== 'string') ||
+        !Array.isArray(detail.terms) ||
+        !detail.terms.every(
+          (term) =>
+            term !== null &&
+            typeof term === 'object' &&
+            typeof term.name === 'string' &&
+            typeof term.description === 'string'
+        ) ||
+        !Array.isArray(detail.references) ||
+        !detail.references.every(
+          (reference) =>
+            reference !== null &&
+            typeof reference === 'object' &&
+            typeof reference.url === 'string' &&
+            typeof reference.publisher === 'string' &&
+            typeof reference.title === 'string'
+        )
+      )
         throw new Error(
           data.message || '트렌드 상세 정보를 확인하지 못했어요.'
         );
@@ -43,10 +68,10 @@ export const getEconomicTrendDetail = async (trendId: number) => {
         if (oldestId !== undefined) detailCache.delete(oldestId);
       }
       detailCache.set(trendId, {
-        value: data.result,
+        value: detail,
         expiresAt: Date.now() + DETAIL_CACHE_TTL,
       });
-      return data.result;
+      return detail;
     })
     .finally(() => {
       // 실패한 요청은 남기지 않아 기존 다시 시도 버튼으로 재조회 가능
