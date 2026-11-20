@@ -326,7 +326,10 @@ const TimeAttackPlayPage = () => {
               ? [
                   {
                     label: '도전 가능 횟수',
-                    value: `${today.usedAttemptCount}회 사용됨 · 남은 ${today.remainingAttemptCount}회`,
+                    value:
+                      today.remainingAttemptCount === null
+                        ? `${today.usedAttemptCount}회 사용됨 · 무제한`
+                        : `${today.usedAttemptCount}회 사용됨 · 남은 ${today.remainingAttemptCount}회`,
                     tone: 'red' as const,
                   },
                 ]

@@ -33,7 +33,7 @@ const StartConfirmModal = ({
 }: StartConfirmModalProps) => {
   const isDaily = mode === 'daily';
   const categoryInfo = category && QUIZ_CATEGORY_INFO[category];
-  const isExhausted = attempt.used >= attempt.limit;
+  const isExhausted = attempt.limit !== null && attempt.used >= attempt.limit;
   const isFishShort = !isPass && fishBalance < fishCost;
 
   const fishValue = isPass ? (
@@ -49,16 +49,19 @@ const StartConfirmModal = ({
     </span>
   );
 
-  const attemptValue = isExhausted ? (
-    <span className="font-semibold text-red-55">
-      오늘 {attempt.limit}/{attempt.limit}회차 모두 사용
-    </span>
-  ) : (
-    <span className="font-semibold text-blue-60">
-      {isDaily && '반영됨 · '}
-      {attempt.used + 1}/{attempt.limit}회차
-    </span>
-  );
+  const attemptValue =
+    attempt.limit === null ? (
+      <span className="font-semibold text-blue-60">횟수 제한 없음</span>
+    ) : isExhausted ? (
+      <span className="font-semibold text-red-55">
+        오늘 {attempt.limit}/{attempt.limit}회차 모두 사용
+      </span>
+    ) : (
+      <span className="font-semibold text-blue-60">
+        {isDaily && '반영됨 · '}
+        {attempt.used + 1}/{attempt.limit}회차
+      </span>
+    );
 
   //정규장은 반영 횟수를 다 써도 학습만 가능
   const notice =
@@ -67,7 +70,7 @@ const StartConfirmModal = ({
           tone: 'warning',
           text: '⚠ 이번 풀이는 주가에 반영되지 않아요. 학습만 할 수 있어요.',
         }
-      : !isDaily && isPass
+      : !isDaily && isPass && attempt.limit !== null
         ? {
             tone: 'info',
             text: '패스 유저도 시간외거래는 하루 3회차까지만 가능해요.',

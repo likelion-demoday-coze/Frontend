@@ -7,7 +7,7 @@ import { getTimeAttackToday } from '../api/timeAttack';
 
 export interface QuizAttempt {
   used: number;
-  limit: number;
+  limit: number | null; // null이면 횟수 제한 없음
 }
 
 export interface QuizEntryStatus {
@@ -53,7 +53,10 @@ const useQuizEntryStatus = () => {
             : { used: 0, limit: isPass ? 3 : 2 },
           timeAttackAttempt: {
             used: timeAttack.usedAttemptCount,
-            limit: timeAttack.dailyAttemptLimit,
+            limit:
+              timeAttack.remainingAttemptCount === null
+                ? null
+                : timeAttack.dailyAttemptLimit,
           },
           isRecovering: recovery?.status === 'PENDING',
         });
