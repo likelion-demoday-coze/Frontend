@@ -24,7 +24,7 @@ import OpenChatNotification from '../components/home/top/OpenChatNotification';
 import StreakRecoveryCompletion from '../components/home/streak/StreakRecoveryCompletion';
 
 // 기존 안내 API를 패스 판매 안내에 사용
-const PASS_POPUP_ENABLED = true;
+const PASS_POPUP_ENABLED = false;
 
 const HomePage = () => {
   const navigate = useNavigate();
